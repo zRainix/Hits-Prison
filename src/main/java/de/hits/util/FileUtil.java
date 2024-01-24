@@ -1,39 +1,57 @@
 package de.hits.util;
 
+import de.hits.customhoe.CustomHoe;
+import org.bukkit.Bukkit;
+import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.YamlConfiguration;
+
 import java.io.*;
 import java.util.Properties;
 
-public class FileUtil {
+public abstract class FileUtil {
 
-    private String fileName;
-    private Properties properties;
+    private CustomHoe main = CustomHoe.getMain();
+
+    private File file;
+    private YamlConfiguration cfg;
 
     public FileUtil(String fileName) {
-        this.fileName = fileName;
-        this.properties = new Properties();
+        if((!fileName.toLowerCase().endsWith(".yml") && !fileName.toLowerCase().endsWith(".yaml"))) {
+            fileName += ".yml";
+        }
+        this.file = new File(main.getDataFolder(), fileName);
+        this.cfg = YamlConfiguration.loadConfiguration(file);
     }
 
-    public void createSettings(String key, String value) {
-        properties.setProperty(key, value);
-    }
-
-    public void saveSettings() {
-        try(OutputStream output = new FileOutputStream(fileName)) {
-            properties.store(output, null);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    public void createFileIfNotExists() {
+        if(!this.file.exists()) {
+            try {
+                this.file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    public void loadSettings() {
-        try(InputStream input = new FileInputStream(fileName)) {
-            properties.load(input);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+    protected void loadConfig() {
+        try {
+            this.cfg.load(file);
+        } catch (IOException | InvalidConfigurationException e) {
+            e.printStackTrace();
         }
     }
 
-    public String getKey(String key) {
-        return properties.getProperty(key);
+    protected void saveConfig() {
+        try {
+            this.cfg.save(file);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
+    public abstract void init();
+
+    public abstract void save();
+
+    public abstract void load();
 }
