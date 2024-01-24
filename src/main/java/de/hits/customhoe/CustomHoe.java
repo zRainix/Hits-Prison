@@ -4,14 +4,16 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class CustomHoe extends JavaPlugin {
 
+    public static String PREFIX = "§c[§a§lHOE§c] §7";
+
     @Override
     public void onEnable() {
-        // Plugin startup logic
+        System.out.println(PREFIX + "started");
 
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+        System.out.println(PREFIX + "stopped");
     }
 }
