@@ -1,0 +1,4 @@
+name: CustomHoe
+version: '${project.version}'
+main: de.hits.customhoe.CustomHoe
+api-version: 1.20
