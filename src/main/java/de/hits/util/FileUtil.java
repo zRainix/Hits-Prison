@@ -2,6 +2,7 @@ package de.hits.util;
 
 import de.hits.customhoe.CustomHoe;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -54,4 +55,8 @@ public abstract class FileUtil {
     public abstract void save();
 
     public abstract void load();
+
+    protected ConfigurationSection getConfig() {
+        return cfg;
+    }
 }

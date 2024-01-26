@@ -28,13 +28,23 @@ public class FileUtilManager {
 
     public void initAll() {
         // TODO
+        for(FileUtil fileUtil : registeredFileUtils) {
+            fileUtil.createFileIfNotExists();
+            fileUtil.init();
+        }
     }
 
     public void loadAll() {
         // TODO
+        for(FileUtil fileUtil : registeredFileUtils) {
+            fileUtil.load();
+        }
     }
 
     public void saveAll() {
         // TODO
+        for(FileUtil fileutil : registeredFileUtils) {
+            fileutil.save();
+        }
     }
 }
