@@ -23,34 +23,37 @@ public final class CustomHoe extends JavaPlugin {
 
         System.out.println("PLUGIN - §aSTARTED");
 
-        registerUtils(fileUtilManager);
+        registerUtils(this.fileUtilManager);
+        registerSchedulers(this.schedulerManager, 20, 20);
 
-        fileUtilManager.initAll();
+        this.fileUtilManager.initAll();
 
-        CustomScheduler scheduler = new CustomScheduler(20, 20) {
-            int seconds = 0;
 
-            public void run() {
-                Bukkit.broadcastMessage("§aAktuell bei Sekunde §6" + seconds + "§a.");
-                seconds++;
-            }
-        };
-
-        this.schedulerManager.registerScheduler(scheduler);
-        this.customScheduler.start();
     }
 
     private void registerUtils(FileUtilManager fileUtilManager) {
-        // Settings Util
+
         this.settingsUtil = new SettingsUtil();
         fileUtilManager.registerFileUtil(this.settingsUtil);
+    }
+
+    private void registerSchedulers(SchedulerManager schedulerManager, int delay, int period) {
+        this.customScheduler = new CustomScheduler(delay, period) {
+            @Override
+            public void run() {
+                System.out.println("CustomScheduler is running for " + delay + " and " + period);
+            }
+        };
+
+        schedulerManager.registerScheduler(this.customScheduler);
+        this.customScheduler.start();
     }
 
     @Override
     public void onDisable() {
         System.out.println("PLUGIN - §cSTOPPED");
 
-        fileUtilManager.saveAll();
+        this.fileUtilManager.saveAll();
     }
 
     public static CustomHoe getMain() {
