@@ -41,11 +41,11 @@ public final class CustomHoe extends JavaPlugin {
         this.customScheduler = new CustomScheduler(delay, period) {
             @Override
             public void run() {
-                System.out.println("SaveAllUtilFiles will run for ");
+                System.out.println("SaveAllUtilFiles will run for " + delay + " " + period);
             }
         };
 
-        this.saveThoseSchedulers = new SaveThoseSchedulers(this.fileUtilManager, 0, 1*10*20);
+        this.saveThoseSchedulers = new SaveThoseSchedulers(this.fileUtilManager, 0, 1*60*20);
 
         this.schedulerManager.registerScheduler(this.customScheduler);
         schedulerManager.registerScheduler(this.saveThoseSchedulers);
