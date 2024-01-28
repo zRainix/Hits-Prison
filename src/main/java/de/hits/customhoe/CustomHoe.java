@@ -28,7 +28,7 @@ public final class CustomHoe extends JavaPlugin {
         fileUtilManager.initAll();
 
         CustomScheduler scheduler = new CustomScheduler(20, 20) {
-            int seconds = 0;
+            int seconds = 1;
 
             public void run() {
                 Bukkit.broadcastMessage("§aAktuell bei Sekunde §6" + seconds + "§a.");
