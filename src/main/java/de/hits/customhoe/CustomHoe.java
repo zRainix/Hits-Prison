@@ -26,14 +26,12 @@ public final class CustomHoe extends JavaPlugin {
         registerUtils(this.fileUtilManager);
         registerSchedulers(schedulerManager);
 
-        this.fileUtilManager.initAll();
-
-
     }
 
     private void registerUtils(FileUtilManager fileUtilManager) {
         this.settingsUtil = new SettingsUtil();
         this.fileUtilManager.registerFileUtil(this.settingsUtil);
+        this.fileUtilManager.initAll();
     }
 
     private void registerSchedulers(SchedulerManager schedulerManager) {
