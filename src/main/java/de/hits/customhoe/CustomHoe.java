@@ -27,7 +27,7 @@ public final class CustomHoe extends JavaPlugin {
         System.out.println("PLUGIN - §aSTARTED");
 
         registerUtils(this.fileUtilManager);
-        registerSchedulers(this.schedulerManager, 20L, 20L);
+        registerSchedulers(this.schedulerManager, 20L, 100L);
 
     }
 
@@ -45,7 +45,7 @@ public final class CustomHoe extends JavaPlugin {
             }
         };
 
-        this.saveThoseSchedulers = new SaveThoseSchedulers(this.fileUtilManager, 0, 1*60*20);
+        this.saveThoseSchedulers = new SaveThoseSchedulers(this.fileUtilManager);
         System.out.println("save");
 
         this.schedulerManager.registerScheduler(this.customScheduler);
