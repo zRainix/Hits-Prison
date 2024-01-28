@@ -56,7 +56,7 @@ public abstract class FileUtil {
 
     public abstract void load();
 
-    public ConfigurationSection getConfig() {
+    public YamlConfiguration getConfig() {
         return this.cfg;
     }
 }
