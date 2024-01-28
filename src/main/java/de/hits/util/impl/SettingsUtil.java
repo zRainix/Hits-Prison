@@ -20,7 +20,7 @@ public class SettingsUtil extends FileUtil {
 
     @Override
     public void save() {
-        this.cfg.set("prefix", prefix);
+        this.cfg.set("prefix", this.prefix);
         saveConfig();
     }
 
@@ -28,7 +28,7 @@ public class SettingsUtil extends FileUtil {
     public void load() {
         loadConfig();
 
-        prefix = this.cfg.getString("prefix");
+        this.prefix = this.cfg.getString("prefix");
     }
 
     public String getPrefix() {
