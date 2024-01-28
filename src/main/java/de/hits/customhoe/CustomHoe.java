@@ -25,7 +25,6 @@ public final class CustomHoe extends JavaPlugin {
     }
 
     private void registerUtils(FileUtilManager fileUtilManager) {
-        // Settings Util
         this.settingsUtil = new SettingsUtil();
         fileUtilManager.registerFileUtil(this.settingsUtil);
     }

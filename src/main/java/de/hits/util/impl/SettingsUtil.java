@@ -9,7 +9,6 @@ public class SettingsUtil extends FileUtil {
     public SettingsUtil() {
         super("settings.yaml");
 
-        //Datenfelder initialisieren
         prefix = "defaultPrefix";
     }
 
