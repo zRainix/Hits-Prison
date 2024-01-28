@@ -25,12 +25,17 @@ public abstract class FileUtil {
     }
 
     public void createFileIfNotExists() {
-        if(!this.file.exists()) {
-            try {
+        try {
+            File parentDirectory = file.getParentFile();
+            if(parentDirectory != null && !parentDirectory.exists()) {
+                parentDirectory.mkdirs();
+            }
+
+            if(!this.file.exists()) {
                 this.file.createNewFile();
+                }
             } catch (IOException e) {
                 e.printStackTrace();
-            }
         }
     }
 

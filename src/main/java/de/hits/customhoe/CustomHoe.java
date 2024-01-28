@@ -1,8 +1,11 @@
 package de.hits.customhoe;
 
+import de.hits.scheduler.CustomScheduler;
+import de.hits.scheduler.SchedulerManager;
 import de.hits.util.FileUtil;
 import de.hits.util.FileUtilManager;
 import de.hits.util.impl.SettingsUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class CustomHoe extends JavaPlugin {
@@ -10,8 +13,9 @@ public final class CustomHoe extends JavaPlugin {
     private static CustomHoe main;
 
     private FileUtilManager fileUtilManager = new FileUtilManager();
-
     private SettingsUtil settingsUtil;
+
+    private SchedulerManager schedulerManager = new SchedulerManager();
 
     @Override
     public void onEnable() {
@@ -19,14 +23,18 @@ public final class CustomHoe extends JavaPlugin {
 
         System.out.println("PLUGIN - §aSTARTED");
 
-        registerUtils(fileUtilManager);
+        registerUtils(this.fileUtilManager);
+        registerSchedulers(this.schedulerManager);
 
-        this.fileUtilManager.initAll();
     }
 
     private void registerUtils(FileUtilManager fileUtilManager) {
         this.settingsUtil = new SettingsUtil();
         this.fileUtilManager.registerFileUtil(this.settingsUtil);
+        this.fileUtilManager.initAll();
+    }
+
+    private void registerSchedulers(SchedulerManager schedulerManager) {
     }
 
     @Override
