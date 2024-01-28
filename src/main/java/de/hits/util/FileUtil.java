@@ -56,7 +56,7 @@ public abstract class FileUtil {
 
     public abstract void load();
 
-    protected ConfigurationSection getConfig() {
+    public ConfigurationSection getConfig() {
         return cfg;
     }
 }
