@@ -15,32 +15,32 @@ public class FileUtilManager {
     }
 
     public void registerFileUtil(FileUtil fileUtil) {
-        if(!registeredFileUtils.contains(fileUtil)) {
-            registeredFileUtils.add(fileUtil);
+        if(!this.registeredFileUtils.contains(fileUtil)) {
+            this.registeredFileUtils.add(fileUtil);
         }
     }
 
     public void unregisterFileUtil(FileUtil fileUtil) {
-        if(registeredFileUtils.contains(fileUtil)) {
-            registeredFileUtils.remove(fileUtil);
+        if(this.registeredFileUtils.contains(fileUtil)) {
+            this.registeredFileUtils.remove(fileUtil);
         }
     }
 
     public void initAll() {
-        for(FileUtil fileUtil : registeredFileUtils) {
+        for(FileUtil fileUtil : this.registeredFileUtils) {
             fileUtil.createFileIfNotExists();
             fileUtil.init();
         }
     }
 
     public void loadAll() {
-        for(FileUtil fileUtil : registeredFileUtils) {
+        for(FileUtil fileUtil : this.registeredFileUtils) {
             fileUtil.load();
         }
     }
 
     public void saveAll() {
-        for(FileUtil fileutil : registeredFileUtils) {
+        for(FileUtil fileutil : this.registeredFileUtils) {
             fileutil.save();
         }
     }

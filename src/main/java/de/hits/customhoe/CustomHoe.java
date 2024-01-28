@@ -21,19 +21,19 @@ public final class CustomHoe extends JavaPlugin {
 
         registerUtils(fileUtilManager);
 
-        fileUtilManager.initAll();
+        this.fileUtilManager.initAll();
     }
 
     private void registerUtils(FileUtilManager fileUtilManager) {
         this.settingsUtil = new SettingsUtil();
-        fileUtilManager.registerFileUtil(this.settingsUtil);
+        this.fileUtilManager.registerFileUtil(this.settingsUtil);
     }
 
     @Override
     public void onDisable() {
         System.out.println("PLUGIN - §cSTOPPED");
 
-        fileUtilManager.saveAll();
+        this.fileUtilManager.saveAll();
     }
 
     public static CustomHoe getMain() {
@@ -41,6 +41,6 @@ public final class CustomHoe extends JavaPlugin {
     }
 
     public SettingsUtil getSettingsUtil() {
-        return settingsUtil;
+        return this.settingsUtil;
     }
 }

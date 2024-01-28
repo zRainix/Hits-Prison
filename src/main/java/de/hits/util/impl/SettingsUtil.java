@@ -32,7 +32,7 @@ public class SettingsUtil extends FileUtil {
     }
 
     public String getPrefix() {
-        return prefix;
+        return this.prefix;
     }
 
     public void setPrefix(String newprefix) {
