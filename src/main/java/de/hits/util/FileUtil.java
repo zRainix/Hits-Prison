@@ -11,10 +11,10 @@ import java.util.Properties;
 
 public abstract class FileUtil {
 
-    private CustomHoe main = CustomHoe.getMain();
+    protected CustomHoe main = CustomHoe.getMain();
 
-    private File file;
-    private YamlConfiguration cfg;
+    protected File file;
+    protected YamlConfiguration cfg;
 
     public FileUtil(String fileName) {
         if((!fileName.toLowerCase().endsWith(".yml") && !fileName.toLowerCase().endsWith(".yaml"))) {
