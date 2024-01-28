@@ -37,7 +37,7 @@ public final class CustomHoe extends JavaPlugin {
         };
 
         this.schedulerManager.registerScheduler(scheduler);
-        this.customScheduler.start();
+        scheduler.start();
     }
 
     private void registerUtils(FileUtilManager fileUtilManager) {
