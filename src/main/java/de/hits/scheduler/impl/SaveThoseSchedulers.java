@@ -14,6 +14,6 @@ public class SaveThoseSchedulers extends CustomScheduler {
 
     @Override
     public void run() {
-        fileUtilManager.saveAll();
+        this.fileUtilManager.saveAll();
     }
 }
