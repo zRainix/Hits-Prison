@@ -40,7 +40,7 @@ public final class CustomHoe extends JavaPlugin {
             this.saveFileUtilScheduler = new SaveFileUtilScheduler(this.fileUtilManager);
             this.schedulerManager.registerScheduler(this.saveFileUtilScheduler);
             this.saveFileUtilScheduler.start();
-        }, 0, 5*20L);
+        }, 0, 5*60*20L);
     }
 
     @Override

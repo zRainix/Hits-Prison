@@ -7,7 +7,7 @@ public class SaveFileUtilScheduler extends CustomScheduler {
 
     private final FileUtilManager fileUtilManager;
     public SaveFileUtilScheduler(FileUtilManager fileUtilManager) {
-        super(0, 1*5*20L);
+        super(0, 5*20L);
 
         this.fileUtilManager = fileUtilManager;
 
