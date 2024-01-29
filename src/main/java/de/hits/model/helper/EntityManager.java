@@ -18,8 +18,7 @@ public class EntityManager {
     }
 
     public void registerEntities(String packageName) throws IOException {
-        for(ClassPath.ClassInfo classInfo : new ClassFinder(packageName).setAnnotationFilter(Entity.class).findClasses()) {
-            Class<?> clazz = classInfo.load();
+        for(Class<?> clazz : new ClassFinder(packageName).setAnnotationFilter(Entity.class).find()) {
             System.out.println(clazz.getName());
             System.out.println("- table: " + clazz.getAnnotation(Entity.class).table());
         }
