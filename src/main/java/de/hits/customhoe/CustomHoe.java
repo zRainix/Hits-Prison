@@ -17,7 +17,6 @@ public final class CustomHoe extends JavaPlugin {
     private SettingsUtil settingsUtil;
 
     private SchedulerManager schedulerManager = new SchedulerManager();
-    private CustomScheduler customScheduler;
 
     private SaveThoseSchedulers saveThoseSchedulers;
 
@@ -28,7 +27,7 @@ public final class CustomHoe extends JavaPlugin {
         System.out.println("PLUGIN - §aSTARTED");
 
         registerUtils(this.fileUtilManager);
-        registerSchedulers(this.schedulerManager, 20L, 5*60*20L);
+        registerSchedulers(this.schedulerManager);
 
     }
 
@@ -38,21 +37,9 @@ public final class CustomHoe extends JavaPlugin {
         this.fileUtilManager.initAll();
     }
 
-    private void registerSchedulers(SchedulerManager schedulerManager, long delay, long period) {
-        this.customScheduler = new CustomScheduler(delay, period) {
-            @Override
-            public void run() {
-                System.out.println("SaveAllUtilFiles will run for " + delay + " " + period);
-            }
-        };
-
+    private void registerSchedulers(SchedulerManager schedulerManager) {
         this.saveThoseSchedulers = new SaveThoseSchedulers(this.fileUtilManager);
-
-        this.schedulerManager.registerScheduler(this.customScheduler);
-        schedulerManager.registerScheduler(this.saveThoseSchedulers);
-
-        this.customScheduler.start();
-        this.saveThoseSchedulers.start();
+        this.schedulerManager.registerScheduler(this.saveThoseSchedulers);
     }
 
     @Override
