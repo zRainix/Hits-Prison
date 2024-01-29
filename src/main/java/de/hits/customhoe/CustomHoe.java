@@ -40,6 +40,7 @@ public final class CustomHoe extends JavaPlugin {
     private void registerSchedulers(SchedulerManager schedulerManager) {
         this.saveThoseSchedulers = new SaveThoseSchedulers(this.fileUtilManager);
         this.schedulerManager.registerScheduler(this.saveThoseSchedulers);
+        System.out.println("yep yep");
     }
 
     @Override
