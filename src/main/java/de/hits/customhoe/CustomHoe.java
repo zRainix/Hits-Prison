@@ -1,5 +1,6 @@
 package de.hits.customhoe;
 
+import de.hits.model.helper.EntityManager;
 import de.hits.mysql.MySQL;
 import de.hits.scheduler.SchedulerManager;
 import de.hits.scheduler.impl.SaveFileUtilScheduler;
@@ -8,6 +9,7 @@ import de.hits.util.impl.SettingsUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
 import java.sql.ResultSet;
 
 public final class CustomHoe extends JavaPlugin {
@@ -39,6 +41,12 @@ public final class CustomHoe extends JavaPlugin {
         ResultSet resultSet = mySQL.executeQuery(selectQuery);
 
         mySQL.disconnect();
+
+        try {
+            new EntityManager(null).registerEntities("de.hits");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
