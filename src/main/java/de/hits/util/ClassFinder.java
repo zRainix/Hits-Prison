@@ -18,7 +18,6 @@ public class ClassFinder {
     private final String CLASS_FILE_SUFFIX = ".class";
     private final String BAD_PACKAGE_ERROR = "Unable to get resources from path '%s'. Are you sure the package '%s' exists?";
 
-
     private ClassPath classpath;
     private String packageName;
     private Class<? extends Annotation>[] annotations;
@@ -51,6 +50,8 @@ public class ClassFinder {
         for (File file : scannedDir.listFiles()) {
             classes.addAll(find(file, packageName));
         }
+        System.out.println(classes);
+        System.out.println(classes.size());
         return classes.stream().filter(clazz -> filterAnnotations(clazz) && filterTypes(clazz)).collect(Collectors.toList());
     }
 
