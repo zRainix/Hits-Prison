@@ -47,6 +47,11 @@ public final class CustomHoe extends JavaPlugin {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        try {
+            System.out.println(Class.forName("de.hits.model.entity.TestEntity"));
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
+        }
 
     }
 
