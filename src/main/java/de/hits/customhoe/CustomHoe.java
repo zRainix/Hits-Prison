@@ -4,6 +4,7 @@ import de.hits.scheduler.SchedulerManager;
 import de.hits.scheduler.impl.SaveFileUtilScheduler;
 import de.hits.util.FileUtilManager;
 import de.hits.util.impl.SettingsUtil;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 public final class CustomHoe extends JavaPlugin {
@@ -35,9 +36,11 @@ public final class CustomHoe extends JavaPlugin {
     }
 
     private void registerSchedulers(SchedulerManager schedulerManager) {
-        this.saveFileUtilScheduler = new SaveFileUtilScheduler(this.fileUtilManager);
-        this.schedulerManager.registerScheduler(this.saveFileUtilScheduler);
-        this.saveFileUtilScheduler.start();
+        Bukkit.getScheduler().runTaskTimer(CustomHoe.getMain(), () ->  {
+            this.saveFileUtilScheduler = new SaveFileUtilScheduler(this.fileUtilManager);
+            this.schedulerManager.registerScheduler(this.saveFileUtilScheduler);
+            this.saveFileUtilScheduler.start();
+        }, 0, 5*20L);
     }
 
     @Override
