@@ -10,6 +10,8 @@ public class SaveThoseSchedulers extends CustomScheduler {
         super(0, 5*20);
 
         this.fileUtilManager = fileUtilManager;
+
+        System.out.println("yep yep");
     }
 
     @Override
