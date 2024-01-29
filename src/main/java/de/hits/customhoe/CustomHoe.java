@@ -1,11 +1,14 @@
 package de.hits.customhoe;
 
+import de.hits.mysql.MySQL;
 import de.hits.scheduler.SchedulerManager;
 import de.hits.scheduler.impl.SaveFileUtilScheduler;
 import de.hits.util.FileUtilManager;
 import de.hits.util.impl.SettingsUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.sql.ResultSet;
 
 public final class CustomHoe extends JavaPlugin {
 
@@ -26,6 +29,15 @@ public final class CustomHoe extends JavaPlugin {
 
         registerUtils(this.fileUtilManager);
         registerSchedulers(this.schedulerManager);
+
+        this.settingsUtil.load();
+        MySQL mySQL = new MySQL(this.settingsUtil);
+        mySQL.connect();
+
+        String selectQuery = "SELECT * FROM weloverainix;";
+        ResultSet resultSet = mySQL.executeQuery(selectQuery);
+
+        mySQL.disconnect();
 
     }
 
