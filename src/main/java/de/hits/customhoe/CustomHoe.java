@@ -44,7 +44,7 @@ public final class CustomHoe extends JavaPlugin {
 
         try {
             new EntityManager(null).registerEntities("de.hits");
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         try {
