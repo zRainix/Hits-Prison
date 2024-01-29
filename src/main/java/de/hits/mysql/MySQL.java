@@ -18,6 +18,9 @@ public class MySQL {
             String url = "jdbc:mysql://" + this.settingsUtil.getHost() + ":" + this.settingsUtil.getPort() + "/" + this.settingsUtil.getDatabase();
             this.connection = DriverManager.getConnection(url, this.settingsUtil.getUser(), this.settingsUtil.getPassword());
             System.out.println("Connected to the database");
+
+            createTable();
+            System.out.println("created all tables");
         } catch (SQLException error) {
             System.out.println("Error connecting to the database: " + error.getMessage());
         }
