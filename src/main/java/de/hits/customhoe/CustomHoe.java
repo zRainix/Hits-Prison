@@ -1,11 +1,15 @@
 package de.hits.customhoe;
 
+import de.hits.model.helper.EntityManager;
 import de.hits.scheduler.SchedulerManager;
 import de.hits.scheduler.impl.SaveFileUtilScheduler;
+import de.hits.util.AutowiredManager;
 import de.hits.util.FileUtilManager;
 import de.hits.util.impl.SettingsUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.io.IOException;
 
 public final class CustomHoe extends JavaPlugin {
 
@@ -26,6 +30,12 @@ public final class CustomHoe extends JavaPlugin {
 
         registerUtils(this.fileUtilManager);
         registerSchedulers(this.schedulerManager);
+
+        try {
+            new EntityManager(new AutowiredManager()).registerEntities("de.hits");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 
