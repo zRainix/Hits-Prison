@@ -20,7 +20,6 @@ public class MySQL {
             System.out.println("Connected to the database");
 
             createTable();
-            System.out.println("created all tables");
         } catch (SQLException error) {
             System.out.println("Error connecting to the database: " + error.getMessage());
         }
