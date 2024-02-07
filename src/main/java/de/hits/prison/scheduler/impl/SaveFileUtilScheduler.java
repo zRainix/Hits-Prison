@@ -1,7 +1,7 @@
-package de.hits.scheduler.impl;
+package de.hits.prison.scheduler.impl;
 
-import de.hits.scheduler.CustomScheduler;
-import de.hits.util.FileUtilManager;
+import de.hits.prison.scheduler.CustomScheduler;
+import de.hits.prison.util.FileUtilManager;
 
 public class SaveFileUtilScheduler extends CustomScheduler {
 
