@@ -1,4 +1,4 @@
-name: CustomHoe
+name: Hits-Prison
 version: '${project.version}'
-main: de.hits.customhoe.CustomHoe
+main: de.hits.prison.HitsPrison
 api-version: 1.20

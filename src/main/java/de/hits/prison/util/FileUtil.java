@@ -1,17 +1,14 @@
-package de.hits.util;
+package de.hits.prison.util;
 
-import de.hits.customhoe.CustomHoe;
-import org.bukkit.Bukkit;
-import org.bukkit.configuration.ConfigurationSection;
+import de.hits.prison.HitsPrison;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 
 import java.io.*;
-import java.util.Properties;
 
 public abstract class FileUtil {
 
-    protected CustomHoe main = CustomHoe.getMain();
+    protected HitsPrison main = HitsPrison.getMain();
 
     protected File file;
     protected YamlConfiguration cfg;

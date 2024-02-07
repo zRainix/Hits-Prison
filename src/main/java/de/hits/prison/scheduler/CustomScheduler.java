@@ -1,6 +1,6 @@
-package de.hits.scheduler;
+package de.hits.prison.scheduler;
 
-import de.hits.customhoe.CustomHoe;
+import de.hits.prison.HitsPrison;
 import org.bukkit.Bukkit;
 
 public abstract class CustomScheduler implements Runnable {
@@ -19,7 +19,7 @@ public abstract class CustomScheduler implements Runnable {
 
     public void start() {
         if (!isRunning()) {
-            schedulerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(CustomHoe.getMain(), this, delay, period);
+            schedulerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(HitsPrison.getMain(), this, delay, period);
         }
     }
 
