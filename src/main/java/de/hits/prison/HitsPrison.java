@@ -1,5 +1,9 @@
 package de.hits.prison;
 
+import de.hits.prison.model.dao.PlayerCurrencyDao;
+import de.hits.prison.model.dao.PrisonPlayerDao;
+import de.hits.prison.model.entity.PlayerCurrency;
+import de.hits.prison.model.entity.PrisonPlayer;
 import de.hits.prison.model.helper.HibernateUtil;
 import de.hits.prison.scheduler.SchedulerManager;
 import de.hits.prison.scheduler.impl.SaveFileUtilScheduler;
@@ -26,6 +30,10 @@ public final class HitsPrison extends JavaPlugin {
     // Schedulers
     private SaveFileUtilScheduler saveFileUtilScheduler;
 
+    // DAOs
+    private PrisonPlayerDao prisonPlayerDao;
+    private PlayerCurrencyDao playerCurrencyDao;
+
     @Override
     public void onEnable() {
         logger.info("Starting " + this.getName() + "...");
@@ -34,8 +42,7 @@ public final class HitsPrison extends JavaPlugin {
 
         registerUtils(this.fileUtilManager);
         registerSchedulers(this.schedulerManager);
-
-        HibernateUtil.init(this);
+        registerHibernate();
 
         logger.info("Plugin " + this.getName() + ": STARTED");
     }
@@ -55,6 +62,13 @@ public final class HitsPrison extends JavaPlugin {
         this.saveFileUtilScheduler = new SaveFileUtilScheduler(this.fileUtilManager);
         this.saveFileUtilScheduler.start();
         this.schedulerManager.registerScheduler(this.saveFileUtilScheduler);
+    }
+
+    private void registerHibernate() {
+        HibernateUtil.init(this);
+
+        this.prisonPlayerDao = new PrisonPlayerDao();
+        this.playerCurrencyDao = new PlayerCurrencyDao();
     }
 
     @Override

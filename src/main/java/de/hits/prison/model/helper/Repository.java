@@ -36,26 +36,26 @@ public class Repository<T, ID extends Serializable> {
         }
     }
 
-    public void save(T entity) {
+    public T save(T entity) {
         Session session = null;
         try {
             session = sessionFactory.openSession();
             Transaction tx = session.beginTransaction();
-            session.save(entity);
+            session.saveOrUpdate(entity);
             tx.commit();
         } finally {
             if (session != null) {
                 session.close();
             }
         }
+        return entity;
     }
 
-    public void delete(ID id) {
+    public void delete(T entity) {
         Session session = null;
         try {
             session = sessionFactory.openSession();
             Transaction tx = session.beginTransaction();
-            T entity = session.get(entityClass, id);
             if (entity != null) {
                 session.delete(entity);
             }

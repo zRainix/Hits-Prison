@@ -1,9 +1,13 @@
 package de.hits.prison.model.helper;
+
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 
-import javax.persistence.criteria.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,8 +28,6 @@ public class CriteriaQueryBuilder<T> {
         this.root = criteriaQuery.from(entityClass);
         this.predicates = new ArrayList<>();
     }
-
-    // Methoden zur Erstellung von Predicates
 
     public CriteriaQueryBuilder<T> equal(String attributeName, Object value) {
         predicates.add(criteriaBuilder.equal(root.get(attributeName), value));
@@ -87,8 +89,6 @@ public class CriteriaQueryBuilder<T> {
         return this;
     }
 
-    // Zusätzliche Methoden
-
     public CriteriaQueryBuilder<T> and(Predicate... conditions) {
         predicates.add(criteriaBuilder.and(conditions));
         return this;
@@ -115,35 +115,47 @@ public class CriteriaQueryBuilder<T> {
     }
 
     public long count() {
-        CriteriaQuery<Long> count = criteriaBuilder.createQuery(Long.class);
-        count.select(criteriaBuilder.count(count.from(entityClass)));
+        long count = 0;
+        CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
+        countQuery.select(criteriaBuilder.count(countQuery.from(entityClass)));
         try (Session session = sessionFactory.openSession()) {
-            Query<Long> query = session.createQuery(count);
-            return query.uniqueResult();
+            Query<Long> query = session.createQuery(countQuery);
+            count = query.uniqueResult();
+            session.close();
         }
+        return count;
     }
 
     public T findFirst() {
+        T first = null;
         try (Session session = sessionFactory.openSession()) {
             Query<T> query = session.createQuery(criteriaQuery);
             query.setMaxResults(1);
-            return query.uniqueResult();
+            first = query.uniqueResult();
+            session.close();
         }
+        return first;
     }
 
     public boolean exists() {
+        boolean exists = false;
         try (Session session = sessionFactory.openSession()) {
             Query<T> query = session.createQuery(criteriaQuery);
             query.setMaxResults(1);
-            return query.uniqueResult() != null;
+            exists = query.uniqueResult() != null;
+            session.close();
         }
+        return exists;
     }
 
     public List<T> findAll() {
+        List<T> all;
         criteriaQuery.select(root).where(predicates.toArray(new Predicate[0]));
         try (Session session = sessionFactory.openSession()) {
             Query<T> query = session.createQuery(criteriaQuery);
-            return query.getResultList();
+            all = query.getResultList();
+            session.close();
         }
+        return all;
     }
 }
