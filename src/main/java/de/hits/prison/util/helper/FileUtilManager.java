@@ -1,4 +1,4 @@
-package de.hits.prison.util;
+package de.hits.prison.util.helper;
 
 import java.util.ArrayList;
 import java.util.List;

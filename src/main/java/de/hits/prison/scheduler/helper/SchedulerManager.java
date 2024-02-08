@@ -1,4 +1,4 @@
-package de.hits.prison.scheduler;
+package de.hits.prison.scheduler.helper;
 
 import java.util.ArrayList;
 import java.util.List;

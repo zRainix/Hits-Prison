@@ -1,6 +1,6 @@
 package de.hits.prison.util.impl;
 
-import de.hits.prison.util.FileUtil;
+import de.hits.prison.util.helper.FileUtil;
 
 public class SettingsUtil extends FileUtil {
 

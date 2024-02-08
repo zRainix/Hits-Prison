@@ -11,6 +11,7 @@ public class PrisonPlayer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
     String playerName;
+    @Column(unique = true)
     String playerUuid;
     LocalDateTime lastPlayed;
     @OneToOne(mappedBy = "refPrisonPlayer")
