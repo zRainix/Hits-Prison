@@ -13,7 +13,9 @@ public class PrisonPlayer {
     String playerName;
     @Column(unique = true)
     String playerUuid;
-    LocalDateTime lastPlayed;
+    LocalDateTime lastLogin;
+    LocalDateTime lastLogout;
+    Long playtimeInMinutes;
     @OneToOne(mappedBy = "refPrisonPlayer")
     PlayerCurrency playerCurrency;
 
@@ -41,12 +43,28 @@ public class PrisonPlayer {
         this.playerUuid = playerUuid;
     }
 
-    public LocalDateTime getLastPlayed() {
-        return lastPlayed;
+    public LocalDateTime getLastLogin() {
+        return lastLogin;
     }
 
-    public void setLastPlayed(LocalDateTime lastPlayed) {
-        this.lastPlayed = lastPlayed;
+    public void setLastLogin(LocalDateTime lastLogin) {
+        this.lastLogin = lastLogin;
+    }
+
+    public LocalDateTime getLastLogout() {
+        return lastLogout;
+    }
+
+    public void setLastLogout(LocalDateTime lastLogout) {
+        this.lastLogout = lastLogout;
+    }
+
+    public Long getPlaytimeInMinutes() {
+        return playtimeInMinutes;
+    }
+
+    public void setPlaytimeInMinutes(Long playtimeInMinutes) {
+        this.playtimeInMinutes = playtimeInMinutes;
     }
 
     public PlayerCurrency getPlayerCurrency() {

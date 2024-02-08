@@ -13,7 +13,7 @@ public class PrisonPlayerDao extends Repository<PrisonPlayer, Long> {
     }
 
     public PrisonPlayer findByPlayer(OfflinePlayer player) {
-        return finder().equal("playerUuid", player.getUniqueId().toString()).findFirst();
+        return findByUuid(player.getUniqueId());
     }
 
     public PrisonPlayer findByUuid(UUID uuid) {

@@ -169,6 +169,18 @@ public class CriteriaQueryBuilder<T> {
         return exists;
     }
 
+    public List<T> findMax(int max) {
+        List<T> all;
+        criteriaQuery.select(root).where(predicates.toArray(new Predicate[0]));
+        try (Session session = sessionFactory.openSession()) {
+            Query<T> query = session.createQuery(criteriaQuery);
+            query.setMaxResults(max);
+            all = query.getResultList();
+            session.close();
+        }
+        return all;
+    }
+
     public List<T> findAll() {
         List<T> all;
         criteriaQuery.select(root).where(predicates.toArray(new Predicate[0]));

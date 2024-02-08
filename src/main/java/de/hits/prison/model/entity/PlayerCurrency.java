@@ -12,7 +12,7 @@ public class PlayerCurrency {
     Long vulcanicAsh;
     Long obsidianShards;
     @OneToOne
-    @JoinColumn(nullable = false)
+    @JoinColumn(nullable = false, unique = true)
     PrisonPlayer refPrisonPlayer;
 
     public Long getId() {
