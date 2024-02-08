@@ -67,6 +67,10 @@ public class Repository<T, ID extends Serializable> {
         }
     }
 
+    public T findById(ID id) {
+        return finder().equal("id", id).findFirst();
+    }
+
     public CriteriaQueryBuilder<T> finder() {
         return new CriteriaQueryBuilder<>(sessionFactory, entityClass);
     }

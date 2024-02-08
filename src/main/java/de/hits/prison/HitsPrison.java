@@ -129,7 +129,19 @@ public final class HitsPrison extends JavaPlugin {
         return main;
     }
 
+    public FileUtilManager getFileUtilManager() {
+        return this.fileUtilManager;
+    }
+
     public SettingsUtil getSettingsUtil() {
         return this.settingsUtil;
+    }
+
+    public PrisonPlayerDao getPrisonPlayerDao() {
+        return this.prisonPlayerDao;
+    }
+
+    public PlayerCurrencyDao getPlayerCurrencyDao() {
+        return this.playerCurrencyDao;
     }
 }
