@@ -10,12 +10,14 @@ public class PrisonPlayer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
     String playerName;
     @Column(unique = true)
     String playerUuid;
     LocalDateTime lastLogin;
     LocalDateTime lastLogout;
     Long playtimeInMinutes;
+
     @OneToOne(mappedBy = "refPrisonPlayer")
     PlayerCurrency playerCurrency;
 
@@ -70,4 +72,5 @@ public class PrisonPlayer {
     public PlayerCurrency getPlayerCurrency() {
         return playerCurrency;
     }
+
 }

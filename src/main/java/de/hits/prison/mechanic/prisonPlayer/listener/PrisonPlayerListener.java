@@ -11,6 +11,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.logging.Logger;
@@ -51,8 +52,9 @@ public class PrisonPlayerListener implements Listener {
 
         if (playerCurrency == null) {
             playerCurrency = new PlayerCurrency();
-            playerCurrency.setVulcanicAsh(0L);
-            playerCurrency.setObsidianShards(0L);
+            playerCurrency.setVulcanicAsh(new BigInteger("0"));
+            playerCurrency.setObsidianShards(new BigInteger("0"));
+            playerCurrency.setExp(new BigInteger("0"));
             playerCurrency.setRefPrisonPlayer(prisonPlayer);
 
             playerCurrencyDao.save(playerCurrency);

@@ -1,6 +1,7 @@
 package de.hits.prison.model.entity;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 
 @Entity
 @Table(name = "player_currency")
@@ -9,8 +10,11 @@ public class PlayerCurrency {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
-    Long vulcanicAsh;
-    Long obsidianShards;
+
+    BigInteger vulcanicAsh;
+    BigInteger obsidianShards;
+    BigInteger exp;
+
     @OneToOne
     @JoinColumn(nullable = false, unique = true)
     PrisonPlayer refPrisonPlayer;
@@ -23,20 +27,28 @@ public class PlayerCurrency {
         this.id = id;
     }
 
-    public Long getVulcanicAsh() {
+    public BigInteger getVulcanicAsh() {
         return vulcanicAsh;
     }
 
-    public void setVulcanicAsh(Long vulcanicAsh) {
+    public void setVulcanicAsh(BigInteger vulcanicAsh) {
         this.vulcanicAsh = vulcanicAsh;
     }
 
-    public Long getObsidianShards() {
+    public BigInteger getObsidianShards() {
         return obsidianShards;
     }
 
-    public void setObsidianShards(Long obsidianShards) {
+    public void setObsidianShards(BigInteger obsidianShards) {
         this.obsidianShards = obsidianShards;
+    }
+
+    public BigInteger getExp() {
+        return exp;
+    }
+
+    public void setExp(BigInteger exp) {
+        this.exp = exp;
     }
 
     public PrisonPlayer getRefPrisonPlayer() {

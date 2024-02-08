@@ -5,7 +5,6 @@ import de.hits.prison.mechanic.helper.BaseManager;
 import de.hits.prison.mechanic.prisonPlayer.listener.PrisonPlayerListener;
 import de.hits.prison.model.dao.PlayerCurrencyDao;
 import de.hits.prison.model.dao.PrisonPlayerDao;
-import de.hits.prison.model.entity.PlayerCurrency;
 import org.bukkit.plugin.PluginManager;
 
 public class PrisonPlayerManager implements BaseManager {
