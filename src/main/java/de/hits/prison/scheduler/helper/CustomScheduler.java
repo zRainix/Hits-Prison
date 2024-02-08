@@ -1,4 +1,4 @@
-package de.hits.prison.scheduler;
+package de.hits.prison.scheduler.helper;
 
 import de.hits.prison.HitsPrison;
 import org.bukkit.Bukkit;

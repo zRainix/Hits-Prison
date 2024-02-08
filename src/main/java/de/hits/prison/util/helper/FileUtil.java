@@ -1,4 +1,4 @@
-package de.hits.prison.util;
+package de.hits.prison.util.helper;
 
 import de.hits.prison.HitsPrison;
 import org.bukkit.configuration.InvalidConfigurationException;

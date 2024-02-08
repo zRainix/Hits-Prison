@@ -1,7 +1,7 @@
 package de.hits.prison.scheduler.impl;
 
-import de.hits.prison.scheduler.CustomScheduler;
-import de.hits.prison.util.FileUtilManager;
+import de.hits.prison.scheduler.helper.CustomScheduler;
+import de.hits.prison.util.helper.FileUtilManager;
 import org.bukkit.Bukkit;
 
 import java.util.logging.Logger;
