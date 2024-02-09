@@ -2,6 +2,7 @@ package de.hits.prison.mechanic.prisonPlayer;
 
 import de.hits.prison.HitsPrison;
 import de.hits.prison.mechanic.helper.BaseManager;
+import de.hits.prison.mechanic.prisonPlayer.command.VulcanicAshCommand;
 import de.hits.prison.mechanic.prisonPlayer.listener.PrisonPlayerListener;
 import de.hits.prison.model.dao.PlayerCurrencyDao;
 import de.hits.prison.model.dao.PrisonPlayerDao;
@@ -15,6 +16,8 @@ public class PrisonPlayerManager implements BaseManager {
         PlayerCurrencyDao playerCurrencyDao = hitsPrison.getPlayerCurrencyDao();
 
         // Commands:
+        VulcanicAshCommand vulcanicAshCommand = new VulcanicAshCommand(playerCurrencyDao);
+        hitsPrison.getCommand("ash").setExecutor(vulcanicAshCommand);
 
         // Listener:
         PrisonPlayerListener prisonPlayerListener = new PrisonPlayerListener(prisonPlayerDao, playerCurrencyDao);

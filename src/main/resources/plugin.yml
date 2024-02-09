@@ -2,3 +2,9 @@ name: Hits-Prison
 version: '${project.version}'
 main: de.hits.prison.HitsPrison
 api-version: 1.20
+
+commands:
+  ash:
+    description: "Vulanic ash bal"
+    usage: /ash <subCommand> [args]
+    aliases: [vulcanicash]

@@ -16,6 +16,7 @@ public class PrisonPlayer {
     String playerUuid;
     LocalDateTime lastLogin;
     LocalDateTime lastLogout;
+    @Column(nullable = false)
     Long playtimeInMinutes;
 
     @OneToOne(mappedBy = "refPrisonPlayer")
@@ -72,5 +73,7 @@ public class PrisonPlayer {
     public PlayerCurrency getPlayerCurrency() {
         return playerCurrency;
     }
+
+
 
 }

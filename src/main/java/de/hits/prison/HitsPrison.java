@@ -1,7 +1,10 @@
 package de.hits.prison;
 
 import de.hits.prison.command.helper.ArgumentParserRegistry;
+import de.hits.prison.command.helper.SimpleCommand;
 import de.hits.prison.mechanic.helper.BaseManager;
+import de.hits.prison.mechanic.prisonPlayer.PrisonPlayerManager;
+import de.hits.prison.mechanic.prisonPlayer.command.VulcanicAshCommand;
 import de.hits.prison.model.dao.PlayerCurrencyDao;
 import de.hits.prison.model.dao.PrisonPlayerDao;
 import de.hits.prison.model.helper.ClassScanner;
@@ -11,6 +14,7 @@ import de.hits.prison.scheduler.impl.SaveFileUtilScheduler;
 import de.hits.prison.util.helper.FileUtilManager;
 import de.hits.prison.util.impl.SettingsUtil;
 import org.bukkit.Bukkit;
+import org.bukkit.command.TabCompleter;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 

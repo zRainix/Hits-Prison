@@ -11,8 +11,11 @@ public class PlayerCurrency {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
+    @Column(columnDefinition = "DECIMAL(65, 0)")
     BigInteger vulcanicAsh;
+    @Column(columnDefinition = "DECIMAL(65, 0)")
     BigInteger obsidianShards;
+    @Column(columnDefinition = "DECIMAL(65, 0)")
     BigInteger exp;
 
     @OneToOne
