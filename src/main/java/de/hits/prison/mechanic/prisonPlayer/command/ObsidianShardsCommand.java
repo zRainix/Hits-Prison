@@ -29,8 +29,7 @@ public class ObsidianShardsCommand extends AdvancedCommand {
 
     @SubCommand(subCommand = "get")
     public void getTargetShards(Player player,
-                             @CommandParameter(name = "target") Player target,
-                             @CommandParameter(name = "amount") BigInteger amount) {
+                                @CommandParameter(name = "target") Player target) {
 
         PlayerCurrency targetShards = this.playerCurrencyDao.findByPlayer(target);
 
@@ -39,16 +38,13 @@ public class ObsidianShardsCommand extends AdvancedCommand {
             return;
         }
 
-        targetShards.setObsidianShards(amount);
-        playerCurrencyDao.save(targetShards);
-
-        player.sendMessage("§7Shards balance of §6" + target.getName() + " §7set to §6" + amount + "§7.");
+        player.sendMessage("§7Shards balance of §6" + target.getName() + "§7: §6" + targetShards.getObsidianShards() + "§7.");
     }
 
     @SubCommand(subCommand = "set")
     public void setTargetShards(Player player,
-                             @CommandParameter(name = "target") Player target,
-                             @CommandParameter(name = "amount") BigInteger amount) {
+                                @CommandParameter(name = "target") Player target,
+                                @CommandParameter(name = "amount") BigInteger amount) {
 
         PlayerCurrency targetShards = this.playerCurrencyDao.findByPlayer(target);
 
@@ -66,8 +62,8 @@ public class ObsidianShardsCommand extends AdvancedCommand {
 
     @SubCommand(subCommand = "remove")
     public void removeTargetShards(Player player,
-                                @CommandParameter(name = "target") Player target,
-                                @CommandParameter(name = "amount") BigInteger amount) {
+                                   @CommandParameter(name = "target") Player target,
+                                   @CommandParameter(name = "amount") BigInteger amount) {
 
         PlayerCurrency targetShards = this.playerCurrencyDao.findByPlayer(target);
 
@@ -85,8 +81,8 @@ public class ObsidianShardsCommand extends AdvancedCommand {
 
     @SubCommand(subCommand = "add")
     public void addTargetShards(Player player,
-                             @CommandParameter(name = "target") Player target,
-                             @CommandParameter(name = "amount") BigInteger amount) {
+                                @CommandParameter(name = "target") Player target,
+                                @CommandParameter(name = "amount") BigInteger amount) {
 
         PlayerCurrency targetShards = this.playerCurrencyDao.findByPlayer(target);
 
@@ -106,9 +102,9 @@ public class ObsidianShardsCommand extends AdvancedCommand {
     public void getTopTen(Player player) {
         List<PlayerCurrency> topObsidianShards = this.playerCurrencyDao.findTopPlayersByCategory("obsidianShards", 10);
 
-        if(!topObsidianShards.isEmpty())  {
+        if (!topObsidianShards.isEmpty()) {
             player.sendMessage("§7Top §610 §7Players by §6Obsidian Shards§7:");
-            for(int i = 0; i < topObsidianShards.size(); i++) {
+            for (int i = 0; i < topObsidianShards.size(); i++) {
                 PlayerCurrency topPlayer = topObsidianShards.get(i);
                 player.sendMessage("§6" + (i + 1) + ". §7" + topPlayer.getRefPrisonPlayer().getPlayerName() + " - §6Shards: §a" + topPlayer.getObsidianShards());
             }

@@ -29,9 +29,7 @@ public class ExpCommand extends AdvancedCommand {
 
     @SubCommand(subCommand = "get")
     public void getTargetExp(Player player,
-                                @CommandParameter(name = "target") Player target,
-                                @CommandParameter(name = "amount") BigInteger amount) {
-
+                                @CommandParameter(name = "target") Player target) {
         PlayerCurrency targetExp = this.playerCurrencyDao.findByPlayer(target);
 
         if (targetExp == null) {
@@ -39,10 +37,7 @@ public class ExpCommand extends AdvancedCommand {
             return;
         }
 
-        targetExp.setExp(amount);
-        playerCurrencyDao.save(targetExp);
-
-        player.sendMessage("§7Exp balance of §6" + target.getName() + " §7set to §6" + amount + "§7.");
+        player.sendMessage("§7Exp balance of §6" + target.getName() + "§7: §6" + targetExp.getExp() + "§7.");
     }
 
     @SubCommand(subCommand = "set")

@@ -29,8 +29,7 @@ public class VulcanicAshCommand extends AdvancedCommand {
 
     @SubCommand(subCommand = "get")
     public void getTargetAsh(Player player,
-                             @CommandParameter(name = "target") Player target,
-                             @CommandParameter(name = "amount") BigInteger amount) {
+                             @CommandParameter(name = "target") Player target) {
 
         PlayerCurrency targetAsh = this.playerCurrencyDao.findByPlayer(target);
 
@@ -39,10 +38,7 @@ public class VulcanicAshCommand extends AdvancedCommand {
             return;
         }
 
-        targetAsh.setVulcanicAsh(amount);
-        playerCurrencyDao.save(targetAsh);
-
-        player.sendMessage("§7Ash balance of §6" + target.getName() + " §7set to §6" + amount + "§7.");
+        player.sendMessage("§7Ash balance of §6" + target.getName() + "§7: §6" + targetAsh.getVulcanicAsh() + "§7.");
     }
 
     @SubCommand(subCommand = "set")
