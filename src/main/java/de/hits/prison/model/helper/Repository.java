@@ -14,64 +14,55 @@ public class Repository<T, ID extends Serializable> {
 
     private final SessionFactory sessionFactory;
     private final Class<T> entityClass;
+    private Session session;
 
     public Repository(Class<T> entityClass) {
         this.sessionFactory = HibernateUtil.getSessionFactory();
         this.entityClass = entityClass;
+        this.session = this.sessionFactory.openSession();
     }
 
     public List<T> findAll() {
-        Session session = null;
-        try {
-            session = sessionFactory.openSession();
-            CriteriaBuilder builder = session.getCriteriaBuilder();
-            CriteriaQuery<T> criteriaQuery = builder.createQuery(entityClass);
-            Root<T> root = criteriaQuery.from(entityClass);
-            criteriaQuery.select(root);
-            return session.createQuery(criteriaQuery).getResultList();
-        } finally {
-            if (session != null) {
-                session.close();
-            }
-        }
+        checkSession();
+        return finder().findAll();
     }
 
     public T save(T entity) {
-        Session session = null;
-        try {
-            session = sessionFactory.openSession();
-            Transaction tx = session.beginTransaction();
-            session.saveOrUpdate(entity);
-            tx.commit();
-        } finally {
-            if (session != null) {
-                session.close();
-            }
-        }
+        checkSession();
+        Transaction tx = session.beginTransaction();
+        session.saveOrUpdate(entity);
+        tx.commit();
         return entity;
     }
 
     public void delete(T entity) {
-        Session session = null;
-        try {
-            session = sessionFactory.openSession();
-            Transaction tx = session.beginTransaction();
-            if (entity != null) {
-                session.delete(entity);
-            }
-            tx.commit();
-        } finally {
-            if (session != null) {
-                session.close();
-            }
+        checkSession();
+        Transaction tx = session.beginTransaction();
+        if (entity != null) {
+            session.delete(entity);
         }
+        tx.commit();
     }
 
     public T findById(ID id) {
+        checkSession();
         return finder().equal("id", id).findFirst();
     }
 
     public CriteriaQueryBuilder<T> finder() {
-        return new CriteriaQueryBuilder<>(sessionFactory, entityClass);
+        checkSession();
+        return new CriteriaQueryBuilder<>(sessionFactory, entityClass, session);
+    }
+
+    public void checkSession() {
+        if (this.session == null) {
+            this.session = this.sessionFactory.openSession();
+            return;
+        }
+        if(!this.session.isConnected()) {
+            this.session.close();
+            this.session = this.sessionFactory.openSession();
+            return;
+        }
     }
 }

@@ -18,8 +18,9 @@ public class CriteriaQueryBuilder<T> {
     private final Root<T> root;
     private final List<Predicate> predicates;
     private final List<Join<?, ?>> joins;
+    private final Session session;
 
-    public CriteriaQueryBuilder(SessionFactory sessionFactory, Class<T> entityClass) {
+    public CriteriaQueryBuilder(SessionFactory sessionFactory, Class<T> entityClass, Session session) {
         this.sessionFactory = sessionFactory;
         this.entityClass = entityClass;
         this.criteriaBuilder = sessionFactory.getCriteriaBuilder();
@@ -27,6 +28,7 @@ public class CriteriaQueryBuilder<T> {
         this.root = criteriaQuery.from(entityClass);
         this.predicates = new ArrayList<>();
         this.joins = new ArrayList<>();
+        this.session = session;
     }
 
     public CriteriaQueryBuilder<T> join(Function<Root<T>, Join<T, ?>> joinFunction) {
@@ -137,58 +139,43 @@ public class CriteriaQueryBuilder<T> {
         criteriaQuery.select(root).where(predicates.toArray(new Predicate[0]));
         CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
         countQuery.select(criteriaBuilder.count(countQuery.from(entityClass)));
-        try (Session session = sessionFactory.openSession()) {
-            Query<Long> query = session.createQuery(countQuery);
-            count = query.uniqueResult();
-            session.close();
-        }
+        Query<Long> query = session.createQuery(countQuery);
+        count = query.uniqueResult();
         return count;
     }
 
     public T findFirst() {
         T first = null;
         criteriaQuery.select(root).where(predicates.toArray(new Predicate[0]));
-        try (Session session = sessionFactory.openSession()) {
-            Query<T> query = session.createQuery(criteriaQuery);
-            query.setMaxResults(1);
-            first = query.uniqueResult();
-            session.close();
-        }
+        Query<T> query = session.createQuery(criteriaQuery);
+        query.setMaxResults(1);
+        first = query.uniqueResult();
         return first;
     }
 
     public boolean exists() {
         boolean exists = false;
         criteriaQuery.select(root).where(predicates.toArray(new Predicate[0]));
-        try (Session session = sessionFactory.openSession()) {
-            Query<T> query = session.createQuery(criteriaQuery);
-            query.setMaxResults(1);
-            exists = query.uniqueResult() != null;
-            session.close();
-        }
+        Query<T> query = session.createQuery(criteriaQuery);
+        query.setMaxResults(1);
+        exists = query.uniqueResult() != null;
         return exists;
     }
 
     public List<T> findMax(int max) {
         List<T> all;
         criteriaQuery.select(root).where(predicates.toArray(new Predicate[0]));
-        try (Session session = sessionFactory.openSession()) {
-            Query<T> query = session.createQuery(criteriaQuery);
-            query.setMaxResults(max);
-            all = query.getResultList();
-            session.close();
-        }
+        Query<T> query = session.createQuery(criteriaQuery);
+        query.setMaxResults(max);
+        all = query.getResultList();
         return all;
     }
 
     public List<T> findAll() {
         List<T> all;
         criteriaQuery.select(root).where(predicates.toArray(new Predicate[0]));
-        try (Session session = sessionFactory.openSession()) {
-            Query<T> query = session.createQuery(criteriaQuery);
-            all = query.getResultList();
-            session.close();
-        }
+        Query<T> query = session.createQuery(criteriaQuery);
+        all = query.getResultList();
         return all;
     }
 }

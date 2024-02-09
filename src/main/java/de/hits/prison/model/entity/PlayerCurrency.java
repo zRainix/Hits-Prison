@@ -46,11 +46,11 @@ public class PlayerCurrency {
         this.obsidianShards = obsidianShards;
     }
 
-    public BigInteger getEXP() {
+    public BigInteger getExp() {
         return exp;
     }
 
-    public void setEXP(BigInteger exp) {
+    public void setExp(BigInteger exp) {
         this.exp = exp;
     }
 
