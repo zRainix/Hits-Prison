@@ -22,7 +22,7 @@ public class ArgumentParserRegistry {
     }
 
     public static void registerAll(String packageName) throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
-        Set<Class<?>> classes = ClassScanner.getClasses(packageName, ArgumentParser.class);
+        Set<Class<? extends ArgumentParser>> classes = ClassScanner.getClasses(packageName, ArgumentParser.class);
 
         classes = classes.stream().filter(clazz -> clazz.getSuperclass() == ArgumentParser.class).collect(Collectors.toSet());
 

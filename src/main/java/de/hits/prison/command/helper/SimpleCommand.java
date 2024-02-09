@@ -1,7 +1,8 @@
 package de.hits.prison.command.helper;
 
+import de.hits.prison.command.anno.BaseCommand;
 import de.hits.prison.command.anno.CommandParameter;
-import de.hits.prison.command.anno.CustomCommandAnnotation;
+import de.hits.prison.command.anno.SubCommand;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -11,10 +12,12 @@ import org.bukkit.entity.Player;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
-public class SimpleCommand implements CommandExecutor, TabCompleter {
-    private final String commandName;
+public abstract class SimpleCommand implements CommandExecutor, TabCompleter {
+    protected final String commandName;
 
     public SimpleCommand(String commandName) {
         this.commandName = commandName;
@@ -22,21 +25,21 @@ public class SimpleCommand implements CommandExecutor, TabCompleter {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (!command.getName().equalsIgnoreCase(commandName)) {
-            return false;
+        if (!command.getName().equalsIgnoreCase(this.commandName)) {
+            return true;
         }
 
-        Method method = findMethod(this.getClass(), "execute");
+        Method method = findBaseCommand(this.getClass());
         if (method == null) {
-            sender.sendMessage("Command is not defined.");
-            return false;
+            sender.sendMessage("§cCommand is not defined.");
+            return true;
         }
 
-        CustomCommandAnnotation annotation = method.getAnnotation(CustomCommandAnnotation.class);
+        BaseCommand annotation = method.getAnnotation(BaseCommand.class);
         if (annotation != null) {
             if (!hasPermission(sender, annotation.permission()) || !hasOp(sender, annotation.op())) {
-                sender.sendMessage("You don't have permission to execute this command.");
-                return false;
+                sender.sendMessage("§cYou don't have permission to execute this command.");
+                return true;
             }
         }
 
@@ -51,7 +54,7 @@ public class SimpleCommand implements CommandExecutor, TabCompleter {
 
         if (argsLength < minLength || argsLength > maxLength) {
             sender.sendMessage("§cPlease use: §6" + generateCommandHelp(parameters));
-            return false;
+            return true;
         }
 
         try {
@@ -64,10 +67,10 @@ public class SimpleCommand implements CommandExecutor, TabCompleter {
             e.printStackTrace();
         }
 
-        return false;
+        return true;
     }
 
-    private int[] getMinMaxLength(Parameter[] parameters) {
+    protected int[] getMinMaxLength(Parameter[] parameters) {
         int minLen = parameters.length - 1;
         int maxLen = minLen;
 
@@ -100,7 +103,7 @@ public class SimpleCommand implements CommandExecutor, TabCompleter {
             return completion;
         }
 
-        CustomCommandAnnotation annotation = method.getAnnotation(CustomCommandAnnotation.class);
+        BaseCommand annotation = method.getAnnotation(BaseCommand.class);
         if (annotation != null) {
             if (!hasPermission(sender, annotation.permission()) || !hasOp(sender, annotation.op())) {
                 return completion;
@@ -128,15 +131,15 @@ public class SimpleCommand implements CommandExecutor, TabCompleter {
         return argumentParser.tabComplete(sender, args[argLen - 1], parameter);
     }
 
-    private boolean hasPermission(CommandSender sender, String permission) {
+    protected boolean hasPermission(CommandSender sender, String permission) {
         return permission.isEmpty() || sender.hasPermission(permission);
     }
 
-    private boolean hasOp(CommandSender sender, boolean requireOp) {
+    protected boolean hasOp(CommandSender sender, boolean requireOp) {
         return !requireOp || sender.isOp();
     }
 
-    private Method findMethod(Class<?> clazz, String methodName) {
+    protected Method findMethod(Class<?> clazz, String methodName) {
         for (Method method : clazz.getDeclaredMethods()) {
             if (method.getName().equals(methodName)) {
                 return method;
@@ -145,7 +148,24 @@ public class SimpleCommand implements CommandExecutor, TabCompleter {
         return null;
     }
 
-    private Object[] parseArgs(CommandSender sender, Parameter[] parameters, String[] args) throws IllegalArgumentException {
+    protected Method findBaseCommand(Class<?> clazz) {
+        for (Method method : clazz.getDeclaredMethods()) {
+            if (method.isAnnotationPresent(BaseCommand.class)) {
+                return method;
+            }
+        }
+        return null;
+    }
+
+    protected List<Method> findSubCommands(Class<?> clazz) {
+        return Arrays.stream(clazz.getDeclaredMethods()).filter(method -> method.isAnnotationPresent(SubCommand.class)).collect(Collectors.toList());
+    }
+
+    protected Object[] parseArgs(CommandSender sender, Parameter[] parameters, String[] args) throws IllegalArgumentException {
+        return parseArgs(sender, parameters, args, null);
+    }
+
+    protected Object[] parseArgs(CommandSender sender, Parameter[] parameters, String[] args, String subCommand) throws IllegalArgumentException {
         Object[] parsedArgs = new Object[parameters.length];
 
         Parameter executor = parameters[0];
@@ -189,8 +209,17 @@ public class SimpleCommand implements CommandExecutor, TabCompleter {
     }
 
     public String generateCommandHelp(Parameter[] parameters) {
+        return generateCommandHelp(parameters, null);
+    }
+
+    public String generateCommandHelp(Parameter[] parameters, String subCommand) {
         StringBuilder sb = new StringBuilder();
+
         sb.append("/").append(this.commandName);
+
+        if (subCommand != null) {
+            sb.append(" ").append(subCommand);
+        }
 
         for (int i = 1; i < parameters.length; i++) {
             Parameter parameter = parameters[i];
@@ -221,7 +250,7 @@ public class SimpleCommand implements CommandExecutor, TabCompleter {
         return sb.toString();
     }
 
-    private CommandParameter getParameterAnnotation(Parameter parameter) {
+    protected CommandParameter getParameterAnnotation(Parameter parameter) {
         for (Annotation annotation : parameter.getDeclaredAnnotations()) {
             if (annotation instanceof CommandParameter) {
                 return (CommandParameter) annotation;

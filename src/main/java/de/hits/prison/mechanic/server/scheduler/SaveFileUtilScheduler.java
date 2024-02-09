@@ -1,23 +1,28 @@
-package de.hits.prison.scheduler.impl;
+package de.hits.prison.mechanic.server.scheduler;
 
+import de.hits.prison.autowire.anno.Autowired;
+import de.hits.prison.autowire.anno.Component;
+import de.hits.prison.scheduler.anno.Scheduler;
 import de.hits.prison.scheduler.helper.CustomScheduler;
-import de.hits.prison.util.helper.FileUtilManager;
+import de.hits.prison.fileUtil.helper.FileUtilManager;
 import org.bukkit.Bukkit;
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.logging.Logger;
 
+@Component
+@Scheduler
 public class SaveFileUtilScheduler extends CustomScheduler {
 
     private Logger logger = Bukkit.getLogger();
 
-    private final FileUtilManager fileUtilManager;
+    @Autowired
+    private static FileUtilManager fileUtilManager;
 
     private static final long fiveMinutes = 5L * 60L * 20L;
 
-    public SaveFileUtilScheduler(FileUtilManager fileUtilManager) {
+    public SaveFileUtilScheduler() {
         super(fiveMinutes, fiveMinutes);
-
-        this.fileUtilManager = fileUtilManager;
 
         logger.info("Scheduler " + getClass().getSimpleName() + " started.");
     }

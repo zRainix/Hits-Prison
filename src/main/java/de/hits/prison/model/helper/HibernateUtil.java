@@ -1,7 +1,14 @@
 package de.hits.prison.model.helper;
 
 import de.hits.prison.HitsPrison;
-import de.hits.prison.util.impl.SettingsUtil;
+import de.hits.prison.autowire.anno.Autowired;
+import de.hits.prison.autowire.anno.Component;
+import de.hits.prison.autowire.helper.AutowiredManager;
+import de.hits.prison.fileUtil.anno.SettingsFile;
+import de.hits.prison.mechanic.server.fileUtil.SettingsUtil;
+import de.hits.prison.model.anno.Repository;
+import de.hits.prison.scheduler.anno.Scheduler;
+import de.hits.prison.scheduler.helper.CustomScheduler;
 import org.bukkit.Bukkit;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
@@ -10,25 +17,27 @@ import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Environment;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+@Component
 public class HibernateUtil {
 
     static Logger logger = Bukkit.getLogger();
 
     private static SessionFactory sessionFactory;
 
+    @Autowired
+    private static SettingsUtil settingsUtil;
+
     public static void init(HitsPrison main) {
         if (sessionFactory == null) {
-
             logger.info("Initializing hibernate...");
 
             try {
-                SettingsUtil settingsUtil = main.getSettingsUtil();
-
                 logger.info("Setting up hibernate environment variables...");
                 Map<String, String> settings = new HashMap<>();
                 settings.put(Environment.DRIVER, "com.mysql.jdbc.Driver");
@@ -85,6 +94,22 @@ public class HibernateUtil {
             logger.info("Shutting down hibernate...");
             sessionFactory.close();
             logger.info("Hibernate shut down.");
+        }
+    }
+
+    public static void registerAllRepositories(String packageName) {
+        Set<Class<?>> repositories = ClassScanner.getClassesByAnnotation(packageName, Repository.class);
+        try {
+            for (Class<?> repository : repositories) {
+                Repository schedulerAnno = repository.getAnnotation(Repository.class);
+
+                if (repository.getSuperclass() == PrisonRepository.class) {
+                    PrisonRepository prisonRepository = (PrisonRepository) repository.getConstructor().newInstance();
+                    AutowiredManager.register(prisonRepository);
+                }
+            }
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+            logger.severe("Error while initializing managers: " + e.getMessage());
         }
     }
 }

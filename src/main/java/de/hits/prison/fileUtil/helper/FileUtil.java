@@ -1,20 +1,25 @@
-package de.hits.prison.util.helper;
+package de.hits.prison.fileUtil.helper;
 
 import de.hits.prison.HitsPrison;
+import de.hits.prison.autowire.anno.Autowired;
+import de.hits.prison.autowire.anno.Component;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
 
+@Component
 public abstract class FileUtil {
 
-    protected HitsPrison main = HitsPrison.getMain();
+    @Autowired
+    private static HitsPrison main;
 
     protected File file;
     protected YamlConfiguration cfg;
 
     public FileUtil(String fileName) {
-        if((!fileName.toLowerCase().endsWith(".yml") && !fileName.toLowerCase().endsWith(".yaml"))) {
+        if ((!fileName.toLowerCase().endsWith(".yml") && !fileName.toLowerCase().endsWith(".yaml"))) {
             fileName += ".yml";
         }
         this.file = new File(main.getDataFolder(), fileName);
@@ -24,15 +29,15 @@ public abstract class FileUtil {
     public void createFileIfNotExists() {
         try {
             File parentDirectory = file.getParentFile();
-            if(parentDirectory != null && !parentDirectory.exists()) {
+            if (parentDirectory != null && !parentDirectory.exists()) {
                 parentDirectory.mkdirs();
             }
 
-            if(!this.file.exists()) {
+            if (!this.file.exists()) {
                 this.file.createNewFile();
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 

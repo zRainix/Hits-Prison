@@ -2,6 +2,7 @@ package de.hits.prison.model.entity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "prison_player")
@@ -10,12 +11,19 @@ public class PrisonPlayer {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
+
     String playerName;
     @Column(unique = true)
     String playerUuid;
-    LocalDateTime lastPlayed;
+    LocalDateTime lastLogin;
+    LocalDateTime lastLogout;
+    @Column(nullable = false)
+    Long playtimeInMinutes;
+
     @OneToOne(mappedBy = "refPrisonPlayer")
     PlayerCurrency playerCurrency;
+    @OneToMany(mappedBy = "refPrisonPlayer")
+    List<PlayerEnchantment> playerEnchantments;
 
     public Long getId() {
         return id;
@@ -41,15 +49,35 @@ public class PrisonPlayer {
         this.playerUuid = playerUuid;
     }
 
-    public LocalDateTime getLastPlayed() {
-        return lastPlayed;
+    public LocalDateTime getLastLogin() {
+        return lastLogin;
     }
 
-    public void setLastPlayed(LocalDateTime lastPlayed) {
-        this.lastPlayed = lastPlayed;
+    public void setLastLogin(LocalDateTime lastLogin) {
+        this.lastLogin = lastLogin;
+    }
+
+    public LocalDateTime getLastLogout() {
+        return lastLogout;
+    }
+
+    public void setLastLogout(LocalDateTime lastLogout) {
+        this.lastLogout = lastLogout;
+    }
+
+    public Long getPlaytimeInMinutes() {
+        return playtimeInMinutes;
+    }
+
+    public void setPlaytimeInMinutes(Long playtimeInMinutes) {
+        this.playtimeInMinutes = playtimeInMinutes;
     }
 
     public PlayerCurrency getPlayerCurrency() {
         return playerCurrency;
+    }
+
+    public List<PlayerEnchantment> getPlayerEnchantments() {
+        return playerEnchantments;
     }
 }

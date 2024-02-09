@@ -1,7 +1,9 @@
-package de.hits.prison.util.impl;
+package de.hits.prison.mechanic.server.fileUtil;
 
-import de.hits.prison.util.helper.FileUtil;
+import de.hits.prison.fileUtil.anno.SettingsFile;
+import de.hits.prison.fileUtil.helper.FileUtil;
 
+@SettingsFile
 public class SettingsUtil extends FileUtil {
 
     private String prefix;
