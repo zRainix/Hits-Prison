@@ -1,5 +1,7 @@
 package de.hits.prison.mechanic.prisonPlayer.command;
 
+import de.hits.prison.autowire.anno.Autowired;
+import de.hits.prison.autowire.anno.Component;
 import de.hits.prison.command.anno.BaseCommand;
 import de.hits.prison.command.anno.CommandParameter;
 import de.hits.prison.command.anno.SubCommand;
@@ -11,18 +13,19 @@ import org.bukkit.entity.Player;
 import java.math.BigInteger;
 import java.util.List;
 
+@Component
 public class ExpCommand extends AdvancedCommand {
 
-    private final PlayerCurrencyDao playerCurrencyDao;
+    @Autowired
+    private static PlayerCurrencyDao playerCurrencyDao;
 
-    public ExpCommand(PlayerCurrencyDao playerCurrencyDao) {
+    public ExpCommand() {
         super("exp");
-        this.playerCurrencyDao = playerCurrencyDao;
     }
 
     @BaseCommand
     public void getExp(Player player) {
-        PlayerCurrency targetExp = this.playerCurrencyDao.findByPlayer(player);
+        PlayerCurrency targetExp = playerCurrencyDao.findByPlayer(player);
 
         player.sendMessage("§7Exp balance: §6" + targetExp.getExp() + "§7.");
     }
@@ -30,7 +33,7 @@ public class ExpCommand extends AdvancedCommand {
     @SubCommand(subCommand = "get")
     public void getTargetExp(Player player,
                                 @CommandParameter(name = "target") Player target) {
-        PlayerCurrency targetExp = this.playerCurrencyDao.findByPlayer(target);
+        PlayerCurrency targetExp = playerCurrencyDao.findByPlayer(target);
 
         if (targetExp == null) {
             player.sendMessage("§cThis player does not exist!");
@@ -45,7 +48,7 @@ public class ExpCommand extends AdvancedCommand {
                                 @CommandParameter(name = "target") Player target,
                                 @CommandParameter(name = "amount") BigInteger amount) {
 
-        PlayerCurrency targetExp = this.playerCurrencyDao.findByPlayer(target);
+        PlayerCurrency targetExp = playerCurrencyDao.findByPlayer(target);
 
         if (targetExp == null) {
             player.sendMessage("§cThis player does not exist!");
@@ -64,7 +67,7 @@ public class ExpCommand extends AdvancedCommand {
                                    @CommandParameter(name = "target") Player target,
                                    @CommandParameter(name = "amount") BigInteger amount) {
 
-        PlayerCurrency targetExp = this.playerCurrencyDao.findByPlayer(target);
+        PlayerCurrency targetExp = playerCurrencyDao.findByPlayer(target);
 
         if (targetExp == null) {
             player.sendMessage("§cThis player does not exist!");
@@ -83,7 +86,7 @@ public class ExpCommand extends AdvancedCommand {
                                 @CommandParameter(name = "target") Player target,
                                 @CommandParameter(name = "amount") BigInteger amount) {
 
-        PlayerCurrency targetExp = this.playerCurrencyDao.findByPlayer(target);
+        PlayerCurrency targetExp = playerCurrencyDao.findByPlayer(target);
 
         if (targetExp == null) {
             player.sendMessage("§cThis player does not exist!");
@@ -99,7 +102,7 @@ public class ExpCommand extends AdvancedCommand {
 
     @SubCommand(subCommand = "top")
     public void getTopTen(Player player) {
-        List<PlayerCurrency> topExp = this.playerCurrencyDao.findTopPlayersByCategory("exp", 10);
+        List<PlayerCurrency> topExp = playerCurrencyDao.findTopPlayersByCategory("exp", 10);
 
         if(!topExp.isEmpty())  {
             player.sendMessage("§7Top §610 §7Players by §6Exp§7:");

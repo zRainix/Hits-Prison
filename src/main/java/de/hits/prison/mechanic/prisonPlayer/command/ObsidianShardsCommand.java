@@ -1,5 +1,7 @@
 package de.hits.prison.mechanic.prisonPlayer.command;
 
+import de.hits.prison.autowire.anno.Autowired;
+import de.hits.prison.autowire.anno.Component;
 import de.hits.prison.command.anno.BaseCommand;
 import de.hits.prison.command.anno.CommandParameter;
 import de.hits.prison.command.anno.SubCommand;
@@ -11,18 +13,19 @@ import org.bukkit.entity.Player;
 import java.math.BigInteger;
 import java.util.List;
 
+@Component
 public class ObsidianShardsCommand extends AdvancedCommand {
 
-    private final PlayerCurrencyDao playerCurrencyDao;
+    @Autowired
+    private static PlayerCurrencyDao playerCurrencyDao;
 
-    public ObsidianShardsCommand(PlayerCurrencyDao playerCurrencyDao) {
+    public ObsidianShardsCommand() {
         super("shards");
-        this.playerCurrencyDao = playerCurrencyDao;
     }
 
     @BaseCommand
     public void getShards(Player player) {
-        PlayerCurrency targetShards = this.playerCurrencyDao.findByPlayer(player);
+        PlayerCurrency targetShards = playerCurrencyDao.findByPlayer(player);
 
         player.sendMessage("§7Shards balance: §6" + targetShards.getObsidianShards() + "§7.");
     }
@@ -31,7 +34,7 @@ public class ObsidianShardsCommand extends AdvancedCommand {
     public void getTargetShards(Player player,
                                 @CommandParameter(name = "target") Player target) {
 
-        PlayerCurrency targetShards = this.playerCurrencyDao.findByPlayer(target);
+        PlayerCurrency targetShards = playerCurrencyDao.findByPlayer(target);
 
         if (targetShards == null) {
             player.sendMessage("§cThis player does not exist!");
@@ -46,7 +49,7 @@ public class ObsidianShardsCommand extends AdvancedCommand {
                                 @CommandParameter(name = "target") Player target,
                                 @CommandParameter(name = "amount") BigInteger amount) {
 
-        PlayerCurrency targetShards = this.playerCurrencyDao.findByPlayer(target);
+        PlayerCurrency targetShards = playerCurrencyDao.findByPlayer(target);
 
         if (targetShards == null) {
             player.sendMessage("§cThis player does not exist!");
@@ -65,7 +68,7 @@ public class ObsidianShardsCommand extends AdvancedCommand {
                                    @CommandParameter(name = "target") Player target,
                                    @CommandParameter(name = "amount") BigInteger amount) {
 
-        PlayerCurrency targetShards = this.playerCurrencyDao.findByPlayer(target);
+        PlayerCurrency targetShards = playerCurrencyDao.findByPlayer(target);
 
         if (targetShards == null) {
             player.sendMessage("§cThis player does not exist!");
@@ -84,7 +87,7 @@ public class ObsidianShardsCommand extends AdvancedCommand {
                                 @CommandParameter(name = "target") Player target,
                                 @CommandParameter(name = "amount") BigInteger amount) {
 
-        PlayerCurrency targetShards = this.playerCurrencyDao.findByPlayer(target);
+        PlayerCurrency targetShards = playerCurrencyDao.findByPlayer(target);
 
         if (targetShards == null) {
             player.sendMessage("§cThis player does not exist!");
@@ -100,7 +103,7 @@ public class ObsidianShardsCommand extends AdvancedCommand {
 
     @SubCommand(subCommand = "top")
     public void getTopTen(Player player) {
-        List<PlayerCurrency> topObsidianShards = this.playerCurrencyDao.findTopPlayersByCategory("obsidianShards", 10);
+        List<PlayerCurrency> topObsidianShards = playerCurrencyDao.findTopPlayersByCategory("obsidianShards", 10);
 
         if (!topObsidianShards.isEmpty()) {
             player.sendMessage("§7Top §610 §7Players by §6Obsidian Shards§7:");

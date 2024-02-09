@@ -1,5 +1,7 @@
 package de.hits.prison.mechanic.prisonPlayer.listener;
 
+import de.hits.prison.autowire.anno.Autowired;
+import de.hits.prison.autowire.anno.Component;
 import de.hits.prison.model.dao.PlayerCurrencyDao;
 import de.hits.prison.model.dao.PrisonPlayerDao;
 import de.hits.prison.model.entity.PlayerCurrency;
@@ -16,19 +18,17 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.logging.Logger;
 
+@Component
 public class PrisonPlayerListener implements Listener {
 
     private Logger logger = Bukkit.getLogger();
 
-    private PrisonPlayerDao prisonPlayerDao;
-    private PlayerCurrencyDao playerCurrencyDao;
+    @Autowired
+    private static PrisonPlayerDao prisonPlayerDao;
+    @Autowired
+    private static PlayerCurrencyDao playerCurrencyDao;
 
     private static long millisToMinutes = 1000L * 60L;
-
-    public PrisonPlayerListener(PrisonPlayerDao prisonPlayerDao, PlayerCurrencyDao playerCurrencyDao) {
-        this.prisonPlayerDao = prisonPlayerDao;
-        this.playerCurrencyDao = playerCurrencyDao;
-    }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {

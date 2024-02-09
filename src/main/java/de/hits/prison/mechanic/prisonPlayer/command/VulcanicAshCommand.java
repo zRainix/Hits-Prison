@@ -1,5 +1,7 @@
 package de.hits.prison.mechanic.prisonPlayer.command;
 
+import de.hits.prison.autowire.anno.Autowired;
+import de.hits.prison.autowire.anno.Component;
 import de.hits.prison.command.anno.BaseCommand;
 import de.hits.prison.command.anno.CommandParameter;
 import de.hits.prison.command.anno.SubCommand;
@@ -11,18 +13,19 @@ import org.bukkit.entity.Player;
 import java.math.BigInteger;
 import java.util.List;
 
+@Component
 public class VulcanicAshCommand extends AdvancedCommand {
 
-    private final PlayerCurrencyDao playerCurrencyDao;
+    @Autowired
+    private static PlayerCurrencyDao playerCurrencyDao;
 
-    public VulcanicAshCommand(PlayerCurrencyDao playerCurrencyDao) {
+    public VulcanicAshCommand() {
         super("ash");
-        this.playerCurrencyDao = playerCurrencyDao;
     }
 
     @BaseCommand
     public void getAsh(Player player) {
-        PlayerCurrency targetAsh = this.playerCurrencyDao.findByPlayer(player);
+        PlayerCurrency targetAsh = playerCurrencyDao.findByPlayer(player);
 
         player.sendMessage("§7Ash balance: §6" + targetAsh.getVulcanicAsh() + "§7.");
     }
@@ -31,7 +34,7 @@ public class VulcanicAshCommand extends AdvancedCommand {
     public void getTargetAsh(Player player,
                              @CommandParameter(name = "target") Player target) {
 
-        PlayerCurrency targetAsh = this.playerCurrencyDao.findByPlayer(target);
+        PlayerCurrency targetAsh = playerCurrencyDao.findByPlayer(target);
 
         if (targetAsh == null) {
             player.sendMessage("§cThis player does not exist!");
@@ -46,7 +49,7 @@ public class VulcanicAshCommand extends AdvancedCommand {
                              @CommandParameter(name = "target") Player target,
                              @CommandParameter(name = "amount") BigInteger amount) {
 
-        PlayerCurrency targetAsh = this.playerCurrencyDao.findByPlayer(target);
+        PlayerCurrency targetAsh = playerCurrencyDao.findByPlayer(target);
 
         if (targetAsh == null) {
             player.sendMessage("§cThis player does not exist!");
@@ -65,7 +68,7 @@ public class VulcanicAshCommand extends AdvancedCommand {
                                 @CommandParameter(name = "target") Player target,
                                 @CommandParameter(name = "amount") BigInteger amount) {
 
-        PlayerCurrency targetAsh = this.playerCurrencyDao.findByPlayer(target);
+        PlayerCurrency targetAsh = playerCurrencyDao.findByPlayer(target);
 
         if (targetAsh == null) {
             player.sendMessage("§cThis player does not exist!");
@@ -84,7 +87,7 @@ public class VulcanicAshCommand extends AdvancedCommand {
                              @CommandParameter(name = "target") Player target,
                              @CommandParameter(name = "amount") BigInteger amount) {
 
-        PlayerCurrency targetAsh = this.playerCurrencyDao.findByPlayer(target);
+        PlayerCurrency targetAsh = playerCurrencyDao.findByPlayer(target);
 
         if (targetAsh == null) {
             player.sendMessage("§cThis player does not exist!");
@@ -100,7 +103,7 @@ public class VulcanicAshCommand extends AdvancedCommand {
 
     @SubCommand(subCommand = "top")
     public void getTopTen(Player player) {
-        List<PlayerCurrency> topVulcanicAsh = this.playerCurrencyDao.findTopPlayersByCategory("vulcanicAsh", 10);
+        List<PlayerCurrency> topVulcanicAsh = playerCurrencyDao.findTopPlayersByCategory("vulcanicAsh", 10);
 
         if(!topVulcanicAsh.isEmpty())  {
             player.sendMessage("§7Top §610 §7Players by §6Vulcanic Ash§7:");

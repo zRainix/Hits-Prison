@@ -2,6 +2,7 @@ package de.hits.prison.model.entity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "prison_player")
@@ -21,6 +22,8 @@ public class PrisonPlayer {
 
     @OneToOne(mappedBy = "refPrisonPlayer")
     PlayerCurrency playerCurrency;
+    @OneToMany(mappedBy = "refPrisonPlayer")
+    List<PlayerEnchantment> playerEnchantments;
 
     public Long getId() {
         return id;
@@ -74,6 +77,7 @@ public class PrisonPlayer {
         return playerCurrency;
     }
 
-
-
+    public List<PlayerEnchantment> getPlayerEnchantments() {
+        return playerEnchantments;
+    }
 }

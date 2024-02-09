@@ -1,12 +1,14 @@
 package de.hits.prison.model.dao;
 
+import de.hits.prison.model.anno.Repository;
 import de.hits.prison.model.entity.PrisonPlayer;
-import de.hits.prison.model.helper.Repository;
+import de.hits.prison.model.helper.PrisonRepository;
 import org.bukkit.OfflinePlayer;
 
 import java.util.UUID;
 
-public class PrisonPlayerDao extends Repository<PrisonPlayer, Long> {
+@Repository
+public class PrisonPlayerDao extends PrisonRepository<PrisonPlayer, Long> {
 
     public PrisonPlayerDao() {
         super(PrisonPlayer.class);

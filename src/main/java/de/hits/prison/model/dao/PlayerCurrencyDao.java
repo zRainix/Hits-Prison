@@ -1,14 +1,16 @@
 package de.hits.prison.model.dao;
 
+import de.hits.prison.model.anno.Repository;
 import de.hits.prison.model.entity.PlayerCurrency;
 import de.hits.prison.model.helper.CriteriaQueryBuilder;
-import de.hits.prison.model.helper.Repository;
+import de.hits.prison.model.helper.PrisonRepository;
 import org.bukkit.OfflinePlayer;
 
 import java.util.List;
 import java.util.UUID;
 
-public class PlayerCurrencyDao extends Repository<PlayerCurrency, Long> {
+@Repository
+public class PlayerCurrencyDao extends PrisonRepository<PlayerCurrency, Long> {
 
     public PlayerCurrencyDao() {
         super(PlayerCurrency.class);

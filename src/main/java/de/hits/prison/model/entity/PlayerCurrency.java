@@ -18,7 +18,7 @@ public class PlayerCurrency {
     @Column(columnDefinition = "DECIMAL(65, 0)")
     BigInteger exp;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(nullable = false, unique = true)
     PrisonPlayer refPrisonPlayer;
 

@@ -1,9 +1,15 @@
 package de.hits.prison.scheduler.helper;
 
 import de.hits.prison.HitsPrison;
+import de.hits.prison.autowire.anno.Autowired;
+import de.hits.prison.autowire.anno.Component;
 import org.bukkit.Bukkit;
 
+@Component
 public abstract class CustomScheduler implements Runnable {
+
+    @Autowired
+    private static HitsPrison main;
 
     private int schedulerId = -1;
     private long delay, period;
@@ -19,7 +25,7 @@ public abstract class CustomScheduler implements Runnable {
 
     public void start() {
         if (!isRunning()) {
-            schedulerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(HitsPrison.getMain(), this, delay, period);
+            schedulerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(main, this, delay, period);
         }
     }
 
