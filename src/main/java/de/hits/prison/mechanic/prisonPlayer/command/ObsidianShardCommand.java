@@ -10,12 +10,12 @@ import org.bukkit.entity.Player;
 import java.math.BigInteger;
 import java.util.List;
 
-public class VulcanicAshCommand extends SimpleCommand {
+public class ObsidianShardCommand extends SimpleCommand {
 
     private final PlayerCurrencyDao playerCurrencyDao;
 
-    public VulcanicAshCommand(PlayerCurrencyDao playerCurrencyDao) {
-        super("ash");
+    public ObsidianShardCommand(PlayerCurrencyDao playerCurrencyDao) {
+        super("shards");
         this.playerCurrencyDao = playerCurrencyDao;
     }
 
@@ -28,57 +28,57 @@ public class VulcanicAshCommand extends SimpleCommand {
             target = sender;
         }
 
-        PlayerCurrency targetAsh = this.playerCurrencyDao.findByPlayer(target);
+        PlayerCurrency targetShards = this.playerCurrencyDao.findByPlayer(target);
         Player player = (Player) sender;
 
-        if(targetAsh == null) {
+        if(targetShards == null) {
             player.sendMessage("§7This player does not exist!");
             return;
         }
 
         if(subCommand == null || subCommand.isEmpty()) {
-            player.sendMessage("§7Ash balance: §c" + targetAsh.getVulcanicAsh());
+            player.sendMessage("§7shards balance: §c" + targetShards.getObsidianShards());
         } else {
             switch(subCommand.toLowerCase()) {
 
                 case "set":
                     if(amount != null) {
-                        targetAsh.setVulcanicAsh(amount);
-                        playerCurrencyDao.save(targetAsh);
-                        player.sendMessage("§7Ash balance of §c" + target.getName() + " §7set to §c" + amount);
+                        targetShards.setObsidianShards(amount);
+                        playerCurrencyDao.save(targetShards);
+                        player.sendMessage("§7shards balance of §c" + target.getName() + " §7set to §c" + amount);
                     } else {
-                        player.sendMessage("Usage: /ash set <Player> <amount>");
+                        player.sendMessage("Usage: /shards set <Player> <amount>");
                     }
                     break;
 
                 case "add":
                     if(amount != null) {
-                        targetAsh.setVulcanicAsh(targetAsh.getVulcanicAsh().add(amount));
-                        playerCurrencyDao.save(targetAsh);
-                        player.sendMessage("§7Ash balance of §c" + target.getName() + " §7was added §c" + amount);
+                        targetShards.setObsidianShards(targetShards.getObsidianShards().add(amount));
+                        playerCurrencyDao.save(targetShards);
+                        player.sendMessage("§7shards balance of §c" + target.getName() + " §7was added §c" + amount);
                     } else {
-                        player.sendMessage("Usage: /ash add <Player> <amount>");
+                        player.sendMessage("Usage: /shards add <Player> <amount>");
                     }
                     break;
 
                 case "remove":
                     if(amount != null) {
-                        targetAsh.setVulcanicAsh(targetAsh.getVulcanicAsh().subtract(amount));
-                        playerCurrencyDao.save(targetAsh);
-                        player.sendMessage("§7Ash balance of §c" + target.getName() + " §7was removed §c" + amount);
+                        targetShards.setObsidianShards(targetShards.getObsidianShards().subtract(amount));
+                        playerCurrencyDao.save(targetShards);
+                        player.sendMessage("§7shards balance of §c" + target.getName() + " §7was removed §c" + amount);
                     } else {
-                        player.sendMessage("Usage: /ash remove <Player> <amount>");
+                        player.sendMessage("Usage: /shards remove <Player> <amount>");
                     }
                     break;
 
                 case "top":
-                    List<PlayerCurrency> topEXPPlayers = playerCurrencyDao.findTopPlayersByCategory("vulcanicAsh", 10);
+                    List<PlayerCurrency> topEXPPlayers = playerCurrencyDao.findTopPlayersByCategory("obsidianShards", 10);
 
                     if(!topEXPPlayers.isEmpty())  {
-                        player.sendMessage("§cTop 10 Players by Ash");
+                        player.sendMessage("§cTop 10 Players by Obsidian Shards");
                         for(int i = 0; i < topEXPPlayers.size(); i++) {
                             PlayerCurrency topPlayer = topEXPPlayers.get(i);
-                            player.sendMessage("§c" + (i + 1) + ". " + topPlayer.getRefPrisonPlayer().getPlayerName() + " - Ash: " + topPlayer.getVulcanicAsh());
+                            player.sendMessage("§c" + (i + 1) + ". " + topPlayer.getRefPrisonPlayer().getPlayerName() + " - Shards: " + topPlayer.getObsidianShards());
                         }
                     } else {
                         player.sendMessage("§cNo more players found!");
@@ -88,8 +88,8 @@ public class VulcanicAshCommand extends SimpleCommand {
                 default:
                     Player specifiedPlayer = Bukkit.getPlayer(subCommand);
                     if (specifiedPlayer != null) {
-                        PlayerCurrency specifiedPlayerAsh = this.playerCurrencyDao.findByPlayer(specifiedPlayer);
-                        player.sendMessage("§7Ash balance of §c" + specifiedPlayer.getName() + ": §c" + specifiedPlayerAsh.getVulcanicAsh());
+                        PlayerCurrency specifiedPlayershards = this.playerCurrencyDao.findByPlayer(specifiedPlayer);
+                        player.sendMessage("§7shards balance of §c" + specifiedPlayer.getName() + ": §c" + specifiedPlayershards.getObsidianShards());
                     } else {
 
                         player.sendMessage("§cUnknown subCommand: " + subCommand + " §crefer to standards <set|add|remove>");

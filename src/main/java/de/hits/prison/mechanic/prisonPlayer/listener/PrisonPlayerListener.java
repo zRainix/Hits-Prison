@@ -54,7 +54,7 @@ public class PrisonPlayerListener implements Listener {
             playerCurrency = new PlayerCurrency();
             playerCurrency.setVulcanicAsh(new BigInteger("0"));
             playerCurrency.setObsidianShards(new BigInteger("0"));
-            playerCurrency.setExp(new BigInteger("0"));
+            playerCurrency.setEXP(new BigInteger("0"));
             playerCurrency.setRefPrisonPlayer(prisonPlayer);
 
             playerCurrencyDao.save(playerCurrency);

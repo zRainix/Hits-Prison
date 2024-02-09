@@ -2,6 +2,8 @@ package de.hits.prison.mechanic.prisonPlayer;
 
 import de.hits.prison.HitsPrison;
 import de.hits.prison.mechanic.helper.BaseManager;
+import de.hits.prison.mechanic.prisonPlayer.command.EXPCommand;
+import de.hits.prison.mechanic.prisonPlayer.command.ObsidianShardCommand;
 import de.hits.prison.mechanic.prisonPlayer.command.VulcanicAshCommand;
 import de.hits.prison.mechanic.prisonPlayer.listener.PrisonPlayerListener;
 import de.hits.prison.model.dao.PlayerCurrencyDao;
@@ -18,6 +20,12 @@ public class PrisonPlayerManager implements BaseManager {
         // Commands:
         VulcanicAshCommand vulcanicAshCommand = new VulcanicAshCommand(playerCurrencyDao);
         hitsPrison.getCommand("ash").setExecutor(vulcanicAshCommand);
+
+        ObsidianShardCommand obsidianShardCommand = new ObsidianShardCommand(playerCurrencyDao);
+        hitsPrison.getCommand("shards").setExecutor(obsidianShardCommand);
+
+        EXPCommand expCommand = new EXPCommand(playerCurrencyDao);
+        hitsPrison.getCommand("exp").setExecutor(expCommand);
 
         // Listener:
         PrisonPlayerListener prisonPlayerListener = new PrisonPlayerListener(prisonPlayerDao, playerCurrencyDao);

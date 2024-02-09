@@ -28,14 +28,14 @@ public class SimpleCommand implements CommandExecutor, TabCompleter {
 
         Method method = findMethod(this.getClass(), "execute");
         if (method == null) {
-            sender.sendMessage("Command is not defined.");
+            sender.sendMessage("§cCommand is not defined.");
             return false;
         }
 
         CustomCommandAnnotation annotation = method.getAnnotation(CustomCommandAnnotation.class);
         if (annotation != null) {
             if (!hasPermission(sender, annotation.permission()) || !hasOp(sender, annotation.op())) {
-                sender.sendMessage("You don't have permission to execute this command.");
+                sender.sendMessage("§cYou don't have permission to execute this command.");
                 return false;
             }
         }

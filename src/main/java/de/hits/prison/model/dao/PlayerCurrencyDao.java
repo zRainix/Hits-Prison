@@ -1,9 +1,11 @@
 package de.hits.prison.model.dao;
 
 import de.hits.prison.model.entity.PlayerCurrency;
+import de.hits.prison.model.helper.CriteriaQueryBuilder;
 import de.hits.prison.model.helper.Repository;
 import org.bukkit.OfflinePlayer;
 
+import java.util.List;
 import java.util.UUID;
 
 public class PlayerCurrencyDao extends Repository<PlayerCurrency, Long> {
@@ -29,4 +31,14 @@ public class PlayerCurrencyDao extends Repository<PlayerCurrency, Long> {
                 .equal("refPrisonPlayer.playerName", name)
                 .findFirst();
     }
+
+    public List<PlayerCurrency> findTopPlayersByCategory(String category, int max) {
+        CriteriaQueryBuilder<PlayerCurrency> queryBuilder = finder();
+        List<PlayerCurrency> topPlayers = queryBuilder
+                .orderDesc(category)
+                .findMax(max);
+
+        return topPlayers;
+    }
+
 }
