@@ -34,13 +34,4 @@ public class PlayerCurrencyDao extends PrisonRepository<PlayerCurrency, Long> {
                 .findFirst();
     }
 
-    public List<PlayerCurrency> findTopPlayersByCategory(String category, int max) {
-        CriteriaQueryBuilder<PlayerCurrency> queryBuilder = finder();
-        List<PlayerCurrency> topPlayers = queryBuilder
-                .orderDesc(category)
-                .findMax(max);
-
-        return topPlayers;
-    }
-
 }

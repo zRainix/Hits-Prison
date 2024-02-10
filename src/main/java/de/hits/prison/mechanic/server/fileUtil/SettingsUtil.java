@@ -16,7 +16,7 @@ public class SettingsUtil extends FileUtil {
     public SettingsUtil() {
         super("settings.yml");
 
-        this.prefix = "§c[§a§lHOE§c] §7";
+        this.prefix = "§c[§a§lPRISON§c] §7";
         this.host = "45.88.109.134";
         this.port = 13306;
         this.database = "minecraft_schema";

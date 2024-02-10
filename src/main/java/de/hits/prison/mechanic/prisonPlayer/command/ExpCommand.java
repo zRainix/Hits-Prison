@@ -6,10 +6,13 @@ import de.hits.prison.command.anno.BaseCommand;
 import de.hits.prison.command.anno.CommandParameter;
 import de.hits.prison.command.anno.SubCommand;
 import de.hits.prison.command.helper.AdvancedCommand;
+import de.hits.prison.mechanic.prisonPlayer.helper.TopPlayerExpCache;
+import de.hits.prison.mechanic.prisonPlayer.scheduler.TopPlayerScheduler;
 import de.hits.prison.model.dao.PlayerCurrencyDao;
 import de.hits.prison.model.entity.PlayerCurrency;
 import de.hits.prison.model.entity.PrisonPlayer;
 import org.bukkit.command.CommandSender;
+import de.hits.prison.model.entity.PrisonPlayer;
 import org.bukkit.entity.Player;
 
 import java.math.BigInteger;
@@ -20,6 +23,9 @@ public class ExpCommand extends AdvancedCommand {
 
     @Autowired
     private static PlayerCurrencyDao playerCurrencyDao;
+
+    @Autowired
+    private static TopPlayerExpCache topPlayerExpCache;
 
     public ExpCommand() {
         super("exp");
@@ -101,7 +107,7 @@ public class ExpCommand extends AdvancedCommand {
 
     @SubCommand(subCommand = "top")
     public void getTopTen(CommandSender sender) {
-        List<PlayerCurrency> topExp = playerCurrencyDao.findTopPlayersByCategory("exp", 10);
+        List<PlayerCurrency> topExp = topPlayerExpCache.getTopPlayerCache();
 
         if (!topExp.isEmpty()) {
             sender.sendMessage("§7Top §610 §7Players by §6Exp§7:");
