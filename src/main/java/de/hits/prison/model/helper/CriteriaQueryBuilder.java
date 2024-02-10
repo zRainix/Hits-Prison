@@ -2,6 +2,7 @@ package de.hits.prison.model.helper;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 
 import javax.persistence.criteria.*;
@@ -136,46 +137,102 @@ public class CriteriaQueryBuilder<T> {
 
     public long count() {
         long count = 0;
-        criteriaQuery.select(root).where(predicates.toArray(new Predicate[0]));
-        CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
-        countQuery.select(criteriaBuilder.count(countQuery.from(entityClass)));
-        Query<Long> query = session.createQuery(countQuery);
-        count = query.uniqueResult();
+        Transaction tx = null;
+        try {
+            Session session = sessionFactory.getCurrentSession();
+            tx = session.beginTransaction();
+            criteriaQuery.select(root).where(predicates.toArray(new Predicate[0]));
+            CriteriaQuery<Long> countQuery = criteriaBuilder.createQuery(Long.class);
+            countQuery.select(criteriaBuilder.count(countQuery.from(entityClass)));
+            Query<Long> query = session.createQuery(countQuery);
+            count = query.uniqueResult();
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null && tx.isActive()) {
+                tx.rollback();
+            }
+            e.printStackTrace();
+        }
         return count;
     }
 
     public T findFirst() {
         T first = null;
-        criteriaQuery.select(root).where(predicates.toArray(new Predicate[0]));
-        Query<T> query = session.createQuery(criteriaQuery);
-        query.setMaxResults(1);
-        first = query.uniqueResult();
+        Transaction tx = null;
+        try {
+            Session session = sessionFactory.getCurrentSession();
+            tx = session.beginTransaction();
+            criteriaQuery.select(root).where(predicates.toArray(new Predicate[0]));
+            Query<T> query = session.createQuery(criteriaQuery);
+            query.setMaxResults(1);
+            first = query.uniqueResult();
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null && tx.isActive()) {
+                tx.rollback();
+            }
+            e.printStackTrace();
+        }
         return first;
     }
 
     public boolean exists() {
         boolean exists = false;
-        criteriaQuery.select(root).where(predicates.toArray(new Predicate[0]));
-        Query<T> query = session.createQuery(criteriaQuery);
-        query.setMaxResults(1);
-        exists = query.uniqueResult() != null;
+        Transaction tx = null;
+        try {
+            Session session = sessionFactory.getCurrentSession();
+            tx = session.beginTransaction();
+            criteriaQuery.select(root).where(predicates.toArray(new Predicate[0]));
+            Query<T> query = session.createQuery(criteriaQuery);
+            query.setMaxResults(1);
+            exists = query.uniqueResult() != null;
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null && tx.isActive()) {
+                tx.rollback();
+            }
+            e.printStackTrace();
+        }
         return exists;
     }
 
     public List<T> findMax(int max) {
-        List<T> all;
-        criteriaQuery.select(root).where(predicates.toArray(new Predicate[0]));
-        Query<T> query = session.createQuery(criteriaQuery);
-        query.setMaxResults(max);
-        all = query.getResultList();
+        List<T> all = new ArrayList<>();
+        Transaction tx = null;
+        try {
+            Session session = sessionFactory.getCurrentSession();
+            tx = session.beginTransaction();
+            criteriaQuery.select(root).where(predicates.toArray(new Predicate[0]));
+            Query<T> query = session.createQuery(criteriaQuery);
+            query.setMaxResults(max);
+            all = query.getResultList();
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null && tx.isActive()) {
+                tx.rollback();
+            }
+            e.printStackTrace();
+        }
         return all;
     }
 
     public List<T> findAll() {
-        List<T> all;
-        criteriaQuery.select(root).where(predicates.toArray(new Predicate[0]));
-        Query<T> query = session.createQuery(criteriaQuery);
-        all = query.getResultList();
+        List<T> all = new ArrayList<>();
+        Transaction tx = null;
+        try {
+            Session session = sessionFactory.getCurrentSession();
+            tx = session.beginTransaction();
+            criteriaQuery.select(root).where(predicates.toArray(new Predicate[0]));
+            Query<T> query = session.createQuery(criteriaQuery);
+            all = query.getResultList();
+            tx.commit();
+        } catch (Exception e) {
+            if (tx != null && tx.isActive()) {
+                tx.rollback();
+            }
+            e.printStackTrace();
+        }
         return all;
     }
+
 }

@@ -8,6 +8,8 @@ import de.hits.prison.command.anno.SubCommand;
 import de.hits.prison.command.helper.AdvancedCommand;
 import de.hits.prison.model.dao.PlayerCurrencyDao;
 import de.hits.prison.model.entity.PlayerCurrency;
+import de.hits.prison.model.entity.PrisonPlayer;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.math.BigInteger;
@@ -27,32 +29,32 @@ public class VulcanicAshCommand extends AdvancedCommand {
     public void getAsh(Player player) {
         PlayerCurrency targetAsh = playerCurrencyDao.findByPlayer(player);
 
-        player.sendMessage("§7Ash balance: §6" + targetAsh.getVulcanicAsh() + "§7.");
+        player.sendMessage("§7Ash balance: §6" + targetAsh.formatVulcanicAsh() + "§7.");
     }
 
     @SubCommand(subCommand = "get")
-    public void getTargetAsh(Player player,
-                             @CommandParameter(name = "target") Player target) {
+    public void getTargetAsh(CommandSender sender,
+                             @CommandParameter(name = "target") PrisonPlayer target) {
 
-        PlayerCurrency targetAsh = playerCurrencyDao.findByPlayer(target);
+        PlayerCurrency targetAsh = target.getPlayerCurrency();
 
         if (targetAsh == null) {
-            player.sendMessage("§cThis player does not exist!");
+            sender.sendMessage("§cThis player does not exist!");
             return;
         }
 
-        player.sendMessage("§7Ash balance of §6" + target.getName() + "§7: §6" + targetAsh.getVulcanicAsh() + "§7.");
+        sender.sendMessage("§7Ash balance of §6" + target.getPlayerName() + "§7: §6" + targetAsh.formatVulcanicAsh() + "§7.");
     }
 
     @SubCommand(subCommand = "set")
-    public void setTargetAsh(Player player,
-                             @CommandParameter(name = "target") Player target,
+    public void setTargetAsh(CommandSender sender,
+                             @CommandParameter(name = "target") PrisonPlayer target,
                              @CommandParameter(name = "amount") BigInteger amount) {
 
-        PlayerCurrency targetAsh = playerCurrencyDao.findByPlayer(target);
+        PlayerCurrency targetAsh = target.getPlayerCurrency();
 
         if (targetAsh == null) {
-            player.sendMessage("§cThis player does not exist!");
+            sender.sendMessage("§cThis player does not exist!");
             return;
         }
 
@@ -60,18 +62,18 @@ public class VulcanicAshCommand extends AdvancedCommand {
 
         playerCurrencyDao.save(targetAsh);
 
-        player.sendMessage("§7Ash balance of §6" + target.getName() + " §7set to §6" + amount + "§7.");
+        sender.sendMessage("§7Ash balance of §6" + target.getPlayerName() + " §7set to §6" + targetAsh.formatVulcanicAsh() + "§7.");
     }
 
     @SubCommand(subCommand = "remove")
-    public void removeTargetAsh(Player player,
-                                @CommandParameter(name = "target") Player target,
+    public void removeTargetAsh(CommandSender sender,
+                                @CommandParameter(name = "target") PrisonPlayer target,
                                 @CommandParameter(name = "amount") BigInteger amount) {
 
-        PlayerCurrency targetAsh = playerCurrencyDao.findByPlayer(target);
+        PlayerCurrency targetAsh = target.getPlayerCurrency();
 
         if (targetAsh == null) {
-            player.sendMessage("§cThis player does not exist!");
+            sender.sendMessage("§cThis player does not exist!");
             return;
         }
 
@@ -79,18 +81,18 @@ public class VulcanicAshCommand extends AdvancedCommand {
 
         playerCurrencyDao.save(targetAsh);
 
-        player.sendMessage("§7Ash balance of §c" + target.getName() + " §7was removed §c" + amount + "§7. New balance: §6" + targetAsh.getVulcanicAsh() + "§7.");
+        sender.sendMessage("§7Ash balance of §c" + target.getPlayerName() + " §7was removed §c" + amount + "§7. New balance: §6" + targetAsh.formatVulcanicAsh() + "§7.");
     }
 
     @SubCommand(subCommand = "add")
-    public void addTargetAsh(Player player,
-                             @CommandParameter(name = "target") Player target,
+    public void addTargetAsh(CommandSender sender,
+                             @CommandParameter(name = "target") PrisonPlayer target,
                              @CommandParameter(name = "amount") BigInteger amount) {
 
-        PlayerCurrency targetAsh = playerCurrencyDao.findByPlayer(target);
+        PlayerCurrency targetAsh = target.getPlayerCurrency();
 
         if (targetAsh == null) {
-            player.sendMessage("§cThis player does not exist!");
+            sender.sendMessage("§cThis player does not exist!");
             return;
         }
 
@@ -98,21 +100,21 @@ public class VulcanicAshCommand extends AdvancedCommand {
 
         playerCurrencyDao.save(targetAsh);
 
-        player.sendMessage("§7Ash balance of §6" + target.getName() + " §7was added §6" + amount + "§7. New balance: §6" + targetAsh.getVulcanicAsh() + "§7.");
+        sender.sendMessage("§7Ash balance of §6" + target.getPlayerName() + " §7was added §6" + amount + "§7. New balance: §6" + targetAsh.formatVulcanicAsh() + "§7.");
     }
 
     @SubCommand(subCommand = "top")
-    public void getTopTen(Player player) {
+    public void getTopTen(CommandSender sender) {
         List<PlayerCurrency> topVulcanicAsh = playerCurrencyDao.findTopPlayersByCategory("vulcanicAsh", 10);
 
-        if(!topVulcanicAsh.isEmpty())  {
-            player.sendMessage("§7Top §610 §7Players by §6Vulcanic Ash§7:");
-            for(int i = 0; i < topVulcanicAsh.size(); i++) {
+        if (!topVulcanicAsh.isEmpty()) {
+            sender.sendMessage("§7Top §610 §7Players by §6Vulcanic Ash§7:");
+            for (int i = 0; i < topVulcanicAsh.size(); i++) {
                 PlayerCurrency topPlayer = topVulcanicAsh.get(i);
-                player.sendMessage("§6" + (i + 1) + ". §7" + topPlayer.getRefPrisonPlayer().getPlayerName() + " - §6Ash: §a" + topPlayer.getVulcanicAsh());
+                sender.sendMessage("§6" + (i + 1) + ". §7" + topPlayer.getRefPrisonPlayer().getPlayerName() + " - §6Ash: §a" + topPlayer.formatVulcanicAsh());
             }
         } else {
-            player.sendMessage("§cNo players found!");
+            sender.sendMessage("§cNo players found!");
         }
     }
 }

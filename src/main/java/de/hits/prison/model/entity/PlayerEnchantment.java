@@ -13,7 +13,7 @@ public class PlayerEnchantment {
     String enchantmentName;
     int enchantmentLevel;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(nullable = false)
     PrisonPlayer refPrisonPlayer;
 

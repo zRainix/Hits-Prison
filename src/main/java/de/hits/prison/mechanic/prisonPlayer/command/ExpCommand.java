@@ -8,6 +8,8 @@ import de.hits.prison.command.anno.SubCommand;
 import de.hits.prison.command.helper.AdvancedCommand;
 import de.hits.prison.model.dao.PlayerCurrencyDao;
 import de.hits.prison.model.entity.PlayerCurrency;
+import de.hits.prison.model.entity.PrisonPlayer;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.math.BigInteger;
@@ -26,32 +28,29 @@ public class ExpCommand extends AdvancedCommand {
     @BaseCommand
     public void getExp(Player player) {
         PlayerCurrency targetExp = playerCurrencyDao.findByPlayer(player);
-
-        player.sendMessage("§7Exp balance: §6" + targetExp.getExp() + "§7.");
+        player.sendMessage("§7Exp balance: §6" + targetExp.formatExp() + "§7.");
     }
 
     @SubCommand(subCommand = "get")
-    public void getTargetExp(Player player,
-                                @CommandParameter(name = "target") Player target) {
-        PlayerCurrency targetExp = playerCurrencyDao.findByPlayer(target);
-
+    public void getTargetExp(CommandSender sender,
+                             @CommandParameter(name = "target") PrisonPlayer target) {
+        PlayerCurrency targetExp = target.getPlayerCurrency();
         if (targetExp == null) {
-            player.sendMessage("§cThis player does not exist!");
+            sender.sendMessage("§cThis player does not exist!");
             return;
         }
-
-        player.sendMessage("§7Exp balance of §6" + target.getName() + "§7: §6" + targetExp.getExp() + "§7.");
+        sender.sendMessage("§7Exp balance of §6" + target.getPlayerName() + "§7: §6" + targetExp.formatExp() + "§7.");
     }
 
     @SubCommand(subCommand = "set")
-    public void setTargetExp(Player player,
-                                @CommandParameter(name = "target") Player target,
-                                @CommandParameter(name = "amount") BigInteger amount) {
+    public void setTargetExp(CommandSender sender,
+                             @CommandParameter(name = "target") PrisonPlayer target,
+                             @CommandParameter(name = "amount") BigInteger amount) {
 
-        PlayerCurrency targetExp = playerCurrencyDao.findByPlayer(target);
+        PlayerCurrency targetExp = target.getPlayerCurrency();
 
         if (targetExp == null) {
-            player.sendMessage("§cThis player does not exist!");
+            sender.sendMessage("§cThis player does not exist!");
             return;
         }
 
@@ -59,37 +58,37 @@ public class ExpCommand extends AdvancedCommand {
 
         playerCurrencyDao.save(targetExp);
 
-        player.sendMessage("§7Exp balance of §6" + target.getName() + " §7set to §6" + amount + "§7.");
+        sender.sendMessage("§7Exp balance of §6" + target.getPlayerName() + " §7set to §6" + targetExp.formatExp() + "§7.");
     }
 
     @SubCommand(subCommand = "remove")
-    public void removeTargetExp(Player player,
-                                   @CommandParameter(name = "target") Player target,
-                                   @CommandParameter(name = "amount") BigInteger amount) {
+    public void removeTargetExp(CommandSender sender,
+                                @CommandParameter(name = "target") PrisonPlayer target,
+                                @CommandParameter(name = "amount") BigInteger amount) {
 
-        PlayerCurrency targetExp = playerCurrencyDao.findByPlayer(target);
+        PlayerCurrency targetExp = target.getPlayerCurrency();
 
         if (targetExp == null) {
-            player.sendMessage("§cThis player does not exist!");
+            sender.sendMessage("§cThis player does not exist!");
             return;
         }
 
-        targetExp.setExp(targetExp.getExp().subtract(amount).min(new BigInteger("0")));
+        targetExp.setExp(targetExp.getExp().subtract(amount).min(BigInteger.ZERO));
 
         playerCurrencyDao.save(targetExp);
 
-        player.sendMessage("§7Exp balance of §c" + target.getName() + " §7was removed §c" + amount + "§7. New balance: §6" + targetExp.getExp() + "§7.");
+        sender.sendMessage("§7Exp balance of §c" + target.getPlayerName() + " §7was removed §c" + amount + "§7. New balance: §6" + targetExp.formatExp() + "§7.");
     }
 
     @SubCommand(subCommand = "add")
-    public void addTargetExp(Player player,
-                                @CommandParameter(name = "target") Player target,
-                                @CommandParameter(name = "amount") BigInteger amount) {
+    public void addTargetExp(CommandSender sender,
+                             @CommandParameter(name = "target") PrisonPlayer target,
+                             @CommandParameter(name = "amount") BigInteger amount) {
 
-        PlayerCurrency targetExp = playerCurrencyDao.findByPlayer(target);
+        PlayerCurrency targetExp = target.getPlayerCurrency();
 
         if (targetExp == null) {
-            player.sendMessage("§cThis player does not exist!");
+            sender.sendMessage("§cThis player does not exist!");
             return;
         }
 
@@ -97,21 +96,21 @@ public class ExpCommand extends AdvancedCommand {
 
         playerCurrencyDao.save(targetExp);
 
-        player.sendMessage("§7Exp balance of §6" + target.getName() + " §7was added §6" + amount + "§7. New balance: §6" + targetExp.getExp() + "§7.");
+        sender.sendMessage("§7Exp balance of §6" + target.getPlayerName() + " §7was added §6" + amount + "§7. New balance: §6" + targetExp.formatExp() + "§7.");
     }
 
     @SubCommand(subCommand = "top")
-    public void getTopTen(Player player) {
+    public void getTopTen(CommandSender sender) {
         List<PlayerCurrency> topExp = playerCurrencyDao.findTopPlayersByCategory("exp", 10);
 
-        if(!topExp.isEmpty())  {
-            player.sendMessage("§7Top §610 §7Players by §6Exp§7:");
-            for(int i = 0; i < topExp.size(); i++) {
+        if (!topExp.isEmpty()) {
+            sender.sendMessage("§7Top §610 §7Players by §6Exp§7:");
+            for (int i = 0; i < topExp.size(); i++) {
                 PlayerCurrency topPlayer = topExp.get(i);
-                player.sendMessage("§6" + (i + 1) + ". §7" + topPlayer.getRefPrisonPlayer().getPlayerName() + " - §6Exp: §a" + topPlayer.getExp());
+                sender.sendMessage("§6" + (i + 1) + ". §7" + topPlayer.getRefPrisonPlayer().getPlayerName() + " - §6Exp: §a" + topPlayer.formatExp());
             }
         } else {
-            player.sendMessage("§cNo players found!");
+            sender.sendMessage("§cNo players found!");
         }
     }
 }

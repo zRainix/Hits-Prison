@@ -8,6 +8,8 @@ import de.hits.prison.command.anno.SubCommand;
 import de.hits.prison.command.helper.AdvancedCommand;
 import de.hits.prison.model.dao.PlayerCurrencyDao;
 import de.hits.prison.model.entity.PlayerCurrency;
+import de.hits.prison.model.entity.PrisonPlayer;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
 import java.math.BigInteger;
@@ -26,33 +28,29 @@ public class ObsidianShardsCommand extends AdvancedCommand {
     @BaseCommand
     public void getShards(Player player) {
         PlayerCurrency targetShards = playerCurrencyDao.findByPlayer(player);
-
-        player.sendMessage("§7Shards balance: §6" + targetShards.getObsidianShards() + "§7.");
+        player.sendMessage("§7Shards balance: §6" + targetShards.formatObsidianShards() + "§7.");
     }
 
     @SubCommand(subCommand = "get")
-    public void getTargetShards(Player player,
-                                @CommandParameter(name = "target") Player target) {
-
-        PlayerCurrency targetShards = playerCurrencyDao.findByPlayer(target);
-
+    public void getTargetShards(CommandSender sender,
+                                @CommandParameter(name = "target") PrisonPlayer target) {
+        PlayerCurrency targetShards = target.getPlayerCurrency();
         if (targetShards == null) {
-            player.sendMessage("§cThis player does not exist!");
+            sender.sendMessage("§cThis player does not exist!");
             return;
         }
-
-        player.sendMessage("§7Shards balance of §6" + target.getName() + "§7: §6" + targetShards.getObsidianShards() + "§7.");
+        sender.sendMessage("§7Shards balance of §6" + target.getPlayerName() + "§7: §6" + targetShards.formatObsidianShards() + "§7.");
     }
 
     @SubCommand(subCommand = "set")
-    public void setTargetShards(Player player,
-                                @CommandParameter(name = "target") Player target,
+    public void setTargetShards(CommandSender sender,
+                                @CommandParameter(name = "target") PrisonPlayer target,
                                 @CommandParameter(name = "amount") BigInteger amount) {
 
-        PlayerCurrency targetShards = playerCurrencyDao.findByPlayer(target);
+        PlayerCurrency targetShards = target.getPlayerCurrency();
 
         if (targetShards == null) {
-            player.sendMessage("§cThis player does not exist!");
+            sender.sendMessage("§cThis player does not exist!");
             return;
         }
 
@@ -60,37 +58,37 @@ public class ObsidianShardsCommand extends AdvancedCommand {
 
         playerCurrencyDao.save(targetShards);
 
-        player.sendMessage("§7Shards balance of §6" + target.getName() + " §7set to §6" + amount + "§7.");
+        sender.sendMessage("§7Shards balance of §6" + target.getPlayerName() + " §7set to §6" + targetShards.formatObsidianShards() + "§7.");
     }
 
     @SubCommand(subCommand = "remove")
-    public void removeTargetShards(Player player,
-                                   @CommandParameter(name = "target") Player target,
+    public void removeTargetShards(CommandSender sender,
+                                   @CommandParameter(name = "target") PrisonPlayer target,
                                    @CommandParameter(name = "amount") BigInteger amount) {
 
-        PlayerCurrency targetShards = playerCurrencyDao.findByPlayer(target);
+        PlayerCurrency targetShards = target.getPlayerCurrency();
 
         if (targetShards == null) {
-            player.sendMessage("§cThis player does not exist!");
+            sender.sendMessage("§cThis player does not exist!");
             return;
         }
 
-        targetShards.setObsidianShards(targetShards.getObsidianShards().subtract(amount).min(new BigInteger("0")));
+        targetShards.setObsidianShards(targetShards.getObsidianShards().subtract(amount).min(BigInteger.ZERO));
 
         playerCurrencyDao.save(targetShards);
 
-        player.sendMessage("§7Shards balance of §c" + target.getName() + " §7was removed §c" + amount + "§7. New balance: §6" + targetShards.getObsidianShards() + "§7.");
+        sender.sendMessage("§7Shards balance of §c" + target.getPlayerName() + " §7was removed §c" + amount + "§7. New balance: §6" + targetShards.formatObsidianShards() + "§7.");
     }
 
     @SubCommand(subCommand = "add")
-    public void addTargetShards(Player player,
-                                @CommandParameter(name = "target") Player target,
+    public void addTargetShards(CommandSender sender,
+                                @CommandParameter(name = "target") PrisonPlayer target,
                                 @CommandParameter(name = "amount") BigInteger amount) {
 
-        PlayerCurrency targetShards = playerCurrencyDao.findByPlayer(target);
+        PlayerCurrency targetShards = target.getPlayerCurrency();
 
         if (targetShards == null) {
-            player.sendMessage("§cThis player does not exist!");
+            sender.sendMessage("§cThis player does not exist!");
             return;
         }
 
@@ -98,21 +96,21 @@ public class ObsidianShardsCommand extends AdvancedCommand {
 
         playerCurrencyDao.save(targetShards);
 
-        player.sendMessage("§7Shards balance of §6" + target.getName() + " §7was added §6" + amount + "§7. New balance: §6" + targetShards.getObsidianShards() + "§7.");
+        sender.sendMessage("§7Shards balance of §6" + target.getPlayerName() + " §7was added §6" + amount + "§7. New balance: §6" + targetShards.formatObsidianShards() + "§7.");
     }
 
     @SubCommand(subCommand = "top")
-    public void getTopTen(Player player) {
+    public void getTopTen(CommandSender sender) {
         List<PlayerCurrency> topObsidianShards = playerCurrencyDao.findTopPlayersByCategory("obsidianShards", 10);
 
         if (!topObsidianShards.isEmpty()) {
-            player.sendMessage("§7Top §610 §7Players by §6Obsidian Shards§7:");
+            sender.sendMessage("§7Top §610 §7Players by §6Obsidian Shards§7:");
             for (int i = 0; i < topObsidianShards.size(); i++) {
                 PlayerCurrency topPlayer = topObsidianShards.get(i);
-                player.sendMessage("§6" + (i + 1) + ". §7" + topPlayer.getRefPrisonPlayer().getPlayerName() + " - §6Shards: §a" + topPlayer.getObsidianShards());
+                sender.sendMessage("§6" + (i + 1) + ". §7" + topPlayer.getRefPrisonPlayer().getPlayerName() + " - §6Shards: §a" + topPlayer.formatObsidianShards());
             }
         } else {
-            player.sendMessage("§cNo players found!");
+            sender.sendMessage("§cNo players found!");
         }
     }
 }

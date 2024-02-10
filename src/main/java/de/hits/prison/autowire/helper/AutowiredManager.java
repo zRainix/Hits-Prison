@@ -1,5 +1,6 @@
 package de.hits.prison.autowire.helper;
 
+import de.hits.prison.HitsPrison;
 import de.hits.prison.autowire.anno.Autowired;
 import de.hits.prison.autowire.anno.Component;
 import de.hits.prison.model.helper.ClassScanner;
@@ -19,7 +20,7 @@ public class AutowiredManager {
     private static void init() {
         autowiredFields = new HashMap<>();
 
-        Set<Class<?>> components = ClassScanner.getClassesByAnnotation("de.hits.prison", Component.class);
+        Set<Class<?>> components = ClassScanner.getClassesByAnnotation(HitsPrison.class.getPackageName(), Component.class);
 
         for (Class<?> component : components) {
             for (Field field : component.getDeclaredFields()) {

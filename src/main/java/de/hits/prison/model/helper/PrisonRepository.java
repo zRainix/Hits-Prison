@@ -1,13 +1,17 @@
 package de.hits.prison.model.helper;
 
+import org.bukkit.Bukkit;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.logging.Logger;
 
 public class PrisonRepository<T, ID extends Serializable> {
+
+    private Logger logger = Bukkit.getLogger();
 
     private final SessionFactory sessionFactory;
     private final Class<T> entityClass;
@@ -52,7 +56,11 @@ public class PrisonRepository<T, ID extends Serializable> {
     }
 
     public void updateSession() {
-        this.session.close();
+        try {
+            this.session.close();
+        } catch (Exception e) {
+            logger.warning("Error while trying to close session: " + e.getMessage());
+        }
         this.session = this.sessionFactory.openSession();
     }
 }

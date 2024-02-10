@@ -2,6 +2,9 @@ package de.hits.prison.model.entity;
 
 import javax.persistence.*;
 import java.math.BigInteger;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 
 @Entity
 @Table(name = "player_currency")
@@ -18,7 +21,7 @@ public class PlayerCurrency {
     @Column(columnDefinition = "DECIMAL(65, 0)")
     BigInteger exp;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, unique = true)
     PrisonPlayer refPrisonPlayer;
 
@@ -61,4 +64,52 @@ public class PlayerCurrency {
     public void setRefPrisonPlayer(PrisonPlayer refPrisonPlayer) {
         this.refPrisonPlayer = refPrisonPlayer;
     }
+
+    public String formatVulcanicAsh() {
+        return formatValue(getVulcanicAsh());
+    }
+
+    public String formatObsidianShards() {
+        return formatValue(getObsidianShards());
+    }
+
+    public String formatExp() {
+        return formatValue(getExp());
+    }
+
+    private String formatValue(BigInteger value) {
+        if (value == null) {
+            return "-";
+        }
+
+        if (value.compareTo(BigInteger.valueOf(1_000)) < 0) {
+            return value.toString();
+        } else if (value.compareTo(BigInteger.valueOf(1_000_000)) < 0) {
+            return format(value, "k");
+        } else if (value.compareTo(BigInteger.valueOf(1_000_000_000)) < 0) {
+            return format(value, "m");
+        } else if (value.compareTo(BigInteger.valueOf(1_000_000_000_000L)) < 0) {
+            return format(value, "b");
+        } else {
+            return format(value);
+        }
+    }
+
+    private String format(BigInteger value, String suffix) {
+        NumberFormat format = new DecimalFormat("#.##");
+        format.setRoundingMode(RoundingMode.FLOOR);
+        double scaledValue = value.doubleValue() / Math.pow(10, getExponent(value));
+        return format.format(scaledValue) + suffix;
+    }
+
+    private String format(BigInteger value) {
+        NumberFormat format = new DecimalFormat("#.##E0");
+        format.setRoundingMode(RoundingMode.FLOOR);
+        return format.format(value.doubleValue());
+    }
+
+    private int getExponent(BigInteger value) {
+        return value.toString().length() - 1;
+    }
+
 }
