@@ -3,11 +3,14 @@ package de.hits.prison.mechanic.prisonPlayer;
 import de.hits.prison.HitsPrison;
 import de.hits.prison.autowire.anno.Autowired;
 import de.hits.prison.autowire.anno.Component;
+import de.hits.prison.autowire.helper.AutowiredManager;
 import de.hits.prison.mechanic.helper.BaseManager;
 import de.hits.prison.mechanic.prisonPlayer.command.ExpCommand;
 import de.hits.prison.mechanic.prisonPlayer.command.ObsidianShardsCommand;
 import de.hits.prison.mechanic.prisonPlayer.command.VulcanicAshCommand;
+import de.hits.prison.mechanic.prisonPlayer.helper.TopPlayerExpCache;
 import de.hits.prison.mechanic.prisonPlayer.listener.PrisonPlayerListener;
+import de.hits.prison.mechanic.prisonPlayer.scheduler.TopPlayerScheduler;
 import de.hits.prison.model.dao.PlayerCurrencyDao;
 import de.hits.prison.model.dao.PrisonPlayerDao;
 import org.bukkit.plugin.PluginManager;
@@ -30,5 +33,8 @@ public class PrisonPlayerManager implements BaseManager {
         // Listener:
         PrisonPlayerListener prisonPlayerListener = new PrisonPlayerListener();
         pluginManager.registerEvents(prisonPlayerListener, hitsPrison);
+
+        AutowiredManager.register(new TopPlayerExpCache());
+
     }
 }

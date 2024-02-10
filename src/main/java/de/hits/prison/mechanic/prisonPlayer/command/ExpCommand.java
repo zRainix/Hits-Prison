@@ -6,8 +6,11 @@ import de.hits.prison.command.anno.BaseCommand;
 import de.hits.prison.command.anno.CommandParameter;
 import de.hits.prison.command.anno.SubCommand;
 import de.hits.prison.command.helper.AdvancedCommand;
+import de.hits.prison.mechanic.prisonPlayer.helper.TopPlayerExpCache;
+import de.hits.prison.mechanic.prisonPlayer.scheduler.TopPlayerScheduler;
 import de.hits.prison.model.dao.PlayerCurrencyDao;
 import de.hits.prison.model.entity.PlayerCurrency;
+import de.hits.prison.model.entity.PrisonPlayer;
 import org.bukkit.entity.Player;
 
 import java.math.BigInteger;
@@ -18,6 +21,9 @@ public class ExpCommand extends AdvancedCommand {
 
     @Autowired
     private static PlayerCurrencyDao playerCurrencyDao;
+
+    @Autowired
+    private static TopPlayerExpCache topPlayerExpCache;
 
     public ExpCommand() {
         super("exp");
@@ -102,13 +108,13 @@ public class ExpCommand extends AdvancedCommand {
 
     @SubCommand(subCommand = "top")
     public void getTopTen(Player player) {
-        List<PlayerCurrency> topExp = playerCurrencyDao.findTopPlayersByCategory("exp", 10);
-
-        if(!topExp.isEmpty())  {
+        if(topPlayerExpCache.getTopPlayerCache() != null && !topPlayerExpCache. getTopPlayerCache().isEmpty())  {
             player.sendMessage("§7Top §610 §7Players by §6Exp§7:");
-            for(int i = 0; i < topExp.size(); i++) {
-                PlayerCurrency topPlayer = topExp.get(i);
-                player.sendMessage("§6" + (i + 1) + ". §7" + topPlayer.getRefPrisonPlayer().getPlayerName() + " - §6Exp: §a" + topPlayer.getExp());
+            for(int i = 0; i < topPlayerExpCache.getTopPlayerCache().size(); i++) {
+
+                PrisonPlayer topEXPPlayerCached = topPlayerExpCache.getTopPlayerCache().get(i);
+                player.sendMessage("§6" + (i + 1) + ". §7" + topEXPPlayerCached.getPlayerName() + " - §6Exp: §a" + topEXPPlayerCached.getPlayerCurrency().getExp());
+                player.sendMessage("Next update in " + TopPlayerScheduler.getTimeUntilNextUpdate());
             }
         } else {
             player.sendMessage("§cNo players found!");

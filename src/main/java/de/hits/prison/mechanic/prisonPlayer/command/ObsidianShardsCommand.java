@@ -103,7 +103,7 @@ public class ObsidianShardsCommand extends AdvancedCommand {
 
     @SubCommand(subCommand = "top")
     public void getTopTen(Player player) {
-        List<PlayerCurrency> topObsidianShards = playerCurrencyDao.findTopPlayersByCategory("obsidianShards", 10);
+        /*List<PlayerCurrency> topObsidianShards = playerCurrencyDao.findTopPlayersByCategory("obsidianShards", 10);
 
         if (!topObsidianShards.isEmpty()) {
             player.sendMessage("§7Top §610 §7Players by §6Obsidian Shards§7:");
@@ -113,6 +113,6 @@ public class ObsidianShardsCommand extends AdvancedCommand {
             }
         } else {
             player.sendMessage("§cNo players found!");
-        }
+        }*/
     }
 }

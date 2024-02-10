@@ -101,8 +101,8 @@ public class VulcanicAshCommand extends AdvancedCommand {
         player.sendMessage("§7Ash balance of §6" + target.getName() + " §7was added §6" + amount + "§7. New balance: §6" + targetAsh.getVulcanicAsh() + "§7.");
     }
 
-    @SubCommand(subCommand = "top")
-    public void getTopTen(Player player) {
+    /*@SubCommand(subCommand = "top")
+    /*public void getTopTen(Player player) {
         List<PlayerCurrency> topVulcanicAsh = playerCurrencyDao.findTopPlayersByCategory("vulcanicAsh", 10);
 
         if(!topVulcanicAsh.isEmpty())  {
@@ -114,5 +114,5 @@ public class VulcanicAshCommand extends AdvancedCommand {
         } else {
             player.sendMessage("§cNo players found!");
         }
-    }
+    }*/
 }
