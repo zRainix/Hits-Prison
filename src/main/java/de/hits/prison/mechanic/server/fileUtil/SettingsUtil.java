@@ -14,7 +14,7 @@ public class SettingsUtil extends FileUtil {
     private String password;
 
     public SettingsUtil() {
-        super("settings.yaml");
+        super("settings.yml");
 
         this.prefix = "§c[§a§lHOE§c] §7";
         this.host = "45.88.109.134";
