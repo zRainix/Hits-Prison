@@ -20,9 +20,9 @@ public class PrisonPlayer {
     @Column(nullable = false)
     Long playtimeInMinutes;
 
-    @OneToOne(mappedBy = "refPrisonPlayer")
+    @OneToOne(mappedBy = "refPrisonPlayer", fetch = FetchType.EAGER)
     PlayerCurrency playerCurrency;
-    @OneToMany(mappedBy = "refPrisonPlayer")
+    @OneToMany(mappedBy = "refPrisonPlayer", fetch = FetchType.EAGER)
     List<PlayerEnchantment> playerEnchantments;
 
     public Long getId() {
