@@ -62,6 +62,15 @@ public abstract class FileUtil {
         }
     }
 
+    public void resetConfig() {
+        cfg.setDefaults(YamlConfiguration.loadConfiguration(file));
+        saveConfig();
+    }
+
+    public String getFileName() {
+        return file.getName();
+    }
+
     public abstract void init();
 
     public abstract void save();

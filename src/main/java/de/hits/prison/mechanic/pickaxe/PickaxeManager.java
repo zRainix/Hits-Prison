@@ -3,9 +3,12 @@ package de.hits.prison.mechanic.pickaxe;
 import de.hits.prison.HitsPrison;
 import de.hits.prison.autowire.anno.Autowired;
 import de.hits.prison.autowire.anno.Component;
+import de.hits.prison.autowire.helper.AutowiredManager;
 import de.hits.prison.mechanic.helper.BaseManager;
 import de.hits.prison.mechanic.pickaxe.fileUtil.PickaxeUtil;
+import de.hits.prison.mechanic.pickaxe.helper.PickaxeHelper;
 import de.hits.prison.mechanic.pickaxe.listener.BlockBreakListener;
+import de.hits.prison.mechanic.pickaxe.listener.PlayerJoinListener;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 
@@ -27,5 +30,8 @@ public class PickaxeManager implements BaseManager {
 
         // Listener
         pluginManager.registerEvents(new BlockBreakListener(), hitsPrison);
+        pluginManager.registerEvents(new PlayerJoinListener(), hitsPrison);
+
+        AutowiredManager.register(new PickaxeHelper());
     }
 }

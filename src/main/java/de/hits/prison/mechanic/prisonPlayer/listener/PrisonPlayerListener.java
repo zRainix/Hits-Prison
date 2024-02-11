@@ -2,6 +2,7 @@ package de.hits.prison.mechanic.prisonPlayer.listener;
 
 import de.hits.prison.autowire.anno.Autowired;
 import de.hits.prison.autowire.anno.Component;
+import de.hits.prison.mechanic.pickaxe.helper.PickaxeHelper;
 import de.hits.prison.model.dao.PlayerCurrencyDao;
 import de.hits.prison.model.dao.PrisonPlayerDao;
 import de.hits.prison.model.entity.PlayerCurrency;
@@ -28,6 +29,9 @@ public class PrisonPlayerListener implements Listener {
     @Autowired
     private static PlayerCurrencyDao playerCurrencyDao;
 
+    @Autowired
+    private static PickaxeHelper pickaxeHelper;
+
     private static long millisToMinutes = 1000L * 60L;
 
     @EventHandler
@@ -40,6 +44,7 @@ public class PrisonPlayerListener implements Listener {
             prisonPlayer = new PrisonPlayer();
             prisonPlayer.setPlayerUuid(p.getUniqueId().toString());
             prisonPlayer.setPlaytimeInMinutes(0L);
+            pickaxeHelper.buildPlayerPickaxe(p);
 
             prisonPlayer = prisonPlayerDao.save(prisonPlayer);
         }

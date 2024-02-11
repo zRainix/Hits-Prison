@@ -4,6 +4,8 @@ import de.hits.prison.autowire.anno.Autowired;
 import de.hits.prison.autowire.anno.Component;
 import de.hits.prison.mechanic.pickaxe.anno.EnchantmentMethod;
 import de.hits.prison.mechanic.pickaxe.helper.DropRate;
+import de.hits.prison.mechanic.pickaxe.helper.EnchantmentRarity;
+import de.hits.prison.mechanic.pickaxe.helper.EnchantmentUsage;
 import de.hits.prison.model.dao.PlayerEnchantmentDao;
 import de.hits.prison.model.dao.PrisonPlayerDao;
 import de.hits.prison.model.entity.PlayerEnchantment;
@@ -48,7 +50,7 @@ public class BlockBreakListener implements Listener {
         List<PlayerEnchantment> playerEnchantments = prisonPlayer.getPlayerEnchantments();
 
         for (PlayerEnchantment playerEnchantment : playerEnchantments) {
-            executePlayerEnchantment(player, e, playerEnchantment);
+            executePlayerEnchantment(player, playerEnchantment, e);
         }
 
         playerBreakBlock(player, e.getBlock(), new DropRate(0.7, 0.3, 0.1));
@@ -64,8 +66,8 @@ public class BlockBreakListener implements Listener {
         player.sendMessage("Ash:" + ash + ", Shards: " + shards + ", Exp: " + exp);
     }
 
-    @EnchantmentMethod("Cube")
-    public void executeBlockEnchantment(Player player, BlockBreakEvent e, PlayerEnchantment blockEnchantment) {
+    @EnchantmentMethod(enchantment = "Cube", enchantmentType = EnchantmentUsage.BREAK, enchantmentRarity = EnchantmentRarity.RARE)
+    public void executeBlockEnchantment(Player player, PlayerEnchantment blockEnchantment, BlockBreakEvent e) {
         int level = blockEnchantment.getEnchantmentLevel();
 
         for (int offsetX = -level; offsetX <= level; offsetX++) {
@@ -85,8 +87,8 @@ public class BlockBreakListener implements Listener {
         }
     }
 
-    @EnchantmentMethod("Jackhammer")
-    public void executeJackhammerEnchantment(Player player, BlockBreakEvent e, PlayerEnchantment blockEnchantment) {
+    @EnchantmentMethod(enchantment = "Jackhammer", enchantmentType = EnchantmentUsage.BREAK, enchantmentRarity = EnchantmentRarity.RARE)
+    public void executeJackhammerEnchantment(Player player, PlayerEnchantment blockEnchantment, BlockBreakEvent e) {
         int mineWidth = 10, mineHeight = 12;
 
         int maxSize = Math.max(mineWidth, mineHeight);
@@ -126,15 +128,15 @@ public class BlockBreakListener implements Listener {
         return playerEnchantmentDao.findByPlayerAndEnchantmentName(player, enchantment);
     }
 
-    private void executePlayerEnchantment(Player player, BlockBreakEvent e, PlayerEnchantment playerEnchantment) {
+    private void executePlayerEnchantment(Player player, PlayerEnchantment playerEnchantment, BlockBreakEvent e) {
         for (Method method : getClass().getMethods()) {
             if (!method.isAnnotationPresent(EnchantmentMethod.class))
                 continue;
             EnchantmentMethod enchantmentMethod = method.getAnnotation(EnchantmentMethod.class);
-            if (!enchantmentMethod.value().equals(playerEnchantment.getEnchantmentName()))
+            if (!enchantmentMethod.enchantment().equals(playerEnchantment.getEnchantmentName()))
                 continue;
             try {
-                method.invoke(this, player, e, playerEnchantment);
+                method.invoke(this, player, playerEnchantment, e);
             } catch (IllegalAccessException | InvocationTargetException ex) {
                 logger.warning("Could not invoke method " + method.getName());
             }

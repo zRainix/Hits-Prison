@@ -76,4 +76,14 @@ public class FileUtilManager {
             logger.severe("Error while initializing managers: " + e.getMessage());
         }
     }
+
+    public FileUtil getFileUtilByName(String fileName) {
+        for (FileUtil fileUtil : registeredFileUtils) {
+            if (fileUtil.getFileName().equalsIgnoreCase(fileName)) {
+                return fileUtil;
+            }
+        }
+        return null;
+    }
+
 }
