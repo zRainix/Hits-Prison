@@ -20,7 +20,7 @@ public class PickaxeUtil extends FileUtil {
 
     @Override
     public void init() {
-        saveConfig();
+        saveDefaultsConfig();
     }
 
     @Override

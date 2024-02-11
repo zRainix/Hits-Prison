@@ -49,6 +49,11 @@ public abstract class FileUtil {
         }
     }
 
+    protected  void saveDefaultsConfig() {
+        this.cfg.options().copyDefaults(true);
+        saveConfig();
+    }
+
     protected void saveConfig() {
         try {
             this.cfg.save(file);

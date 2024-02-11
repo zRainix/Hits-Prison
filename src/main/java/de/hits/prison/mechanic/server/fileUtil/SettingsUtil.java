@@ -29,17 +29,19 @@ public class SettingsUtil extends FileUtil {
     @Override
     public void init() {
         this.cfg.addDefault("prefix", this.prefix);
+        this.cfg.addDefault("remoteMySQL", this.remoteMySQL);
         this.cfg.addDefault("host", this.host);
         this.cfg.addDefault("port", this.port);
         this.cfg.addDefault("database", this.database);
         this.cfg.addDefault("user", this.user);
         this.cfg.addDefault("password", this.password);
-        saveConfig();
+        saveDefaultsConfig();
     }
 
     @Override
     public void save() {
         this.cfg.set("prefix", this.prefix);
+        this.cfg.set("remoteMySQL", this.remoteMySQL);
         this.cfg.set("host", this.host);
         this.cfg.set("port", this.port);
         this.cfg.set("database", this.database);
@@ -53,6 +55,7 @@ public class SettingsUtil extends FileUtil {
         loadConfig();
 
         this.prefix = this.cfg.getString("prefix");
+        this.remoteMySQL = this.cfg.getBoolean("remoteMySQL");
         this.host = this.cfg.getString("host");
         this.port = this.cfg.getInt("port");
         this.database = this.cfg.getString("database");
