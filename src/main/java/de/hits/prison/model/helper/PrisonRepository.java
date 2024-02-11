@@ -5,7 +5,9 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
+import javax.persistence.Table;
 import java.io.Serializable;
+import java.math.BigInteger;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -16,6 +18,8 @@ public class PrisonRepository<T, ID extends Serializable> {
     private final SessionFactory sessionFactory;
     private final Class<T> entityClass;
     private Session session;
+
+    public static BigInteger maxBigIntegerValue = new BigInteger("99999999999999999999999999999999999999999999999999999999999999999");
 
     public PrisonRepository(Class<T> entityClass) {
         this.sessionFactory = HibernateUtil.getSessionFactory();

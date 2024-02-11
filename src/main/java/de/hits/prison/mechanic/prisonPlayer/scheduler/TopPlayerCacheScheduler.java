@@ -44,13 +44,13 @@ public class TopPlayerCacheScheduler extends CustomScheduler {
 
     @Override
     public void run() {
+        this.nextUpdate = System.currentTimeMillis() + (period * ticksToMillis);
+
         topPlayerExpCache.updateTopPlayers();
         topPlayerVulcanicAshCache.updateTopPlayers();
         topPlayerObsidianShardsCache.updateTopPlayers();
 
         logger.info("UPDATED updateCachedTopPlayers");
-
-        this.nextUpdate = System.currentTimeMillis() + (period * ticksToMillis);
     }
 
     public String getTimeUntilNextUpdate() {

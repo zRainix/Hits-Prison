@@ -11,6 +11,7 @@ import de.hits.prison.mechanic.prisonPlayer.scheduler.TopPlayerCacheScheduler;
 import de.hits.prison.model.dao.PlayerCurrencyDao;
 import de.hits.prison.model.entity.PlayerCurrency;
 import de.hits.prison.model.entity.PrisonPlayer;
+import de.hits.prison.model.helper.PrisonRepository;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -60,7 +61,7 @@ public class ExpCommand extends AdvancedCommand {
             return;
         }
 
-        targetExp.setExp(amount);
+        targetExp.setExp(amount.min(PrisonRepository.maxBigIntegerValue));
 
         playerCurrencyDao.save(targetExp);
 
@@ -79,11 +80,11 @@ public class ExpCommand extends AdvancedCommand {
             return;
         }
 
-        targetExp.setExp(targetExp.getExp().subtract(amount).min(BigInteger.ZERO));
+        targetExp.setExp(targetExp.getExp().subtract(amount).max(BigInteger.ZERO));
 
         playerCurrencyDao.save(targetExp);
 
-        sender.sendMessage("§7Exp balance of §c" + target.getPlayerName() + " §7was removed §c" + amount + "§7. New balance: §6" + targetExp.formatExp() + "§7.");
+        sender.sendMessage("§7Exp balance of §6" + target.getPlayerName() + " §7was removed §6" + amount + "§7. New balance: §6" + targetExp.formatExp() + "§7.");
     }
 
     @SubCommand(subCommand = "add")
@@ -98,7 +99,7 @@ public class ExpCommand extends AdvancedCommand {
             return;
         }
 
-        targetExp.setExp(targetExp.getExp().add(amount));
+        targetExp.setExp(targetExp.getExp().add(amount).min(PrisonRepository.maxBigIntegerValue));
 
         playerCurrencyDao.save(targetExp);
 

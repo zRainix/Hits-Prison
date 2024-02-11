@@ -45,8 +45,6 @@ public final class HitsPrison extends JavaPlugin {
         registerCommandParsers();
         registerManagers(pluginManager);
 
-        System.out.println(packageName);
-
         logger.info("Plugin " + this.getName() + ": STARTED");
     }
 

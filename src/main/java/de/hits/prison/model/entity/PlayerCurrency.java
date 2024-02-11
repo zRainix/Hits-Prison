@@ -85,31 +85,26 @@ public class PlayerCurrency {
         if (value.compareTo(BigInteger.valueOf(1_000)) < 0) {
             return value.toString();
         } else if (value.compareTo(BigInteger.valueOf(1_000_000)) < 0) {
-            return format(value, "k");
+            return format(value, 3, "k");
         } else if (value.compareTo(BigInteger.valueOf(1_000_000_000)) < 0) {
-            return format(value, "m");
+            return format(value, 6, "m");
         } else if (value.compareTo(BigInteger.valueOf(1_000_000_000_000L)) < 0) {
-            return format(value, "b");
+            return format(value, 9, "b");
         } else {
             return format(value);
         }
     }
 
-    private String format(BigInteger value, String suffix) {
+    private String format(BigInteger value, int exp, String suffix) {
         NumberFormat format = new DecimalFormat("#.##");
         format.setRoundingMode(RoundingMode.FLOOR);
-        double scaledValue = value.doubleValue() / Math.pow(10, getExponent(value));
+        double scaledValue = value.doubleValue() / Math.pow(10, exp);
         return format.format(scaledValue) + suffix;
     }
 
     private String format(BigInteger value) {
-        NumberFormat format = new DecimalFormat("#.##E0");
+        NumberFormat format = new DecimalFormat("#.####E0");
         format.setRoundingMode(RoundingMode.FLOOR);
-        return format.format(value.doubleValue());
+        return format.format(value).replace("E", "x10^");
     }
-
-    private int getExponent(BigInteger value) {
-        return value.toString().length() - 1;
-    }
-
 }

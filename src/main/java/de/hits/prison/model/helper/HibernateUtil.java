@@ -4,11 +4,8 @@ import de.hits.prison.HitsPrison;
 import de.hits.prison.autowire.anno.Autowired;
 import de.hits.prison.autowire.anno.Component;
 import de.hits.prison.autowire.helper.AutowiredManager;
-import de.hits.prison.fileUtil.anno.SettingsFile;
 import de.hits.prison.mechanic.server.fileUtil.SettingsUtil;
 import de.hits.prison.model.anno.Repository;
-import de.hits.prison.scheduler.anno.Scheduler;
-import de.hits.prison.scheduler.helper.CustomScheduler;
 import org.bukkit.Bukkit;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
@@ -17,6 +14,7 @@ import org.hibernate.boot.registry.StandardServiceRegistry;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Environment;
 
+import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.Map;
@@ -32,6 +30,8 @@ public class HibernateUtil {
 
     @Autowired
     private static SettingsUtil settingsUtil;
+    @Autowired
+    private static HitsPrison main;
 
     public static void init(HitsPrison main) {
         if (sessionFactory == null) {
@@ -40,10 +40,28 @@ public class HibernateUtil {
             try {
                 logger.info("Setting up hibernate environment variables...");
                 Map<String, String> settings = new HashMap<>();
-                settings.put(Environment.DRIVER, "com.mysql.jdbc.Driver");
-                settings.put(Environment.URL, "jdbc:mysql://" + settingsUtil.getHost() + ":" + settingsUtil.getPort() + "/" + settingsUtil.getDatabase() + "");
-                settings.put(Environment.USER, settingsUtil.getUser());
-                settings.put(Environment.PASS, settingsUtil.getPassword());
+
+                if (settingsUtil.isRemoteMySQL()) {
+                    logger.info("Remote MySQL enabled. Connecting to remote host.");
+
+                    settings.put(Environment.DRIVER, "com.mysql.jdbc.Driver");
+                    settings.put(Environment.URL, "jdbc:mysql://" + settingsUtil.getHost() + ":" + settingsUtil.getPort() + "/" + settingsUtil.getDatabase() + "");
+                    settings.put(Environment.USER, settingsUtil.getUser());
+                    settings.put(Environment.PASS, settingsUtil.getPassword());
+                } else {
+                    logger.info("Remote MySQL not enabled. Starting local database.");
+
+                    File databaseFolder = new File(main.getDataFolder(), "localDatabase");
+                    databaseFolder.mkdirs();
+
+                    File databaseFile = new File(databaseFolder, "local");
+
+                    settings.put(Environment.DRIVER, "org.h2.Driver");
+                    settings.put(Environment.URL, "jdbc:h2:" + databaseFile.getAbsolutePath() + ";MODE=MySQL");
+                    settings.put(Environment.USER, "sa");
+                    settings.put(Environment.PASS, "");
+                }
+
                 settings.put(Environment.DIALECT, "org.hibernate.dialect.MySQL8Dialect");
                 settings.put(Environment.HBM2DDL_AUTO, "update");
                 settings.put(Environment.PHYSICAL_NAMING_STRATEGY, "de.hits.prison.model.helper.CustomPhysicalNamingStrategy");

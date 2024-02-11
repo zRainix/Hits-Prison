@@ -11,6 +11,7 @@ import de.hits.prison.mechanic.prisonPlayer.scheduler.TopPlayerCacheScheduler;
 import de.hits.prison.model.dao.PlayerCurrencyDao;
 import de.hits.prison.model.entity.PlayerCurrency;
 import de.hits.prison.model.entity.PrisonPlayer;
+import de.hits.prison.model.helper.PrisonRepository;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -64,7 +65,7 @@ public class VulcanicAshCommand extends AdvancedCommand {
             return;
         }
 
-        targetAsh.setVulcanicAsh(amount);
+        targetAsh.setVulcanicAsh(amount.min(PrisonRepository.maxBigIntegerValue));
 
         playerCurrencyDao.save(targetAsh);
 
@@ -83,11 +84,11 @@ public class VulcanicAshCommand extends AdvancedCommand {
             return;
         }
 
-        targetAsh.setVulcanicAsh(targetAsh.getVulcanicAsh().subtract(amount).min(new BigInteger("0")));
+        targetAsh.setVulcanicAsh(targetAsh.getVulcanicAsh().subtract(amount).max(BigInteger.ZERO));
 
         playerCurrencyDao.save(targetAsh);
 
-        sender.sendMessage("§7Ash balance of §c" + target.getPlayerName() + " §7was removed §c" + amount + "§7. New balance: §6" + targetAsh.formatVulcanicAsh() + "§7.");
+        sender.sendMessage("§7Ash balance of §6" + target.getPlayerName() + " §7was removed §6" + amount + "§7. New balance: §6" + targetAsh.formatVulcanicAsh() + "§7.");
     }
 
     @SubCommand(subCommand = "add")
@@ -102,7 +103,7 @@ public class VulcanicAshCommand extends AdvancedCommand {
             return;
         }
 
-        targetAsh.setVulcanicAsh(targetAsh.getVulcanicAsh().add(amount));
+        targetAsh.setVulcanicAsh(targetAsh.getVulcanicAsh().add(amount).min(PrisonRepository.maxBigIntegerValue));
 
         playerCurrencyDao.save(targetAsh);
 

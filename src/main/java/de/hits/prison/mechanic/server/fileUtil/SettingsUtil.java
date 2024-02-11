@@ -7,6 +7,7 @@ import de.hits.prison.fileUtil.helper.FileUtil;
 public class SettingsUtil extends FileUtil {
 
     private String prefix;
+    private boolean remoteMySQL;
     private String host;
     private int port;
     private String database;
@@ -17,10 +18,11 @@ public class SettingsUtil extends FileUtil {
         super("settings.yml");
 
         this.prefix = "§c[§a§lPRISON§c] §7";
-        this.host = "45.88.109.134";
-        this.port = 13306;
-        this.database = "minecraft_schema";
-        this.user = "root";
+        this.remoteMySQL = false;
+        this.host = "localhost";
+        this.port = 3306;
+        this.database = "schema";
+        this.user = "user";
         this.password = "password";
     }
 
@@ -64,6 +66,14 @@ public class SettingsUtil extends FileUtil {
 
     public void setPrefix(String prefix) {
         this.prefix = prefix;
+    }
+
+    public boolean isRemoteMySQL() {
+        return remoteMySQL;
+    }
+
+    public void setRemoteMySQL(boolean remoteMySQL) {
+        this.remoteMySQL = remoteMySQL;
     }
 
     public void setHost(String host) {

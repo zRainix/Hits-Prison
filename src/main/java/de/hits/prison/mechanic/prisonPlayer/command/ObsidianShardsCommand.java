@@ -11,6 +11,7 @@ import de.hits.prison.mechanic.prisonPlayer.scheduler.TopPlayerCacheScheduler;
 import de.hits.prison.model.dao.PlayerCurrencyDao;
 import de.hits.prison.model.entity.PlayerCurrency;
 import de.hits.prison.model.entity.PrisonPlayer;
+import de.hits.prison.model.helper.PrisonRepository;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -60,7 +61,7 @@ public class ObsidianShardsCommand extends AdvancedCommand {
             return;
         }
 
-        targetShards.setObsidianShards(amount);
+        targetShards.setObsidianShards(amount.min(PrisonRepository.maxBigIntegerValue));
 
         playerCurrencyDao.save(targetShards);
 
@@ -79,11 +80,11 @@ public class ObsidianShardsCommand extends AdvancedCommand {
             return;
         }
 
-        targetShards.setObsidianShards(targetShards.getObsidianShards().subtract(amount).min(BigInteger.ZERO));
+        targetShards.setObsidianShards(targetShards.getObsidianShards().subtract(amount).max(BigInteger.ZERO));
 
         playerCurrencyDao.save(targetShards);
 
-        sender.sendMessage("§7Shards balance of §c" + target.getPlayerName() + " §7was removed §c" + amount + "§7. New balance: §6" + targetShards.formatObsidianShards() + "§7.");
+        sender.sendMessage("§7Shards balance of §6" + target.getPlayerName() + " §7was removed §6" + amount + "§7. New balance: §6" + targetShards.formatObsidianShards() + "§7.");
     }
 
     @SubCommand(subCommand = "add")
@@ -98,7 +99,7 @@ public class ObsidianShardsCommand extends AdvancedCommand {
             return;
         }
 
-        targetShards.setObsidianShards(targetShards.getObsidianShards().add(amount));
+        targetShards.setObsidianShards(targetShards.getObsidianShards().add(amount).min(PrisonRepository.maxBigIntegerValue));
 
         playerCurrencyDao.save(targetShards);
 
