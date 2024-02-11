@@ -3,12 +3,14 @@ package de.hits.prison.mechanic.server.command;
 import de.hits.prison.autowire.anno.Autowired;
 import de.hits.prison.command.anno.BaseCommand;
 import de.hits.prison.command.anno.CommandParameter;
+import de.hits.prison.command.anno.SubCommand;
+import de.hits.prison.command.helper.AdvancedCommand;
 import de.hits.prison.command.helper.SimpleCommand;
 import de.hits.prison.fileUtil.helper.FileUtil;
 import de.hits.prison.fileUtil.helper.FileUtilManager;
 import org.bukkit.command.CommandSender;
 
-public class FileUtilCommand extends SimpleCommand {
+public class FileUtilCommand extends AdvancedCommand {
 
     @Autowired
     private static FileUtilManager fileUtilManager;
@@ -18,67 +20,46 @@ public class FileUtilCommand extends SimpleCommand {
         this.fileUtilManager = fileUtilManager;
     }
 
-    @BaseCommand
-    public void fileUtilCommand(CommandSender sender,
-                                @CommandParameter(name = "action") String action,
-                                @CommandParameter(name = "fileName") String fileName) {
-
-        switch(action.toLowerCase()) {
-            case "load":
-                loadFile(sender, fileName);
-                break;
-            case "save":
-                saveFile(sender , fileName);
-                break;
-            case "reset":
-                resetFile(sender ,fileName);
-                break;
-            default:
-                sender.sendMessage("Invalid subCommand, refer to <load|save|reset>");
-                break;
-        }
-    }
-
-    private void loadFile(CommandSender sender, String fileName) {
-        //TODO
-        FileUtil fileUtil = getFileUtil(fileName);
+    @SubCommand(subCommand = "load")
+    private void loadFile(CommandSender sender, FileUtil fileUtil) {
+        fileUtil = getFileUtil(fileUtil);
         if(fileUtil != null) {
             fileUtil.load();
-            sender.sendMessage("File " + fileName + " loaded successfully");
+            sender.sendMessage("File " + fileUtil + " loaded successfully");
         } else {
-            sender.sendMessage("FileUtil not found: " + fileName);
+            sender.sendMessage("FileUtil not found: " + fileUtil);
         }
 
         sender.sendMessage();
     }
 
-    private void saveFile(CommandSender sender, String fileName) {
-        //TODO
-        FileUtil fileUtil = getFileUtil(fileName);
+    @SubCommand(subCommand = "save")
+    private void saveFile(CommandSender sender, FileUtil fileUtil) {
+        fileUtil = getFileUtil(fileUtil);
         if(fileUtil != null) {
             fileUtil.save();
-            sender.sendMessage("File " + fileName + " saved successfully");
+            sender.sendMessage("File " + fileUtil + " saved successfully");
         } else {
-            sender.sendMessage("FileUtil not found: " + fileName);
+            sender.sendMessage("FileUtil not found: " + fileUtil);
         }
 
         sender.sendMessage();
     }
 
-    private void resetFile(CommandSender sender, String fileName) {
-        //TODO
-        FileUtil fileUtil = getFileUtil(fileName);
+    @SubCommand(subCommand = "reset")
+    private void resetFile(CommandSender sender, FileUtil fileUtil) {
+        fileUtil = getFileUtil(fileUtil);
         if (fileUtil != null) {
             fileUtil.resetConfig();
-            sender.sendMessage("File " + fileName + " reseted successfully");
+            sender.sendMessage("File " + fileUtil + " reseted successfully");
         } else {
-            sender.sendMessage("FileUtil not found: " + fileName);
+            sender.sendMessage("FileUtil not found: " + fileUtil);
         }
 
         sender.sendMessage();
     }
 
-    private de.hits.prison.fileUtil.helper.FileUtil getFileUtil(String fileName) {
-        return fileUtilManager.getFileUtilByName(fileName);
+    private de.hits.prison.fileUtil.helper.FileUtil getFileUtil(FileUtil fileUtil) {
+        return fileUtil;
     }
 }

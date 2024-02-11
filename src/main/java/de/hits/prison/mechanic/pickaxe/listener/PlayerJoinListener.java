@@ -24,11 +24,7 @@ public class PlayerJoinListener implements Listener {
     public void onPlayerJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        ItemStack playerpickaxe = pickaxeHelper.buildPlayerPickaxe(player);
-
-        player.getInventory().addItem(playerpickaxe);
-
-        pickaxeHelper.checkPlayerPickaxe(player);
+        player.sendMessage("Welcome!");
     }
 
 }

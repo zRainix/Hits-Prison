@@ -48,8 +48,11 @@ public class PickaxeUtil extends FileUtil {
         }
         ConfigurationSection enchantmentSection = cfg.getConfigurationSection("Enchantment");
         for (String name : enchantmentSection.getKeys(false)) {
+
             int maxLevel = enchantmentSection.getInt(name + ".MaxLevel");
-            pickaxeEnchantments.add(new PickaxeEnchantment(name, maxLevel));
+            int enchantmentType = enchantmentSection.getInt(name + ".EnchantmentType");
+
+            pickaxeEnchantments.add(new PickaxeEnchantment(name, maxLevel, enchantmentType));
         }
 
         if (!cfg.contains("EnchantmentType")) {

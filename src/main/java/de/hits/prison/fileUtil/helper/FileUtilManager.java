@@ -86,4 +86,8 @@ public class FileUtilManager {
         return null;
     }
 
+    public List<FileUtil> getAllFileUtils() {
+        return registeredFileUtils;
+    }
+
 }

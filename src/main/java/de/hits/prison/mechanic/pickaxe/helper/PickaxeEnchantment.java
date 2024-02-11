@@ -5,9 +5,20 @@ public class PickaxeEnchantment {
     private String name;
     private int maxLevel;
 
-    public PickaxeEnchantment(String name, int maxLevel) {
+    private int type;
+
+    public PickaxeEnchantment(String name, int maxLevel, int type) {
         this.name = name;
         this.maxLevel = maxLevel;
+        this.type = type;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 
     public String getName() {
