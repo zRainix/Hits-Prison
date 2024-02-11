@@ -6,6 +6,8 @@ import de.hits.prison.command.anno.BaseCommand;
 import de.hits.prison.command.anno.CommandParameter;
 import de.hits.prison.command.anno.SubCommand;
 import de.hits.prison.command.helper.AdvancedCommand;
+import de.hits.prison.mechanic.prisonPlayer.cache.impl.TopPlayerVulcanicAshCache;
+import de.hits.prison.mechanic.prisonPlayer.scheduler.TopPlayerCacheScheduler;
 import de.hits.prison.model.dao.PlayerCurrencyDao;
 import de.hits.prison.model.entity.PlayerCurrency;
 import de.hits.prison.model.entity.PrisonPlayer;
@@ -20,6 +22,10 @@ public class VulcanicAshCommand extends AdvancedCommand {
 
     @Autowired
     private static PlayerCurrencyDao playerCurrencyDao;
+    @Autowired
+    private static TopPlayerVulcanicAshCache topPlayerVulcanicAshCache;
+    @Autowired
+    private static TopPlayerCacheScheduler topPlayerCacheScheduler;
 
     public VulcanicAshCommand() {
         super("ash");
@@ -105,7 +111,7 @@ public class VulcanicAshCommand extends AdvancedCommand {
 
     @SubCommand(subCommand = "top")
     public void getTopTen(CommandSender sender) {
-        List<PlayerCurrency> topVulcanicAsh = playerCurrencyDao.findTopPlayersByCategory("vulcanicAsh", 10);
+        List<PlayerCurrency> topVulcanicAsh = topPlayerVulcanicAshCache.getTopPlayerCache();
 
         if (!topVulcanicAsh.isEmpty()) {
             sender.sendMessage("§7Top §610 §7Players by §6Vulcanic Ash§7:");
@@ -113,6 +119,7 @@ public class VulcanicAshCommand extends AdvancedCommand {
                 PlayerCurrency topPlayer = topVulcanicAsh.get(i);
                 sender.sendMessage("§6" + (i + 1) + ". §7" + topPlayer.getRefPrisonPlayer().getPlayerName() + " - §6Ash: §a" + topPlayer.formatVulcanicAsh());
             }
+            sender.sendMessage("§7Next update in §6" + topPlayerCacheScheduler.getTimeUntilNextUpdate());
         } else {
             sender.sendMessage("§cNo players found!");
         }

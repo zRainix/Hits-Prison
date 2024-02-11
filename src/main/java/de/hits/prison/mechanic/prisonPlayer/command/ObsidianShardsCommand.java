@@ -6,6 +6,8 @@ import de.hits.prison.command.anno.BaseCommand;
 import de.hits.prison.command.anno.CommandParameter;
 import de.hits.prison.command.anno.SubCommand;
 import de.hits.prison.command.helper.AdvancedCommand;
+import de.hits.prison.mechanic.prisonPlayer.cache.impl.TopPlayerObsidianShardsCache;
+import de.hits.prison.mechanic.prisonPlayer.scheduler.TopPlayerCacheScheduler;
 import de.hits.prison.model.dao.PlayerCurrencyDao;
 import de.hits.prison.model.entity.PlayerCurrency;
 import de.hits.prison.model.entity.PrisonPlayer;
@@ -20,6 +22,10 @@ public class ObsidianShardsCommand extends AdvancedCommand {
 
     @Autowired
     private static PlayerCurrencyDao playerCurrencyDao;
+    @Autowired
+    private static TopPlayerObsidianShardsCache topPlayerObsidianShardsCache;
+    @Autowired
+    private static TopPlayerCacheScheduler topPlayerCacheScheduler;
 
     public ObsidianShardsCommand() {
         super("shards");
@@ -101,7 +107,7 @@ public class ObsidianShardsCommand extends AdvancedCommand {
 
     @SubCommand(subCommand = "top")
     public void getTopTen(CommandSender sender) {
-        List<PlayerCurrency> topObsidianShards = playerCurrencyDao.findTopPlayersByCategory("obsidianShards", 10);
+        List<PlayerCurrency> topObsidianShards = topPlayerObsidianShardsCache.getTopPlayerCache();
 
         if (!topObsidianShards.isEmpty()) {
             sender.sendMessage("§7Top §610 §7Players by §6Obsidian Shards§7:");
@@ -109,6 +115,7 @@ public class ObsidianShardsCommand extends AdvancedCommand {
                 PlayerCurrency topPlayer = topObsidianShards.get(i);
                 sender.sendMessage("§6" + (i + 1) + ". §7" + topPlayer.getRefPrisonPlayer().getPlayerName() + " - §6Shards: §a" + topPlayer.formatObsidianShards());
             }
+            sender.sendMessage("§7Next update in §6" + topPlayerCacheScheduler.getTimeUntilNextUpdate());
         } else {
             sender.sendMessage("§cNo players found!");
         }
