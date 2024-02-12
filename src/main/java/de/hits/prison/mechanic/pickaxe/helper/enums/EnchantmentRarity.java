@@ -1,4 +1,4 @@
-package de.hits.prison.mechanic.pickaxe.helper;
+package de.hits.prison.mechanic.pickaxe.helper.enums;
 
 public enum EnchantmentRarity {
 

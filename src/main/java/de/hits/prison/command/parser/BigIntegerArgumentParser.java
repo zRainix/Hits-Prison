@@ -1,6 +1,5 @@
 package de.hits.prison.command.parser;
 
-import de.hits.prison.command.anno.AdditionalParser;
 import de.hits.prison.command.helper.ArgumentParser;
 import org.bukkit.command.CommandSender;
 

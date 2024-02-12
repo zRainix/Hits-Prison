@@ -5,8 +5,9 @@ import de.hits.prison.fileUtil.helper.FileUtil;
 
 @SettingsFile
 public class ExpUtil extends FileUtil {
+
     public ExpUtil() {
-        super("Exp-Level");
+        super("expLevels.yml");
     }
 
     @Override

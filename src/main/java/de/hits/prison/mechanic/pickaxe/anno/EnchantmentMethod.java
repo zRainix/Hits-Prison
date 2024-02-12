@@ -1,8 +1,7 @@
 package de.hits.prison.mechanic.pickaxe.anno;
 
-import de.hits.prison.mechanic.pickaxe.helper.EnchantmentRarity;
-import de.hits.prison.mechanic.pickaxe.helper.EnchantmentType;
-import de.hits.prison.mechanic.pickaxe.helper.EnchantmentUsage;
+import de.hits.prison.mechanic.pickaxe.helper.enums.EnchantmentRarity;
+import de.hits.prison.mechanic.pickaxe.helper.enums.EnchantmentType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -13,7 +12,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface EnchantmentMethod {
     String enchantment();
-    EnchantmentUsage enchantmentType();
+    EnchantmentType enchantmentType();
     EnchantmentRarity enchantmentRarity();
 
 }

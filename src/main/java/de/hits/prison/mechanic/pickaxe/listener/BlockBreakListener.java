@@ -4,8 +4,8 @@ import de.hits.prison.autowire.anno.Autowired;
 import de.hits.prison.autowire.anno.Component;
 import de.hits.prison.mechanic.pickaxe.anno.EnchantmentMethod;
 import de.hits.prison.mechanic.pickaxe.helper.DropRate;
-import de.hits.prison.mechanic.pickaxe.helper.EnchantmentRarity;
-import de.hits.prison.mechanic.pickaxe.helper.EnchantmentUsage;
+import de.hits.prison.mechanic.pickaxe.helper.enums.EnchantmentRarity;
+import de.hits.prison.mechanic.pickaxe.helper.enums.EnchantmentType;
 import de.hits.prison.model.dao.PlayerEnchantmentDao;
 import de.hits.prison.model.dao.PrisonPlayerDao;
 import de.hits.prison.model.entity.PlayerEnchantment;
@@ -66,7 +66,7 @@ public class BlockBreakListener implements Listener {
         player.sendMessage("Ash:" + ash + ", Shards: " + shards + ", Exp: " + exp);
     }
 
-    @EnchantmentMethod(enchantment = "Cube", enchantmentType = EnchantmentUsage.BREAK, enchantmentRarity = EnchantmentRarity.RARE)
+    @EnchantmentMethod(enchantment = "Cube", enchantmentType = EnchantmentType.BREAK, enchantmentRarity = EnchantmentRarity.RARE)
     public void executeBlockEnchantment(Player player, PlayerEnchantment blockEnchantment, BlockBreakEvent e) {
         int level = blockEnchantment.getEnchantmentLevel();
 
@@ -87,7 +87,7 @@ public class BlockBreakListener implements Listener {
         }
     }
 
-    @EnchantmentMethod(enchantment = "Jackhammer", enchantmentType = EnchantmentUsage.BREAK, enchantmentRarity = EnchantmentRarity.RARE)
+    @EnchantmentMethod(enchantment = "Jackhammer", enchantmentType = EnchantmentType.BREAK, enchantmentRarity = EnchantmentRarity.RARE)
     public void executeJackhammerEnchantment(Player player, PlayerEnchantment blockEnchantment, BlockBreakEvent e) {
         int mineWidth = 10, mineHeight = 12;
 

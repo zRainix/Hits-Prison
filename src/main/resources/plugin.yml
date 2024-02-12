@@ -7,4 +7,4 @@ commands:
   ash:
   shards:
   exp:
-  fileutil:
+  fileUtil:

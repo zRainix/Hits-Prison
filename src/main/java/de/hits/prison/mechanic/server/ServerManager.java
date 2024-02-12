@@ -11,15 +11,13 @@ import org.bukkit.plugin.PluginManager;
 @Component
 public class ServerManager implements BaseManager {
 
-    @Autowired
-    private static FileUtilManager fileUtilManager;
 
     @Override
     public void register(HitsPrison hitsPrison, PluginManager pluginManager) {
 
         // Commands
-        FileUtilCommand fileUtilCommand = new FileUtilCommand(fileUtilManager);
-        hitsPrison.getCommand("fileutil").setExecutor(fileUtilCommand);
+        FileUtilCommand fileUtilCommand = new FileUtilCommand();
+        hitsPrison.getCommand("fileUtil").setExecutor(fileUtilCommand);
 
         // Listener
 
