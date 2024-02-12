@@ -1,14 +1,14 @@
 package de.hits.prison;
 
-import de.hits.prison.autowire.anno.Autowired;
-import de.hits.prison.autowire.helper.AutowiredManager;
-import de.hits.prison.command.helper.ArgumentParserRegistry;
-import de.hits.prison.fileUtil.helper.FileUtilManager;
-import de.hits.prison.mechanic.helper.BaseManager;
-import de.hits.prison.mechanic.server.scheduler.SaveFileUtilScheduler;
-import de.hits.prison.model.helper.ClassScanner;
-import de.hits.prison.model.helper.HibernateUtil;
-import de.hits.prison.scheduler.helper.SchedulerManager;
+import de.hits.prison.base.scheduler.SaveFileUtilScheduler;
+import de.hits.prison.server.autowire.anno.Autowired;
+import de.hits.prison.server.autowire.helper.AutowiredManager;
+import de.hits.prison.server.command.helper.ArgumentParserRegistry;
+import de.hits.prison.server.fileUtil.helper.FileUtilManager;
+import de.hits.prison.server.helper.Manager;
+import de.hits.prison.server.model.helper.ClassScanner;
+import de.hits.prison.server.model.helper.HibernateUtil;
+import de.hits.prison.server.scheduler.helper.SchedulerManager;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -25,8 +25,6 @@ public final class HitsPrison extends JavaPlugin {
     // Manager
     private FileUtilManager fileUtilManager = new FileUtilManager();
     private SchedulerManager schedulerManager = new SchedulerManager();
-
-    private static String packageName = HitsPrison.class.getPackageName();
 
     @Autowired
     private static SaveFileUtilScheduler saveFileUtilScheduler;
@@ -51,42 +49,41 @@ public final class HitsPrison extends JavaPlugin {
     private void registerUtils(FileUtilManager fileUtilManager) {
         AutowiredManager.register(fileUtilManager);
 
-        fileUtilManager.registerAllFileUtils(packageName);
+        fileUtilManager.registerAllFileUtils(getClass().getPackageName());
     }
 
     private void registerSchedulers(SchedulerManager schedulerManager) {
         AutowiredManager.register(schedulerManager);
 
-        schedulerManager.registerAllSchedulers(packageName);
+        schedulerManager.registerAllSchedulers(getClass().getPackageName());
     }
 
     private void registerHibernate() {
         HibernateUtil.init(this);
 
-        HibernateUtil.registerAllRepositories(packageName);
+        HibernateUtil.registerAllRepositories(getClass().getPackageName());
     }
 
     private void registerCommandParsers() {
         try {
-            ArgumentParserRegistry.registerAll(packageName + ".command.parser");
+            ArgumentParserRegistry.registerAll();
         } catch (NoSuchMethodException | InvocationTargetException | InstantiationException | IllegalAccessException e) {
             logger.severe("Error while initializing command type parsers: " + e.getMessage());
         }
     }
 
     private void registerManagers(PluginManager pluginManager) {
-        Set<Class<? extends BaseManager>> managers = ClassScanner.getClasses(packageName, BaseManager.class);
+        Set<Class<? extends Manager>> managers = ClassScanner.getClasses(getClass().getPackageName(), Manager.class);
 
         try {
             for (Class<?> manager : managers) {
-                BaseManager baseManager = (BaseManager) manager.getConstructor().newInstance();
-                Method method = manager.getMethod("register", HitsPrison.class, PluginManager.class);
-                method.setAccessible(true);
-                method.invoke(baseManager, this, pluginManager);
+                Manager baseManager = (Manager) manager.getConstructor().newInstance();
                 AutowiredManager.register(baseManager);
+                baseManager.register(this, pluginManager);
             }
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
             logger.severe("Error while initializing managers: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
