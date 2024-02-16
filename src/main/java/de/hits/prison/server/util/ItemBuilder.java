@@ -40,7 +40,7 @@ public class ItemBuilder {
             List<String> currentLore = meta.getLore();
             if (currentLore == null)
                 currentLore = new ArrayList<>();
-            currentLore.add("\t".repeat(repeats++));
+            currentLore.add("§a".repeat(repeats++));
             meta.setLore(currentLore);
         }
         return this;

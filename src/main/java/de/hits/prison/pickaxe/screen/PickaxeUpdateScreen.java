@@ -2,9 +2,9 @@ package de.hits.prison.pickaxe.screen;
 
 import de.hits.prison.base.autowire.anno.Autowired;
 import de.hits.prison.base.autowire.anno.Component;
+import de.hits.prison.base.model.dao.PlayerEnchantmentDao;
 import de.hits.prison.base.model.dao.PrisonPlayerDao;
 import de.hits.prison.base.model.entity.PlayerEnchantment;
-import de.hits.prison.base.model.entity.PrisonPlayer;
 import de.hits.prison.base.screen.helper.ClickAction;
 import de.hits.prison.base.screen.helper.Screen;
 import de.hits.prison.base.screen.helper.ScreenColumn;
@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,16 +26,17 @@ public class PickaxeUpdateScreen extends Screen {
     private static PickaxeUtil pickaxeUtil;
     @Autowired
     private static PrisonPlayerDao prisonPlayerDao;
+    @Autowired
+    private static PlayerEnchantmentDao playerEnchantmentDao;
 
     private final Player player;
     private final Map<String, ScreenColumn> typeColumns;
-    private final List<PickaxeUtil.PickaxeEnchantmentType> enchantmentTypes;
 
     public PickaxeUpdateScreen(Player player) {
         super(getTitle(player), 6);
         this.player = player;
         this.typeColumns = new HashMap<>();
-        enchantmentTypes = pickaxeUtil.getPickaxeEnchantmentTypes();
+        List<PickaxeUtil.PickaxeEnchantmentType> enchantmentTypes = pickaxeUtil.getPickaxeEnchantmentTypes();
         int[] slots = getStartSlots(enchantmentTypes.size());
         for (int i = 0; i < enchantmentTypes.size(); i++) {
             PickaxeUtil.PickaxeEnchantmentType type = enchantmentTypes.get(i);
@@ -45,34 +47,28 @@ public class PickaxeUpdateScreen extends Screen {
 
     public int[] getStartSlots(int columns) {
         return switch (columns) {
-            case 1 -> new int[]{4};
-            case 2 -> new int[]{3, 5};
-            case 3 -> new int[]{2, 4, 6};
-            case 4 -> new int[]{1, 3, 5, 7};
-            case 5 -> new int[]{2, 3, 4, 5, 6};
-            case 6 -> new int[]{1, 2, 3, 5, 6, 7};
-            case 7 -> new int[]{1, 2, 3, 4, 5, 6, 7};
-            case 8 -> new int[]{0, 1, 2, 3, 5, 6, 7, 8};
-            case 9 -> new int[]{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+            case 1 -> new int[]{             4             };
+            case 2 -> new int[]{          3,    5          };
+            case 3 -> new int[]{       2,    4,    6       };
+            case 4 -> new int[]{    1,    3,    5,    7    };
+            case 5 -> new int[]{       2, 3, 4, 5, 6       };
+            case 6 -> new int[]{    1, 2, 3,    5, 6, 7    };
+            case 7 -> new int[]{    1, 2, 3, 4, 5, 6, 7    };
+            case 8 -> new int[]{ 0, 1, 2, 3,    5, 6, 7, 8 };
+            case 9 -> new int[]{ 0, 1, 2, 3, 4, 5, 6, 7, 8 };
             default -> throw new IllegalStateException("Unexpected value: " + columns);
         };
     }
 
     @Override
     public void init() {
-        PrisonPlayer prisonPlayer = prisonPlayerDao.findByPlayer(player);
-        if (prisonPlayer == null)
-            return;
-
-        for (PlayerEnchantment playerEnchantment : prisonPlayer.getPlayerEnchantments()) {
-            PickaxeUtil.PickaxeEnchantment enchantment = pickaxeUtil.getPickaxeEnchantment(playerEnchantment.getEnchantmentName());
-            if (enchantment == null)
-                continue;
+        for (PickaxeUtil.PickaxeEnchantment enchantment : pickaxeUtil.getPickaxeEnchantments().stream().sorted(Comparator.comparingInt(o -> o.getRarity().getOrder())).toList()) {
+            PlayerEnchantment playerEnchantment = playerEnchantmentDao.findByPlayerAndEnchantmentName(player, enchantment.getName());
             ScreenColumn screenColumn = typeColumns.get(enchantment.getType().getName());
             screenColumn.addItem(buildEnchantmentItem(playerEnchantment, enchantment), new ClickAction() {
                 @Override
                 public void onClick(Player player, Screen screen, InventoryClickEvent event) {
-                    player.sendMessage("Öffne " + playerEnchantment.getEnchantmentName());
+                    // TODO: Open new menu for buying/upgrading an enchantment
                 }
             });
         }
@@ -80,9 +76,9 @@ public class PickaxeUpdateScreen extends Screen {
 
     private ItemStack buildEnchantmentItem(PlayerEnchantment playerEnchantment, PickaxeUtil.PickaxeEnchantment enchantment) {
         ItemBuilder itemBuilder = new ItemBuilder(enchantment.getPreviewMaterial()).setAllItemFlags()
-                .setDisplayName(enchantment.getRarity().getColorPrefix() + enchantment.getName())
+                .setDisplayName(enchantment.getRarity().getColorPrefix() + enchantment.getRarity().getName() + "§8: §b" + enchantment.getName())
                 .addLoreBreak()
-                .addLore("§8-- Description --")
+                .addLore("§8-- §bDescription §8--")
                 .addLore("§7" + enchantment.getDescription())
                 .addLoreBreak();
         /*

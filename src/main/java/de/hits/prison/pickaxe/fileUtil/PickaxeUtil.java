@@ -48,10 +48,10 @@ public class PickaxeUtil extends FileUtil {
         cfg.set("Enchantment", null);
         for (PickaxeEnchantment enchantment : pickaxeEnchantments) {
             cfg.set("Enchantment." + enchantment.getName() + ".Description", enchantment.getDescription());
-            cfg.set("Enchantment." + enchantment.getName() + ".PreviewMaterial", enchantment.getPreviewMaterial());
+            cfg.set("Enchantment." + enchantment.getName() + ".PreviewMaterial", enchantment.getPreviewMaterial().name());
             cfg.set("Enchantment." + enchantment.getName() + ".MaxLevel", enchantment.getMaxLevel());
-            cfg.set("Enchantment." + enchantment.getName() + ".Type", enchantment.getRarity().getId());
-            cfg.set("Enchantment." + enchantment.getName() + ".Rarity", enchantment.getType().getId());
+            cfg.set("Enchantment." + enchantment.getName() + ".Type", enchantment.getType().getId());
+            cfg.set("Enchantment." + enchantment.getName() + ".Rarity", enchantment.getRarity().getId());
             for (EnchantmentLevel enchantmentLevel : enchantment.getEnchantmentLevels()) {
                 cfg.set("Enchantment." + enchantment.getName() + ".Level." + enchantmentLevel.getLevel() + ".Price", enchantmentLevel.getPrice());
                 cfg.set("Enchantment." + enchantment.getName() + ".Level." + enchantmentLevel.getLevel() + ".ActivationChance", enchantmentLevel.getActivationChance());
@@ -80,6 +80,8 @@ public class PickaxeUtil extends FileUtil {
     }
 
     private void loadEnchantmentType() {
+        pickaxeEnchantmentTypes.clear();
+
         ConfigurationSection enchantmentTypeSection = cfg.getConfigurationSection("EnchantmentType");
 
         if (enchantmentTypeSection == null)
@@ -94,6 +96,8 @@ public class PickaxeUtil extends FileUtil {
     }
 
     private void loadEnchantmentRarity() {
+        enchantmentRarities.clear();
+
         ConfigurationSection enchantmentRaritySection = cfg.getConfigurationSection("EnchantmentRarity");
 
         if (enchantmentRaritySection == null)
@@ -109,6 +113,8 @@ public class PickaxeUtil extends FileUtil {
     }
 
     private void loadEnchantment() {
+        pickaxeEnchantments.clear();
+
         ConfigurationSection enchantmentSection = cfg.getConfigurationSection("Enchantment");
 
         if (enchantmentSection == null)
