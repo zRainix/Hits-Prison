@@ -14,6 +14,8 @@ public class ItemBuilder {
     private final ItemStack item;
     private final ItemMeta meta;
 
+    private int repeats = 1;
+
     public ItemBuilder(Material material) {
         this.item = new ItemStack(material);
         this.meta = item.getItemMeta();
@@ -29,6 +31,17 @@ public class ItemBuilder {
     public ItemBuilder setLore(List<String> lore) {
         if (meta != null) {
             meta.setLore(lore);
+        }
+        return this;
+    }
+
+    public ItemBuilder addLoreBreak() {
+        if (meta != null) {
+            List<String> currentLore = meta.getLore();
+            if (currentLore == null)
+                currentLore = new ArrayList<>();
+            currentLore.add("\t".repeat(repeats++));
+            meta.setLore(currentLore);
         }
         return this;
     }
