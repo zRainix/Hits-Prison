@@ -1,13 +1,12 @@
 package de.hits.prison.prisonPlayer.cache;
 
-import de.hits.prison.server.autowire.anno.Autowired;
-import de.hits.prison.server.autowire.anno.Component;
-import de.hits.prison.server.model.dao.PlayerCurrencyDao;
-import de.hits.prison.server.model.entity.PlayerCurrency;
+import de.hits.prison.base.autowire.anno.Autowired;
+import de.hits.prison.base.autowire.anno.Component;
+import de.hits.prison.base.model.dao.PlayerCurrencyDao;
+import de.hits.prison.base.model.entity.PlayerCurrency;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class TopPlayerCache {
@@ -25,7 +24,7 @@ public class TopPlayerCache {
     }
 
     public void updateTopPlayers() {
-        this.topPlayersCache = playerCurrencyDao.finder().orderDesc(this.currency).findMax(10).stream().collect(Collectors.toList());
+        this.topPlayersCache = playerCurrencyDao.finder().orderDesc(this.currency).findMax(10);
     }
 
     public List<PlayerCurrency> getTopPlayerCache() {

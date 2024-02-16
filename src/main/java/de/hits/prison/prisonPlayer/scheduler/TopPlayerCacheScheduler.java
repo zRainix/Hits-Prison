@@ -1,12 +1,12 @@
 package de.hits.prison.prisonPlayer.scheduler;
 
-import de.hits.prison.prisonPlayer.cache.impl.TopPlayerObsidianShardsCache;
-import de.hits.prison.prisonPlayer.cache.impl.TopPlayerVulcanicAshCache;
-import de.hits.prison.server.autowire.anno.Autowired;
-import de.hits.prison.server.autowire.anno.Component;
+import de.hits.prison.base.autowire.anno.Autowired;
+import de.hits.prison.base.autowire.anno.Component;
+import de.hits.prison.base.scheduler.anno.Scheduler;
+import de.hits.prison.base.scheduler.helper.CustomScheduler;
 import de.hits.prison.prisonPlayer.cache.impl.TopPlayerExpCache;
-import de.hits.prison.server.scheduler.anno.Scheduler;
-import de.hits.prison.server.scheduler.helper.CustomScheduler;
+import de.hits.prison.prisonPlayer.cache.impl.TopPlayerObsidianShardsCache;
+import de.hits.prison.prisonPlayer.cache.impl.TopPlayerVolcanicAshCache;
 import org.bukkit.Bukkit;
 
 import java.util.logging.Logger;
@@ -15,12 +15,12 @@ import java.util.logging.Logger;
 @Scheduler
 public class TopPlayerCacheScheduler extends CustomScheduler {
 
-    private Logger logger = Bukkit.getLogger();
+    private final Logger logger = Bukkit.getLogger();
 
     @Autowired
     private static TopPlayerExpCache topPlayerExpCache;
     @Autowired
-    private static TopPlayerVulcanicAshCache topPlayerVulcanicAshCache;
+    private static TopPlayerVolcanicAshCache topPlayerVolcanicAshCache;
     @Autowired
     private static TopPlayerObsidianShardsCache topPlayerObsidianShardsCache;
 
@@ -35,17 +35,21 @@ public class TopPlayerCacheScheduler extends CustomScheduler {
     public TopPlayerCacheScheduler() {
         super(delay, period);
 
-        this.nextUpdate = System.currentTimeMillis() + (delay * ticksToMillis);
+        long nextDelay = delay * ticksToMillis;
+
+        this.nextUpdate = System.currentTimeMillis() + nextDelay;
 
         logger.info("First init all updateCachedTopPlayers");
     }
 
     @Override
     public void run() {
-        this.nextUpdate = System.currentTimeMillis() + (period * ticksToMillis);
+        long nextPeriod = period * ticksToMillis;
+
+        this.nextUpdate = System.currentTimeMillis() + nextPeriod;
 
         topPlayerExpCache.updateTopPlayers();
-        topPlayerVulcanicAshCache.updateTopPlayers();
+        topPlayerVolcanicAshCache.updateTopPlayers();
         topPlayerObsidianShardsCache.updateTopPlayers();
 
         logger.info("UPDATED updateCachedTopPlayers");

@@ -1,13 +1,12 @@
 package de.hits.prison.prisonPlayer.listener;
 
 import de.hits.prison.pickaxe.helper.PickaxeHelper;
-import de.hits.prison.server.autowire.anno.Autowired;
-import de.hits.prison.server.autowire.anno.Component;
-import de.hits.prison.server.model.dao.PlayerCurrencyDao;
-import de.hits.prison.server.model.dao.PrisonPlayerDao;
-import de.hits.prison.server.model.entity.PlayerCurrency;
-import de.hits.prison.server.model.entity.PrisonPlayer;
-import org.bukkit.Bukkit;
+import de.hits.prison.base.autowire.anno.Autowired;
+import de.hits.prison.base.autowire.anno.Component;
+import de.hits.prison.base.model.dao.PlayerCurrencyDao;
+import de.hits.prison.base.model.dao.PrisonPlayerDao;
+import de.hits.prison.base.model.entity.PlayerCurrency;
+import de.hits.prison.base.model.entity.PrisonPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -17,12 +16,9 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.logging.Logger;
 
 @Component
 public class PrisonPlayerListener implements Listener {
-
-    private Logger logger = Bukkit.getLogger();
 
     @Autowired
     private static PrisonPlayerDao prisonPlayerDao;
@@ -32,7 +28,7 @@ public class PrisonPlayerListener implements Listener {
     @Autowired
     private static PickaxeHelper pickaxeHelper;
 
-    private static long millisToMinutes = 1000L * 60L;
+    private static final long millisToMinutes = 1000L * 60L;
 
     @EventHandler
     public void onJoin(PlayerJoinEvent e) {
@@ -58,7 +54,7 @@ public class PrisonPlayerListener implements Listener {
 
         if (playerCurrency == null) {
             playerCurrency = new PlayerCurrency();
-            playerCurrency.setVulcanicAsh(new BigInteger("0"));
+            playerCurrency.setVolcanicAsh(new BigInteger("0"));
             playerCurrency.setObsidianShards(new BigInteger("0"));
             playerCurrency.setExp(new BigInteger("0"));
             playerCurrency.setRefPrisonPlayer(prisonPlayer);

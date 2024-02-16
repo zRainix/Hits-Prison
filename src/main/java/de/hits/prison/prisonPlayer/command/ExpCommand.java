@@ -2,16 +2,16 @@ package de.hits.prison.prisonPlayer.command;
 
 import de.hits.prison.prisonPlayer.cache.impl.TopPlayerExpCache;
 import de.hits.prison.prisonPlayer.scheduler.TopPlayerCacheScheduler;
-import de.hits.prison.server.autowire.anno.Autowired;
-import de.hits.prison.server.autowire.anno.Component;
-import de.hits.prison.server.command.anno.BaseCommand;
-import de.hits.prison.server.command.anno.CommandParameter;
-import de.hits.prison.server.command.anno.SubCommand;
-import de.hits.prison.server.command.helper.AdvancedCommand;
-import de.hits.prison.server.model.dao.PlayerCurrencyDao;
-import de.hits.prison.server.model.entity.PlayerCurrency;
-import de.hits.prison.server.model.entity.PrisonPlayer;
-import de.hits.prison.server.model.helper.PrisonRepository;
+import de.hits.prison.base.autowire.anno.Autowired;
+import de.hits.prison.base.autowire.anno.Component;
+import de.hits.prison.base.command.anno.BaseCommand;
+import de.hits.prison.base.command.anno.CommandParameter;
+import de.hits.prison.base.command.anno.SubCommand;
+import de.hits.prison.base.command.helper.AdvancedCommand;
+import de.hits.prison.base.model.dao.PlayerCurrencyDao;
+import de.hits.prison.base.model.entity.PlayerCurrency;
+import de.hits.prison.base.model.entity.PrisonPlayer;
+import de.hits.prison.base.model.helper.PrisonRepository;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 

@@ -1,11 +1,13 @@
 package de.hits.prison.pickaxe.fileUtil;
 
-import de.hits.prison.server.fileUtil.anno.SettingsFile;
-import de.hits.prison.server.fileUtil.helper.FileUtil;
+import de.hits.prison.base.fileUtil.anno.SettingsFile;
+import de.hits.prison.base.fileUtil.helper.FileUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemoryConfiguration;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -13,7 +15,7 @@ import java.util.logging.Logger;
 @SettingsFile
 public class PickaxeUtil extends FileUtil {
 
-    private Logger logger = Bukkit.getLogger();
+    private final Logger logger = Bukkit.getLogger();
 
     List<PickaxeEnchantment> pickaxeEnchantments;
     List<EnchantmentType> enchantmentTypes;
@@ -31,6 +33,11 @@ public class PickaxeUtil extends FileUtil {
         MemoryConfiguration defaultConfig = new MemoryConfiguration();
         defaultConfig.set("Enchantment.Efficiency.MaxLevel", 10);
         defaultConfig.set("Enchantment.Efficiency.Type", 1);
+        defaultConfig.set("Enchantment.Efficiency.Rarity", 1);
+        defaultConfig.set("EnchantmentType.1.Name", "Enchantment");
+        defaultConfig.set("EnchantmentRarity.1.Name", "Common");
+        defaultConfig.set("EnchantmentRarity.1.ColorPrefix", "§7");
+        defaultConfig.set("EnchantmentRarity.1.Order", 1);
         cfg.addDefaults(defaultConfig);
         saveDefaultsConfig();
     }
@@ -42,6 +49,10 @@ public class PickaxeUtil extends FileUtil {
             cfg.set("Enchantment." + enchantment.getName() + ".MaxLevel", enchantment.getMaxLevel());
             cfg.set("Enchantment." + enchantment.getName() + ".Type", enchantment.getRarity().getId());
             cfg.set("Enchantment." + enchantment.getName() + ".Rarity", enchantment.getType().getId());
+            for (EnchantmentLevel enchantmentLevel : enchantment.getEnchantmentLevels()) {
+                cfg.set("Enchantment." + enchantment.getName() + ".Level." + enchantmentLevel.getLevel() + ".Price", enchantmentLevel.getPrice());
+                cfg.set("Enchantment." + enchantment.getName() + ".Level." + enchantmentLevel.getLevel() + ".ActivationChance", enchantmentLevel.getActivationChance());
+            }
         }
         cfg.set("EnchantmentType", null);
         for (EnchantmentType enchantmentType : enchantmentTypes) {
@@ -50,6 +61,8 @@ public class PickaxeUtil extends FileUtil {
         cfg.set("EnchantmentRarity", null);
         for (EnchantmentRarity enchantmentRarity : enchantmentRarities) {
             cfg.set("EnchantmentRarity." + enchantmentRarity.getId() + ".Name", enchantmentRarity.getName());
+            cfg.set("EnchantmentRarity." + enchantmentRarity.getId() + ".ColorPrefix", enchantmentRarity.getColorPrefix());
+            cfg.set("EnchantmentRarity." + enchantmentRarity.getId() + ".Order", enchantmentRarity.getOrder());
         }
         saveConfig();
     }
@@ -64,10 +77,11 @@ public class PickaxeUtil extends FileUtil {
     }
 
     private void loadEnchantmentType() {
-        if (!cfg.contains("EnchantmentType")) {
-            return;
-        }
         ConfigurationSection enchantmentTypeSection = cfg.getConfigurationSection("EnchantmentType");
+
+        if (enchantmentTypeSection == null)
+            return;
+
         for (String id : enchantmentTypeSection.getKeys(false)) {
             int enchantmentTypeId = Integer.parseInt(id);
 
@@ -77,28 +91,30 @@ public class PickaxeUtil extends FileUtil {
     }
 
     private void loadEnchantmentRarity() {
-        if (!cfg.contains("EnchantmentRarity")) {
-            return;
-        }
         ConfigurationSection enchantmentRaritySection = cfg.getConfigurationSection("EnchantmentRarity");
+
+        if (enchantmentRaritySection == null)
+            return;
+
         for (String id : enchantmentRaritySection.getKeys(false)) {
             int enchantmentRarityId = Integer.parseInt(id);
             String name = enchantmentRaritySection.getString(id + ".Name", "Rarity-" + id);
             String colorPrefix = enchantmentRaritySection.getString(id + ".ColorPrefix", "§a");
-            int order = enchantmentRaritySection.getInt(id + ".ColorPrefix", 0);
+            int order = enchantmentRaritySection.getInt(id + ".Order", 0);
             enchantmentRarities.add(new EnchantmentRarity(enchantmentRarityId, name, colorPrefix, order));
         }
     }
 
     private void loadEnchantment() {
-        if (!cfg.contains("Enchantment")) {
-            return;
-        }
         ConfigurationSection enchantmentSection = cfg.getConfigurationSection("Enchantment");
+
+        if (enchantmentSection == null)
+            return;
+
         for (String name : enchantmentSection.getKeys(false)) {
             int maxLevel = enchantmentSection.getInt(name + ".MaxLevel", 0);
-            String type = enchantmentSection.getString(name + ".Type", "");
-            String rarity = enchantmentSection.getString(name + ".Rarity", "");
+            int type = enchantmentSection.getInt(name + ".Type", 1);
+            int rarity = enchantmentSection.getInt(name + ".Rarity", 1);
             EnchantmentType enchantmentType = getEnchantmentType(type);
             EnchantmentRarity enchantmentRarity = getEnchantmentRarity(rarity);
             if (maxLevel < 1) {
@@ -113,7 +129,17 @@ public class PickaxeUtil extends FileUtil {
                 logger.warning("Could not add enchantment " + name + ": EnchantmentRarity by id " + rarity + " not found.");
                 continue;
             }
-            pickaxeEnchantments.add(new PickaxeEnchantment(name, maxLevel, enchantmentType, enchantmentRarity));
+            List<EnchantmentLevel> enchantmentLevels = new ArrayList<>();
+            ConfigurationSection levelSection = enchantmentSection.getConfigurationSection(name + ".Level");
+            if (levelSection != null) {
+                for (String levelString : levelSection.getKeys(false)) {
+                    int level = Integer.parseInt(levelString);
+                    BigInteger price = new BigInteger(levelSection.getString(levelString + ".Price", "0"));
+                    BigDecimal activationChance = new BigDecimal(levelSection.getString(levelString + ".ActivationChance", "1.0"));
+                    enchantmentLevels.add(new EnchantmentLevel(level, price, activationChance));
+                }
+            }
+            pickaxeEnchantments.add(new PickaxeEnchantment(name, maxLevel, enchantmentType, enchantmentRarity, enchantmentLevels));
         }
     }
 
@@ -126,10 +152,28 @@ public class PickaxeUtil extends FileUtil {
         return null;
     }
 
+    private EnchantmentType getEnchantmentType(int id) {
+        for (EnchantmentType enchantmentType : enchantmentTypes) {
+            if (enchantmentType.getId() == id) {
+                return enchantmentType;
+            }
+        }
+        return null;
+    }
+
     private EnchantmentType getEnchantmentType(String enchantmentName) {
         for (EnchantmentType enchantmentType : enchantmentTypes) {
             if (enchantmentType.getName().equalsIgnoreCase(enchantmentName)) {
                 return enchantmentType;
+            }
+        }
+        return null;
+    }
+
+    private EnchantmentRarity getEnchantmentRarity(int id) {
+        for (EnchantmentRarity enchantmentRarity : enchantmentRarities) {
+            if (enchantmentRarity.getId() == id) {
+                return enchantmentRarity;
             }
         }
         return null;
@@ -154,12 +198,14 @@ public class PickaxeUtil extends FileUtil {
         private int maxLevel;
         private EnchantmentType type;
         private EnchantmentRarity rarity;
+        private List<EnchantmentLevel> enchantmentLevels;
 
-        public PickaxeEnchantment(String name, int maxLevel, EnchantmentType type, EnchantmentRarity rarity) {
+        public PickaxeEnchantment(String name, int maxLevel, EnchantmentType type, EnchantmentRarity rarity, List<EnchantmentLevel> enchantmentLevels) {
             this.name = name;
             this.maxLevel = maxLevel;
             this.type = type;
             this.rarity = rarity;
+            this.enchantmentLevels = enchantmentLevels;
         }
 
         public String getName() {
@@ -192,6 +238,14 @@ public class PickaxeUtil extends FileUtil {
 
         public void setRarity(EnchantmentRarity rarity) {
             this.rarity = rarity;
+        }
+
+        public List<EnchantmentLevel> getEnchantmentLevels() {
+            return enchantmentLevels;
+        }
+
+        public void setEnchantmentLevels(List<EnchantmentLevel> enchantmentLevels) {
+            this.enchantmentLevels = enchantmentLevels;
         }
     }
 
@@ -266,6 +320,43 @@ public class PickaxeUtil extends FileUtil {
 
         public void setOrder(int order) {
             this.order = order;
+        }
+    }
+
+    public static class EnchantmentLevel {
+
+        private int level;
+        private BigInteger price;
+        private BigDecimal activationChance;
+
+        public EnchantmentLevel(int level, BigInteger price, BigDecimal activationChance) {
+            this.level = level;
+            this.price = price;
+            this.activationChance = activationChance;
+        }
+
+        public int getLevel() {
+            return level;
+        }
+
+        public void setLevel(int level) {
+            this.level = level;
+        }
+
+        public BigInteger getPrice() {
+            return price;
+        }
+
+        public void setPrice(BigInteger price) {
+            this.price = price;
+        }
+
+        public BigDecimal getActivationChance() {
+            return activationChance;
+        }
+
+        public void setActivationChance(BigDecimal activationChance) {
+            this.activationChance = activationChance;
         }
     }
 }

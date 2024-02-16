@@ -1,7 +1,7 @@
 package de.hits.prison.prisonPlayer.fileUtil;
 
-import de.hits.prison.server.fileUtil.anno.SettingsFile;
-import de.hits.prison.server.fileUtil.helper.FileUtil;
+import de.hits.prison.base.fileUtil.anno.SettingsFile;
+import de.hits.prison.base.fileUtil.helper.FileUtil;
 
 @SettingsFile
 public class ExpUtil extends FileUtil {

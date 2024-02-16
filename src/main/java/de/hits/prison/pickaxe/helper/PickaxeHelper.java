@@ -1,16 +1,14 @@
 package de.hits.prison.pickaxe.helper;
 
-import de.hits.prison.base.util.ItemBuilder;
+import de.hits.prison.base.autowire.anno.Autowired;
+import de.hits.prison.base.autowire.anno.Component;
+import de.hits.prison.base.model.dao.PrisonPlayerDao;
+import de.hits.prison.base.model.entity.PlayerEnchantment;
+import de.hits.prison.base.model.entity.PrisonPlayer;
+import de.hits.prison.pickaxe.enchantment.helper.PickaxeEnchantmentImplManager;
 import de.hits.prison.pickaxe.fileUtil.PickaxeUtil;
-import de.hits.prison.pickaxe.helper.apply.ApplyEnchantments;
-import de.hits.prison.server.autowire.anno.Autowired;
-import de.hits.prison.server.autowire.anno.Component;
-import de.hits.prison.server.model.dao.PlayerEnchantmentDao;
-import de.hits.prison.server.model.dao.PrisonPlayerDao;
-import de.hits.prison.server.model.entity.PlayerEnchantment;
-import de.hits.prison.server.model.entity.PrisonPlayer;
+import de.hits.prison.server.util.ItemBuilder;
 import net.minecraft.nbt.NBTTagCompound;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.craftbukkit.v1_20_R3.inventory.CraftItemStack;
 import org.bukkit.entity.Player;
@@ -18,22 +16,18 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.UUID;
-import java.util.logging.Logger;
 
 @Component
 public class PickaxeHelper {
 
-    private Logger logger = Bukkit.getLogger();
-
     @Autowired
     private static PrisonPlayerDao prisonPlayerDao;
     @Autowired
-    private static PlayerEnchantmentDao playerEnchantmentDao;
-    @Autowired
     private static PickaxeUtil pickaxeUtil;
-
-    private ApplyEnchantments applyEnchantments = new ApplyEnchantments();
+    @Autowired
+    private static PickaxeEnchantmentImplManager pickaxeEnchantmentImplManager;
 
     public ItemStack buildPlayerPickaxe(Player player) {
         PrisonPlayer prisonPlayer = prisonPlayerDao.findByPlayer(player);
@@ -46,13 +40,18 @@ public class PickaxeHelper {
 
         pickaxeBuilder.setDisplayName("§7[§b֍§7] §c§l" + player.getName() + " §7[§b֍§7] §c§l");
 
-        prisonPlayer.getPlayerEnchantments().stream().sorted(Comparator.comparingInt(p -> getPickaxeEnchantmentFromPlayerEnchantment(p) != null ? getPickaxeEnchantmentFromPlayerEnchantment(p).getRarity().getOrder() : 0)).map(playerEnchantment -> playerEnchantmentToString(playerEnchantment)).forEach(
-                playerEnchantmentLore -> pickaxeBuilder.addLore(playerEnchantmentLore)
+        List<PlayerEnchantment> playerEnchantments = prisonPlayer.getPlayerEnchantments();
+
+        playerEnchantments.stream().sorted(Comparator.comparingInt(p -> getPickaxeEnchantmentFromPlayerEnchantment(p) != null ? getPickaxeEnchantmentFromPlayerEnchantment(p).getRarity().getOrder() : 0)).map(this::playerEnchantmentToString).forEach(
+                pickaxeBuilder::addLore
         );
 
-        prisonPlayer.getPlayerEnchantments().stream().forEach(
-                playerEnchantment -> applyEnchantments.applyEnchantment(playerEnchantment, pickaxeBuilder)
-        );
+        playerEnchantments.forEach(playerEnchantment -> pickaxeEnchantmentImplManager.getEnchantmentsImplementations().stream().filter(pickaxeEnchantmentImpl -> pickaxeEnchantmentImpl.getEnchantmentName().equals(playerEnchantment.getEnchantmentName())).forEach(pickaxeEnchantmentImpl -> {
+            VanillaEnchantment vanillaEnchantment = pickaxeEnchantmentImpl.getVanillaEnchantment(prisonPlayer, playerEnchantment);
+            if (vanillaEnchantment != null) {
+                pickaxeBuilder.addEnchant(vanillaEnchantment.getEnchantment(), vanillaEnchantment.getLevel(), true);
+            }
+        }));
 
         pickaxeBuilder.setAllItemFlags();
 
@@ -61,7 +60,7 @@ public class PickaxeHelper {
         pickaxeBuilder.setUnbreakable(true);
 
         net.minecraft.world.item.ItemStack item = CraftItemStack.asNMSCopy(pickaxeBuilder.build());
-        NBTTagCompound tag = (item.u() ? item.v() : new NBTTagCompound());
+        NBTTagCompound tag = item.v() != null ? item.v() : new NBTTagCompound();
 
         tag.a("PickaxeUUID", UUID.fromString(prisonPlayer.getPlayerUuid()));
         tag.a("PickaxePrisonPlayerId", prisonPlayer.getId());
@@ -79,7 +78,7 @@ public class PickaxeHelper {
         return rarity.getColorPrefix() + "❚ §7" + playerEnchantment.getEnchantmentName() + " " + playerEnchantment.getEnchantmentLevel();
     }
 
-    private boolean isCustomPickaxe(ItemStack itemStack, PrisonPlayer prisonPlayer) {
+    public boolean isCustomPickaxe(ItemStack itemStack, PrisonPlayer prisonPlayer) {
         if (itemStack == null || !itemStack.hasItemMeta())
             return false;
         net.minecraft.world.item.ItemStack item = CraftItemStack.asNMSCopy(itemStack);
@@ -89,7 +88,7 @@ public class PickaxeHelper {
             return false;
 
         UUID uuid;
-        Long prisonPlayerId;
+        long prisonPlayerId;
         try {
             uuid = tag.a("PickaxeUUID");
             prisonPlayerId = tag.i("PickaxePrisonPlayerId");
@@ -100,21 +99,20 @@ public class PickaxeHelper {
         if (uuid == null)
             return false;
 
-        if (prisonPlayerId == null || prisonPlayerId == 0L)
+        if (prisonPlayerId == 0L)
             return false;
 
         if (prisonPlayer != null) {
             if (!uuid.toString().equals(prisonPlayer.getPlayerUuid()))
                 return false;
 
-            if (prisonPlayerId != prisonPlayer.getId())
-                return false;
+            return prisonPlayerId == prisonPlayer.getId();
         }
 
         return true;
     }
 
-    public void checkPlayerPickaxe(Player player) {
+    public void checkPlayerInventory(Player player) {
         PrisonPlayer prisonPlayer = prisonPlayerDao.findByPlayer(player);
         PlayerInventory inventory = player.getInventory();
         boolean foundOwn = false;
