@@ -14,7 +14,7 @@ import de.hits.prison.base.model.entity.PrisonPlayer;
 import de.hits.prison.base.screen.ScreenManager;
 import de.hits.prison.pickaxe.fileUtil.PickaxeUtil;
 import de.hits.prison.pickaxe.helper.PickaxeHelper;
-import de.hits.prison.pickaxe.screen.PickaxeUpdateScreen;
+import de.hits.prison.pickaxe.screen.PickaxeScreen;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -39,7 +39,7 @@ public class EnchantmentCommand extends AdvancedCommand {
 
     @BaseCommand
     public void testScreen(Player player) {
-        screenManager.openScreen(player, new PickaxeUpdateScreen(player));
+        screenManager.openScreen(player, new PickaxeScreen(player));
     }
 
     @SubCommand(subCommand = "set")
@@ -75,7 +75,7 @@ public class EnchantmentCommand extends AdvancedCommand {
                                   @CommandParameter(name = "enchantment") PickaxeUtil.PickaxeEnchantment pickaxeEnchantment) {
         PlayerEnchantment playerEnchantment = playerEnchantmentDao.findByPrisonPlayerAndEnchantmentName(prisonPlayer, pickaxeEnchantment.getName());
         if (playerEnchantment == null) {
-            sender.sendMessage("§cPlayer §6" + prisonPlayer.getPlayerName() + " §cdid not have enchantment §6" + pickaxeEnchantment.getName() + "§c.");
+            sender.sendMessage("§cPlayer §6" + prisonPlayer.getPlayerName() + " §cdoes not have enchantment §6" + pickaxeEnchantment.getName() + "§c.");
             return;
         }
         playerEnchantmentDao.delete(playerEnchantment);

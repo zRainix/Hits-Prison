@@ -1,10 +1,10 @@
 package de.hits.prison.base.screen;
 
 import de.hits.prison.HitsPrison;
-import de.hits.prison.server.util.ItemBuilder;
 import de.hits.prison.base.helper.Manager;
 import de.hits.prison.base.screen.helper.Screen;
 import de.hits.prison.base.screen.listener.ScreenListener;
+import de.hits.prison.server.util.ItemBuilder;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -55,6 +55,7 @@ public class ScreenManager implements Manager {
 
     public void closeAllScreens() {
         for (Player player : playerScreen.keySet()) {
+            player.closeInventory();
             closeScreen(player);
         }
     }

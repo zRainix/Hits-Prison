@@ -10,6 +10,7 @@ import org.bukkit.configuration.MemoryConfiguration;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -150,6 +151,18 @@ public class PickaxeUtil extends FileUtil {
                     enchantmentLevels.add(new EnchantmentLevel(level, price, activationChance));
                 }
             }
+            enchantmentLevels.sort(Comparator.comparingInt(EnchantmentLevel::getLevel));
+            boolean notFound = false;
+            for (int i = 0; i < enchantmentLevels.size(); i++) {
+                if (enchantmentLevels.get(i).getLevel() != i + 1) {
+                    logger.warning("Could not add enchantment " + name + ": Level " + (i + 1) + " not found.");
+                    notFound = true;
+                    break;
+                }
+            }
+            if (notFound)
+                continue;
+
             pickaxeEnchantments.add(new PickaxeEnchantment(name, description, previewMaterial, maxLevel, pickaxeEnchantmentType, pickaxeEnchantmentRarity, enchantmentLevels));
         }
     }
@@ -233,6 +246,10 @@ public class PickaxeUtil extends FileUtil {
 
         public String getName() {
             return name;
+        }
+
+        public String getFullName() {
+            return "§8[§r" + rarity.getColorPrefix() + rarity.getName() + "§8] §7" + getName();
         }
 
         public void setName(String name) {

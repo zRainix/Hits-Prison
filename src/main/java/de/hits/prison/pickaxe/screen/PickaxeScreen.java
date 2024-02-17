@@ -9,6 +9,7 @@ import de.hits.prison.base.screen.helper.ClickAction;
 import de.hits.prison.base.screen.helper.Screen;
 import de.hits.prison.base.screen.helper.ScreenColumn;
 import de.hits.prison.pickaxe.fileUtil.PickaxeUtil;
+import de.hits.prison.pickaxe.screen.helper.PickaxeScreensHelper;
 import de.hits.prison.server.util.ItemBuilder;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
@@ -20,7 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
-public class PickaxeUpdateScreen extends Screen {
+public class PickaxeScreen extends Screen {
 
     @Autowired
     private static PickaxeUtil pickaxeUtil;
@@ -32,12 +33,16 @@ public class PickaxeUpdateScreen extends Screen {
     private final Player player;
     private final Map<String, ScreenColumn> typeColumns;
 
-    public PickaxeUpdateScreen(Player player) {
-        super(getTitle(player), 6);
+    public PickaxeScreen(Player player) {
+        this(player, null);
+    }
+
+    public PickaxeScreen(Player player, Screen parent) {
+        super(getTitle(player), 6, parent);
         this.player = player;
         this.typeColumns = new HashMap<>();
         List<PickaxeUtil.PickaxeEnchantmentType> enchantmentTypes = pickaxeUtil.getPickaxeEnchantmentTypes();
-        int[] slots = getStartSlots(enchantmentTypes.size());
+        int[] slots = getCenteredSlot(enchantmentTypes.size());
         for (int i = 0; i < enchantmentTypes.size(); i++) {
             PickaxeUtil.PickaxeEnchantmentType type = enchantmentTypes.get(i);
             typeColumns.put(type.getName(), new ScreenColumn(this, slots[i], 1));
@@ -45,48 +50,18 @@ public class PickaxeUpdateScreen extends Screen {
         typeColumns.values().forEach(this::addScreenColumn);
     }
 
-    public int[] getStartSlots(int columns) {
-        return switch (columns) {
-            case 1 -> new int[]{             4             };
-            case 2 -> new int[]{          3,    5          };
-            case 3 -> new int[]{       2,    4,    6       };
-            case 4 -> new int[]{    1,    3,    5,    7    };
-            case 5 -> new int[]{       2, 3, 4, 5, 6       };
-            case 6 -> new int[]{    1, 2, 3,    5, 6, 7    };
-            case 7 -> new int[]{    1, 2, 3, 4, 5, 6, 7    };
-            case 8 -> new int[]{ 0, 1, 2, 3,    5, 6, 7, 8 };
-            case 9 -> new int[]{ 0, 1, 2, 3, 4, 5, 6, 7, 8 };
-            default -> throw new IllegalStateException("Unexpected value: " + columns);
-        };
-    }
-
     @Override
     public void init() {
         for (PickaxeUtil.PickaxeEnchantment enchantment : pickaxeUtil.getPickaxeEnchantments().stream().sorted(Comparator.comparingInt(o -> o.getRarity().getOrder())).toList()) {
             PlayerEnchantment playerEnchantment = playerEnchantmentDao.findByPlayerAndEnchantmentName(player, enchantment.getName());
             ScreenColumn screenColumn = typeColumns.get(enchantment.getType().getName());
-            screenColumn.addItem(buildEnchantmentItem(playerEnchantment, enchantment), new ClickAction() {
+            screenColumn.addItem(PickaxeScreensHelper.buildEnchantmentItem(enchantment, playerEnchantment), new ClickAction() {
                 @Override
                 public void onClick(Player player, Screen screen, InventoryClickEvent event) {
-                    // TODO: Open new menu for buying/upgrading an enchantment
+                    screenManager.openScreen(player, new EnchantmentUpdateScreen(enchantment, playerEnchantment, screen));
                 }
             });
         }
-    }
-
-    private ItemStack buildEnchantmentItem(PlayerEnchantment playerEnchantment, PickaxeUtil.PickaxeEnchantment enchantment) {
-        ItemBuilder itemBuilder = new ItemBuilder(enchantment.getPreviewMaterial()).setAllItemFlags()
-                .setDisplayName(enchantment.getRarity().getColorPrefix() + enchantment.getRarity().getName() + "§8: §b" + enchantment.getName())
-                .addLoreBreak()
-                .addLore("§8-- §bDescription §8--")
-                .addLore("§7" + enchantment.getDescription())
-                .addLoreBreak();
-        /*
-        TODO: Add levels
-        - if first level: different text: purchase instead of upgrade
-        - if first level has activation chance of 1 do not display activation chance
-         */
-        return itemBuilder.build();
     }
 
     private static String getTitle(Player player) {
