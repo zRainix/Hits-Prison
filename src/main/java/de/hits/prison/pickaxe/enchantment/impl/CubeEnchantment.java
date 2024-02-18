@@ -1,5 +1,6 @@
 package de.hits.prison.pickaxe.enchantment.impl;
 
+import de.hits.prison.pickaxe.enchantment.anno.DefaultEnchantment;
 import de.hits.prison.pickaxe.enchantment.helper.PickaxeEnchantmentImpl;
 import de.hits.prison.pickaxe.helper.PlayerDrops;
 import de.hits.prison.base.model.entity.PlayerEnchantment;
@@ -8,6 +9,7 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.block.BlockBreakEvent;
 
+@DefaultEnchantment(maxLevel = 3, description = "Mines a cube of blocks around mined block. \nEvery extra minded block drops exp.", activationPrice = "100", priceMultiplier = "10", type = "Mining")
 public class CubeEnchantment extends PickaxeEnchantmentImpl {
     public CubeEnchantment() {
         super("Cube");

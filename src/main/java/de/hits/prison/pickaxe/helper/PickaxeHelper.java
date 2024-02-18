@@ -73,7 +73,7 @@ public class PickaxeHelper {
     private String playerEnchantmentToString(PlayerEnchantment playerEnchantment) {
         PickaxeUtil.PickaxeEnchantment pickaxeEnchantment = getPickaxeEnchantmentFromPlayerEnchantment(playerEnchantment);
 
-        PickaxeUtil.PickaxeEnchantmentRarity rarity = pickaxeEnchantment != null ? pickaxeEnchantment.getRarity() : new PickaxeUtil.PickaxeEnchantmentRarity(0, "Undefined", "§c", 0);
+        PickaxeUtil.PickaxeEnchantmentRarity rarity = pickaxeEnchantment != null ? pickaxeEnchantment.getRarity() : new PickaxeUtil.PickaxeEnchantmentRarity("Undefined", "§c", 0);
 
         return rarity.getColorPrefix() + "❚ §7" + playerEnchantment.getEnchantmentName() + " " + playerEnchantment.getEnchantmentLevel();
     }

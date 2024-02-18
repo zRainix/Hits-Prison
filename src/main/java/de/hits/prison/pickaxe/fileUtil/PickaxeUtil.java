@@ -5,7 +5,6 @@ import de.hits.prison.base.fileUtil.helper.FileUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.configuration.MemoryConfiguration;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -32,15 +31,6 @@ public class PickaxeUtil extends FileUtil {
 
     @Override
     public void init() {
-        MemoryConfiguration defaultConfig = new MemoryConfiguration();
-        defaultConfig.set("Enchantment.Efficiency.MaxLevel", 10);
-        defaultConfig.set("Enchantment.Efficiency.Type", 1);
-        defaultConfig.set("Enchantment.Efficiency.Rarity", 1);
-        defaultConfig.set("EnchantmentType.1.Name", "Enchantment");
-        defaultConfig.set("EnchantmentRarity.1.Name", "Common");
-        defaultConfig.set("EnchantmentRarity.1.ColorPrefix", "§7");
-        defaultConfig.set("EnchantmentRarity.1.Order", 1);
-        cfg.addDefaults(defaultConfig);
         saveDefaultsConfig();
     }
 
@@ -51,22 +41,21 @@ public class PickaxeUtil extends FileUtil {
             cfg.set("Enchantment." + enchantment.getName() + ".Description", enchantment.getDescription());
             cfg.set("Enchantment." + enchantment.getName() + ".PreviewMaterial", enchantment.getPreviewMaterial().name());
             cfg.set("Enchantment." + enchantment.getName() + ".MaxLevel", enchantment.getMaxLevel());
-            cfg.set("Enchantment." + enchantment.getName() + ".Type", enchantment.getType().getId());
-            cfg.set("Enchantment." + enchantment.getName() + ".Rarity", enchantment.getRarity().getId());
+            cfg.set("Enchantment." + enchantment.getName() + ".Type", enchantment.getType().getName());
+            cfg.set("Enchantment." + enchantment.getName() + ".Rarity", enchantment.getRarity().getName());
             for (EnchantmentLevel enchantmentLevel : enchantment.getEnchantmentLevels()) {
-                cfg.set("Enchantment." + enchantment.getName() + ".Level." + enchantmentLevel.getLevel() + ".Price", enchantmentLevel.getPrice());
-                cfg.set("Enchantment." + enchantment.getName() + ".Level." + enchantmentLevel.getLevel() + ".ActivationChance", enchantmentLevel.getActivationChance());
+                cfg.set("Enchantment." + enchantment.getName() + ".Level." + enchantmentLevel.getLevel() + ".Price", enchantmentLevel.getPrice().toString());
+                cfg.set("Enchantment." + enchantment.getName() + ".Level." + enchantmentLevel.getLevel() + ".ActivationChance", enchantmentLevel.getActivationChance().toString());
             }
         }
         cfg.set("EnchantmentType", null);
         for (PickaxeEnchantmentType pickaxeEnchantmentType : pickaxeEnchantmentTypes) {
-            cfg.set("EnchantmentType." + pickaxeEnchantmentType.getId() + ".Name", pickaxeEnchantmentType.getName());
+            cfg.set("EnchantmentType." + pickaxeEnchantmentType.getName() + ".PreviewMaterial", pickaxeEnchantmentType.getPreviewMaterial().name());
         }
         cfg.set("EnchantmentRarity", null);
         for (PickaxeEnchantmentRarity pickaxeEnchantmentRarity : enchantmentRarities) {
-            cfg.set("EnchantmentRarity." + pickaxeEnchantmentRarity.getId() + ".Name", pickaxeEnchantmentRarity.getName());
-            cfg.set("EnchantmentRarity." + pickaxeEnchantmentRarity.getId() + ".ColorPrefix", pickaxeEnchantmentRarity.getColorPrefix());
-            cfg.set("EnchantmentRarity." + pickaxeEnchantmentRarity.getId() + ".Order", pickaxeEnchantmentRarity.getOrder());
+            cfg.set("EnchantmentRarity." + pickaxeEnchantmentRarity.getName() + ".ColorPrefix", pickaxeEnchantmentRarity.getColorPrefix());
+            cfg.set("EnchantmentRarity." + pickaxeEnchantmentRarity.getName() + ".Order", pickaxeEnchantmentRarity.getOrder());
         }
         saveConfig();
     }
@@ -88,11 +77,9 @@ public class PickaxeUtil extends FileUtil {
         if (enchantmentTypeSection == null)
             return;
 
-        for (String id : enchantmentTypeSection.getKeys(false)) {
-            int enchantmentTypeId = Integer.parseInt(id);
-
-            String name = enchantmentTypeSection.getString(id + ".Name");
-            pickaxeEnchantmentTypes.add(new PickaxeEnchantmentType(enchantmentTypeId, name));
+        for (String name : enchantmentTypeSection.getKeys(false)) {
+            Material previewMaterial = Material.getMaterial(enchantmentTypeSection.getString(name + ".PreviewMaterial", "DIAMOND_PICKAXE").toUpperCase());
+            pickaxeEnchantmentTypes.add(new PickaxeEnchantmentType(name, previewMaterial));
         }
     }
 
@@ -104,12 +91,10 @@ public class PickaxeUtil extends FileUtil {
         if (enchantmentRaritySection == null)
             return;
 
-        for (String id : enchantmentRaritySection.getKeys(false)) {
-            int enchantmentRarityId = Integer.parseInt(id);
-            String name = enchantmentRaritySection.getString(id + ".Name", "Rarity-" + id);
-            String colorPrefix = enchantmentRaritySection.getString(id + ".ColorPrefix", "§a");
-            int order = enchantmentRaritySection.getInt(id + ".Order", 0);
-            enchantmentRarities.add(new PickaxeEnchantmentRarity(enchantmentRarityId, name, colorPrefix, order));
+        for (String name : enchantmentRaritySection.getKeys(false)) {
+            String colorPrefix = enchantmentRaritySection.getString(name + ".ColorPrefix", "§a");
+            int order = enchantmentRaritySection.getInt(name + ".Order", 0);
+            enchantmentRarities.add(new PickaxeEnchantmentRarity(name, colorPrefix, order));
         }
     }
 
@@ -125,8 +110,8 @@ public class PickaxeUtil extends FileUtil {
             String description = enchantmentSection.getString(name + ".Description", "");
             Material previewMaterial = Material.getMaterial(enchantmentSection.getString(name + ".PreviewMaterial", "DIAMOND").toUpperCase());
             int maxLevel = enchantmentSection.getInt(name + ".MaxLevel", 0);
-            int type = enchantmentSection.getInt(name + ".Type", 1);
-            int rarity = enchantmentSection.getInt(name + ".Rarity", 1);
+            String type = enchantmentSection.getString(name + ".Type", "None");
+            String rarity = enchantmentSection.getString(name + ".Rarity", "Common");
             PickaxeEnchantmentType pickaxeEnchantmentType = getEnchantmentType(type);
             PickaxeEnchantmentRarity pickaxeEnchantmentRarity = getEnchantmentRarity(rarity);
             if (maxLevel < 1) {
@@ -134,11 +119,11 @@ public class PickaxeUtil extends FileUtil {
                 continue;
             }
             if (pickaxeEnchantmentType == null) {
-                logger.warning("Could not add enchantment " + name + ": EnchantmentType by id " + type + " not found.");
+                logger.warning("Could not add enchantment " + name + ": EnchantmentType by name " + type + " not found.");
                 continue;
             }
             if (pickaxeEnchantmentRarity == null) {
-                logger.warning("Could not add enchantment " + name + ": EnchantmentRarity by id " + rarity + " not found.");
+                logger.warning("Could not add enchantment " + name + ": EnchantmentRarity by name " + rarity + " not found.");
                 continue;
             }
             List<EnchantmentLevel> enchantmentLevels = new ArrayList<>();
@@ -176,36 +161,23 @@ public class PickaxeUtil extends FileUtil {
         return null;
     }
 
-    private PickaxeEnchantmentType getEnchantmentType(int id) {
+    public void setPickaxeEnchantment(PickaxeEnchantment pickaxeEnchantment) {
+        pickaxeEnchantments.removeIf(enchantment -> enchantment.getName().equals(pickaxeEnchantment.getName()));
+        pickaxeEnchantments.add(pickaxeEnchantment);
+    }
+
+    public PickaxeEnchantmentType getEnchantmentType(String name) {
         for (PickaxeEnchantmentType pickaxeEnchantmentType : pickaxeEnchantmentTypes) {
-            if (pickaxeEnchantmentType.getId() == id) {
+            if (pickaxeEnchantmentType.getName().equalsIgnoreCase(name)) {
                 return pickaxeEnchantmentType;
             }
         }
         return null;
     }
 
-    private PickaxeEnchantmentType getEnchantmentType(String enchantmentName) {
-        for (PickaxeEnchantmentType pickaxeEnchantmentType : pickaxeEnchantmentTypes) {
-            if (pickaxeEnchantmentType.getName().equalsIgnoreCase(enchantmentName)) {
-                return pickaxeEnchantmentType;
-            }
-        }
-        return null;
-    }
-
-    private PickaxeEnchantmentRarity getEnchantmentRarity(int id) {
+    public PickaxeEnchantmentRarity getEnchantmentRarity(String name) {
         for (PickaxeEnchantmentRarity pickaxeEnchantmentRarity : enchantmentRarities) {
-            if (pickaxeEnchantmentRarity.getId() == id) {
-                return pickaxeEnchantmentRarity;
-            }
-        }
-        return null;
-    }
-
-    private PickaxeEnchantmentRarity getEnchantmentRarity(String enchantmentName) {
-        for (PickaxeEnchantmentRarity pickaxeEnchantmentRarity : enchantmentRarities) {
-            if (pickaxeEnchantmentRarity.getName().equalsIgnoreCase(enchantmentName)) {
+            if (pickaxeEnchantmentRarity.getName().equalsIgnoreCase(name)) {
                 return pickaxeEnchantmentRarity;
             }
         }
@@ -315,12 +287,12 @@ public class PickaxeUtil extends FileUtil {
 
     public static class PickaxeEnchantmentType {
 
-        private int id;
         private String name;
+        private Material previewMaterial;
 
-        public PickaxeEnchantmentType(int id, String name) {
-            this.id = id;
+        public PickaxeEnchantmentType(String name, Material previewMaterial) {
             this.name = name;
+            this.previewMaterial = previewMaterial;
         }
 
         public String getName() {
@@ -331,24 +303,22 @@ public class PickaxeUtil extends FileUtil {
             this.name = name;
         }
 
-        public int getId() {
-            return id;
+        public Material getPreviewMaterial() {
+            return previewMaterial;
         }
 
-        public void setId(int id) {
-            this.id = id;
+        public void setPreviewMaterial(Material previewMaterial) {
+            this.previewMaterial = previewMaterial;
         }
     }
 
     public static class PickaxeEnchantmentRarity {
 
-        private int id;
         private String name;
         private String colorPrefix;
         private int order;
 
-        public PickaxeEnchantmentRarity(int id, String name, String colorPrefix, int order) {
-            this.id = id;
+        public PickaxeEnchantmentRarity(String name, String colorPrefix, int order) {
             this.name = name;
             this.colorPrefix = colorPrefix;
             this.order = order;
@@ -360,14 +330,6 @@ public class PickaxeUtil extends FileUtil {
 
         public void setName(String name) {
             this.name = name;
-        }
-
-        public int getId() {
-            return id;
-        }
-
-        public void setId(int id) {
-            this.id = id;
         }
 
         public String getColorPrefix() {

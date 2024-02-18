@@ -22,13 +22,61 @@ public class PickaxeScreensHelper {
                 .setDisplayName(enchantment.getFullName())
                 .addLoreBreak()
                 .addLore("§8-- §bDescription §8--")
-                .addLore("§7" + enchantment.getDescription())
+                .addLore("§7", enchantment.getDescription().split("\n"))
                 .addLoreBreak();
-        if (nextLevels == null || nextLevels.isEmpty()) {
+
+        if (nextLevels != null && nextLevels.isEmpty()) {
+            return itemBuilder.build();
+        }
+
+        int playerLevel = playerEnchantment != null ? playerEnchantment.getEnchantmentLevel() : 0;
+
+        if (playerLevel == 0) {
             itemBuilder
-                    .addLore("§6§lMax Level")
+                    .addLore("§8-- §bActivation §8--")
+                    .addLore("§7Price to activate: §b" + NumberUtil.formatValue(enchantment.getLevel(1).getPrice()))
                     .addLoreBreak();
             return itemBuilder.build();
+        }
+
+        boolean maxLevel = nextLevels == null;
+
+        itemBuilder
+                .addLore("§8-- §bStats §8--")
+                .addLore("§7Current level: §b" + playerLevel + (maxLevel ? " §8(§6Max§8)" : ""));
+
+        if (enchantment.getLevel(1).getActivationChance().compareTo(BigDecimal.valueOf(1D)) != 0) {
+            PickaxeUtil.EnchantmentLevel enchantmentLevel = enchantment.getLevel(playerLevel);
+            itemBuilder
+                    .addLore("§7Activation chance: §b" + enchantmentLevel.getActivationChance().multiply(BigDecimal.valueOf(100)) + "%");
+        }
+
+        itemBuilder
+                .addLoreBreak();
+
+        if (maxLevel)
+            return itemBuilder.build();
+
+        itemBuilder
+                .addLore("§8-- §bNext levels §8--");
+
+        for (int level : nextLevels) {
+            PickaxeUtil.EnchantmentLevel enchantmentLevel = enchantment.getLevel(level);
+            BigInteger price = calculatePrice(enchantment, playerLevel, level);
+            String levelTitle = "§7Level §b" + level;
+            if (level == 1) {
+                levelTitle += " §8(§aActivate Enchantment§8)";
+            } else if (level == enchantment.getMaxLevel()) {
+                levelTitle += " §8(§6Max§8)";
+            }
+            levelTitle += "§7:";
+            itemBuilder.addLore(levelTitle)
+                    .addLore("§7- Price: §b" + NumberUtil.formatValue(price));
+            if (enchantment.getLevel(1).getActivationChance().compareTo(BigDecimal.valueOf(1D)) != 0) {
+                itemBuilder
+                        .addLore("§7- Activation chance: §b" + enchantmentLevel.getActivationChance().multiply(BigDecimal.valueOf(100)) + "%");
+            }
+            itemBuilder.addLoreBreak();
         }
         /*
         TODO: Add levels
@@ -78,16 +126,22 @@ public class PickaxeScreensHelper {
         return levels;
     }
 
+    public static BigInteger calculatePrice(PickaxeUtil.PickaxeEnchantment enchantment, int currentLevel, int targetLevel) {
+        BigInteger price = BigInteger.valueOf(0);
+        for (int i = currentLevel; i < targetLevel; i++) {
+            price = price.add(enchantment.getLevel(i + 1).getPrice());
+        }
+        return price;
+    }
+
     public static ItemStack buildLevelItem(PickaxeUtil.PickaxeEnchantment enchantment, PlayerEnchantment playerEnchantment, int level) {
         int playerLevel = playerEnchantment != null ? playerEnchantment.getEnchantmentLevel() : 0;
         PickaxeUtil.EnchantmentLevel enchantmentLevel = enchantment.getLevel(level);
         if (enchantmentLevel == null) {
             return null;
         }
-        BigInteger price = BigInteger.valueOf(0);
-        for (int i = playerLevel; i < level; i++) {
-            price = price.add(enchantment.getLevel(i + 1).getPrice());
-        }
+
+        BigInteger price = calculatePrice(enchantment, playerLevel, level);
 
         String displayName = "§8Buy Level: §b" + level;
         if (level == 1) {

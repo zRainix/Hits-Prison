@@ -56,7 +56,7 @@ public class NumberUtil {
     private static String format(BigDecimal value) {
         NumberFormat format = new DecimalFormat("#.####E0");
         format.setRoundingMode(RoundingMode.FLOOR);
-        return format.format(value).replace("E", "x10^");
+        return format.format(value);
     }
 
 }

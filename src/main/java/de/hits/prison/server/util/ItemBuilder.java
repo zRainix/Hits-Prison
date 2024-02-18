@@ -8,6 +8,7 @@ import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class ItemBuilder {
@@ -41,6 +42,30 @@ public class ItemBuilder {
             if (currentLore == null)
                 currentLore = new ArrayList<>();
             currentLore.add("§a".repeat(repeats++));
+            meta.setLore(currentLore);
+        }
+        return this;
+    }
+
+    public ItemBuilder addLore(String prefix, String... lore) {
+        if (meta != null) {
+            List<String> currentLore = meta.getLore();
+            if (currentLore == null)
+                currentLore = new ArrayList<>();
+            for(String l : lore) {
+                currentLore.add(prefix + l);
+            }
+            meta.setLore(currentLore);
+        }
+        return this;
+    }
+
+    public ItemBuilder addLore(String... lore) {
+        if (meta != null) {
+            List<String> currentLore = meta.getLore();
+            if (currentLore == null)
+                currentLore = new ArrayList<>();
+            currentLore.addAll(Arrays.asList(lore));
             meta.setLore(currentLore);
         }
         return this;

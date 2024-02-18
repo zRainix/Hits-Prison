@@ -1,11 +1,13 @@
 package de.hits.prison.pickaxe.enchantment.impl;
 
+import de.hits.prison.pickaxe.enchantment.anno.DefaultEnchantment;
 import de.hits.prison.pickaxe.enchantment.helper.PickaxeEnchantmentImpl;
 import de.hits.prison.pickaxe.helper.PlayerDrops;
 import de.hits.prison.base.model.entity.PlayerEnchantment;
 import de.hits.prison.base.model.entity.PrisonPlayer;
 import org.bukkit.event.block.BlockBreakEvent;
 
+@DefaultEnchantment(maxLevel = 20, description = "Increases drops from mined block.", activationPrice = "100", priceMultiplier = "2", type = "Drops")
 public class FortuneEnchantment extends PickaxeEnchantmentImpl {
 
     public FortuneEnchantment() {
