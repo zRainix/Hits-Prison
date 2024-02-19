@@ -78,12 +78,7 @@ public class PickaxeScreensHelper {
             }
             itemBuilder.addLoreBreak();
         }
-        /*
-        TODO: Add levels
-        - Use PickaxeScreensHelper#getNextLevels to get next levels to display. Use methods java doc for help.
-        - if first level: different text: purchase instead of upgrade
-        - if first level has activation chance of 1 do not display activation chance
-         */
+
         return itemBuilder.build();
     }
 
