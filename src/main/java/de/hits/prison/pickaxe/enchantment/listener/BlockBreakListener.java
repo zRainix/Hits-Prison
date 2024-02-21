@@ -39,9 +39,6 @@ public class BlockBreakListener implements Listener {
     public void onBlockBreak(BlockBreakEvent e) {
         Player player = e.getPlayer();
 
-        // TODO: Check if item used is pickaxe
-        // TODO: Check if player is in mine
-
         PrisonPlayer prisonPlayer = prisonPlayerDao.findByPlayer(player);
 
         if (prisonPlayer == null)
@@ -49,6 +46,8 @@ public class BlockBreakListener implements Listener {
 
         if (!pickaxeHelper.isCustomPickaxe(player.getInventory().getItemInMainHand(), prisonPlayer))
             return;
+
+        // TODO: Check if player is in mine
 
         e.setDropItems(false);
         e.setExpToDrop(0);
