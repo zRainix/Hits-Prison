@@ -1,6 +1,7 @@
 package de.hits.prison.pickaxe.screen.helper;
 
 import de.hits.prison.base.model.entity.PlayerEnchantment;
+import de.hits.prison.base.model.entity.PrisonPlayer;
 import de.hits.prison.pickaxe.fileUtil.PickaxeUtil;
 import de.hits.prison.server.util.ItemBuilder;
 import de.hits.prison.server.util.NumberUtil;
@@ -91,7 +92,7 @@ public class PickaxeScreensHelper {
      * if enchantment has no levels: empty list
      * if player enchantment is null: only first level (buy)
      * if player enchantment level is enchantment max level: returns null
-     * else returns player level + 1, player level + 10 (if possible) and enchantment max level
+     * else returns player level + 1, player level + 10 (if possible) and max purchasable level
      */
     public static List<Integer> getNextLevels(PickaxeUtil.PickaxeEnchantment enchantment, PlayerEnchantment playerEnchantment) {
         int maxLevel = enchantment.getMaxLevel();
@@ -106,19 +107,42 @@ public class PickaxeScreensHelper {
             return List.of(1);
 
         int playerLevel = playerEnchantment.getEnchantmentLevel();
+        PrisonPlayer prisonPlayer = playerEnchantment.getRefPrisonPlayer();
 
         List<Integer> levels = new ArrayList<>();
         int plusOne = playerLevel + 1;
-        levels.add(plusOne);
+        if (possibleToBuyLevel(prisonPlayer, enchantment, playerLevel, plusOne))
+            levels.add(plusOne);
 
         int plusTen = playerLevel + 10;
-        if (enchantment.getLevel(10) != null)
+        if (possibleToBuyLevel(prisonPlayer, enchantment, playerLevel, plusTen))
             levels.add(plusTen);
 
-        if (plusOne != maxLevel && plusTen != maxLevel && enchantment.getLevel(maxLevel) != null)
-            levels.add(maxLevel);
+        int maxPurchasableLevel = -1;
+        for(int level = playerLevel+2; level <= maxLevel; level++) {
+            if(!possibleToBuyLevel(prisonPlayer, enchantment, playerLevel, level)) {
+                break;
+            }
+            maxPurchasableLevel = level;
+        }
+        if(maxPurchasableLevel != -1 && !levels.contains(maxPurchasableLevel))
+            levels.add(maxPurchasableLevel);
 
         return levels;
+    }
+
+    public static boolean possibleToBuyLevel(PrisonPlayer prisonPlayer, PickaxeUtil.PickaxeEnchantment enchantment, int playerLevel, int level) {
+        if(enchantment.getLevel(level) == null) {
+            return false;
+        }
+
+        BigInteger playerBalance = prisonPlayer.getPlayerCurrency().getVolcanicAsh();
+        BigInteger price = calculatePrice(enchantment, playerLevel, level);
+
+        if(playerBalance.compareTo(price) < 0) {
+            return false;
+        }
+        return true;
     }
 
     public static BigInteger calculatePrice(PickaxeUtil.PickaxeEnchantment enchantment, int currentLevel, int targetLevel) {

@@ -6,6 +6,9 @@ import de.hits.prison.base.autowire.helper.AutowiredManager;
 import de.hits.prison.base.helper.Manager;
 import de.hits.prison.pickaxe.command.EnchantmentCommand;
 import de.hits.prison.pickaxe.enchantment.listener.BlockBreakListener;
+import de.hits.prison.pickaxe.enchantment.listener.RightClickAirListener;
+import de.hits.prison.pickaxe.enchantment.listener.RightClickBlockListener;
+import de.hits.prison.pickaxe.enchantment.listener.RightClickEntityListener;
 import de.hits.prison.pickaxe.helper.PickaxeHelper;
 import de.hits.prison.pickaxe.listener.PickaxeFlagsListener;
 import org.bukkit.plugin.PluginManager;
@@ -22,6 +25,9 @@ public class PickaxeManager implements Manager {
         // Listener
         pluginManager.registerEvents(new BlockBreakListener(), hitsPrison);
         pluginManager.registerEvents(new PickaxeFlagsListener(), hitsPrison);
+        pluginManager.registerEvents(new RightClickAirListener(), hitsPrison);
+        pluginManager.registerEvents(new RightClickBlockListener(), hitsPrison);
+        pluginManager.registerEvents(new RightClickEntityListener(), hitsPrison);
 
         AutowiredManager.register(new PickaxeHelper());
     }
