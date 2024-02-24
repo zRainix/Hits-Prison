@@ -23,6 +23,11 @@ public abstract class FileUtil {
     protected File file;
     protected YamlConfiguration cfg;
 
+    public FileUtil(File file) {
+        this.file = file;
+        this.cfg = YamlConfiguration.loadConfiguration(file);
+    }
+
     public FileUtil(String fileName) {
         if ((!fileName.toLowerCase().endsWith(".yml") && !fileName.toLowerCase().endsWith(".yaml"))) {
             fileName += ".yml";

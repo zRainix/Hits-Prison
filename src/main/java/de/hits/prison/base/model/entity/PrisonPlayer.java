@@ -2,6 +2,8 @@ package de.hits.prison.base.model.entity;
 
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -26,8 +28,12 @@ public class PrisonPlayer {
 
     @OneToOne(mappedBy = "refPrisonPlayer", fetch = FetchType.EAGER)
     PlayerCurrency playerCurrency;
-    @OneToMany(mappedBy = "refPrisonPlayer", fetch = FetchType.EAGER)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToMany(mappedBy = "refPrisonPlayer")
     List<PlayerEnchantment> playerEnchantments;
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @OneToOne(mappedBy = "refPrisonPlayer", fetch = FetchType.EAGER)
+    PlayerMine playerMine;
 
     public Long getId() {
         return id;
@@ -83,6 +89,10 @@ public class PrisonPlayer {
 
     public List<PlayerEnchantment> getPlayerEnchantments() {
         return playerEnchantments;
+    }
+
+    public PlayerMine getPlayerMine() {
+        return playerMine;
     }
 
     public OfflinePlayer getOfflinePlayer() {
