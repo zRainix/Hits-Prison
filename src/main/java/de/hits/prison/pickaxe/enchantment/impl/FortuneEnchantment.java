@@ -15,7 +15,7 @@ public class FortuneEnchantment extends PickaxeEnchantmentImpl {
     }
 
     @Override
-    public PlayerDrops onBreak(PrisonPlayer prisonPlayer, PlayerDrops playerDrops, PlayerEnchantment fortuneEnchantment, BlockBreakEvent e) {
+    public PlayerDrops onBreak(PrisonPlayer prisonPlayer, PlayerDrops playerDrops, PlayerEnchantment fortuneEnchantment, BlockBreakEvent event) {
         playerDrops.multiply(multiplierByLevel(fortuneEnchantment.getEnchantmentLevel()));
         return playerDrops;
     }

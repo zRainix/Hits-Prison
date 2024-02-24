@@ -1,5 +1,6 @@
 package de.hits.prison.pickaxe.enchantment.listener;
 
+import de.hits.prison.base.model.entity.PlayerCurrency;
 import de.hits.prison.pickaxe.enchantment.helper.PickaxeEnchantmentImplManager;
 import de.hits.prison.pickaxe.helper.PickaxeHelper;
 import de.hits.prison.pickaxe.helper.PlayerDrops;
@@ -19,6 +20,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import java.util.logging.Logger;
 
 @Component
@@ -60,7 +62,7 @@ public class BlockBreakListener implements Listener {
 
         List<PlayerDrops> extraPlayerDrops = new ArrayList<>();
 
-        playerEnchantments.stream().forEach(playerEnchantment -> {
+        playerEnchantments.forEach(playerEnchantment -> {
             pickaxeEnchantmentImplManager.getEnchantmentsImplementations().stream().filter(pickaxeEnchantmentImpl -> pickaxeEnchantmentImpl.getEnchantmentName().equals(playerEnchantment.getEnchantmentName())).forEach(pickaxeEnchantmentImpl -> {
                 PlayerDrops extraDrop = pickaxeEnchantmentImpl.onBreak(prisonPlayer, playerDrops.clonePlayerDrops(), playerEnchantment, e);
                 if (extraDrop != null) {

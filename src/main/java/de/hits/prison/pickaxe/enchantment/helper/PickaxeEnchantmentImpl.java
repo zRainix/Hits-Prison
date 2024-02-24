@@ -21,7 +21,7 @@ public class PickaxeEnchantmentImpl {
         return enchantmentName;
     }
 
-    public PlayerDrops onBreak(PrisonPlayer prisonPlayer, PlayerDrops playerDrops, PlayerEnchantment playerEnchantment, BlockBreakEvent e) {
+    public PlayerDrops onBreak(PrisonPlayer prisonPlayer, PlayerDrops playerDrops, PlayerEnchantment playerEnchantment, BlockBreakEvent event) {
         return null;
     }
 
@@ -33,13 +33,13 @@ public class PickaxeEnchantmentImpl {
         return null;
     }
 
-    public void onRightClickAir(PrisonPlayer prisonPlayer, PlayerEnchantment playerEnchantment, PlayerInteractEvent e) {
+    public void onRightClickAir(PrisonPlayer prisonPlayer, PlayerEnchantment playerEnchantment, PlayerInteractEvent event) {
     }
 
-    public void onRightClickEntity(PrisonPlayer prisonPlayer, PlayerEnchantment playerEnchantment, PlayerInteractAtEntityEvent e) {
+    public void onRightClickEntity(PrisonPlayer prisonPlayer, PlayerEnchantment playerEnchantment, PlayerInteractAtEntityEvent event) {
     }
 
-    public void onRightClickBlock(PrisonPlayer prisonPlayer, PlayerEnchantment playerEnchantment, PlayerInteractEvent e) {
+    public void onRightClickBlock(PrisonPlayer prisonPlayer, PlayerEnchantment playerEnchantment, PlayerInteractEvent event) {
     }
 
 }

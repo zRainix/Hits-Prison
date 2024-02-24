@@ -16,7 +16,7 @@ public class CubeEnchantment extends PickaxeEnchantmentImpl {
     }
 
     @Override
-    public PlayerDrops onBreak(PrisonPlayer prisonPlayer, PlayerDrops playerDrops, PlayerEnchantment cubeEnchantment, BlockBreakEvent e) {
+    public PlayerDrops onBreak(PrisonPlayer prisonPlayer, PlayerDrops playerDrops, PlayerEnchantment cubeEnchantment, BlockBreakEvent event) {
         int level = cubeEnchantment.getEnchantmentLevel();
 
         PlayerDrops extraPlayerDrops = new PlayerDrops();
@@ -25,7 +25,7 @@ public class CubeEnchantment extends PickaxeEnchantmentImpl {
             for (int offsetY = -level; offsetY <= level; offsetY++) {
                 for (int offsetZ = -level; offsetZ <= level; offsetZ++) {
                     if (!(offsetX == 0 && offsetY == 0 && offsetZ == 0)) {
-                        Block offset = e.getBlock().getRelative(offsetX, offsetY, offsetZ);
+                        Block offset = event.getBlock().getRelative(offsetX, offsetY, offsetZ);
                         if (offset.getType().isAir())
                             continue;
                         if (offset.getType().getHardness() == -1.0F)
