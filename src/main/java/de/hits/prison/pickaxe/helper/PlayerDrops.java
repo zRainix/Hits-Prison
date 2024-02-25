@@ -5,6 +5,8 @@ import de.hits.prison.base.autowire.anno.Component;
 import de.hits.prison.base.model.dao.PlayerCurrencyDao;
 import de.hits.prison.base.model.entity.PlayerCurrency;
 import de.hits.prison.base.model.helper.PrisonRepository;
+import de.hits.prison.pickaxe.blocks.BlockValue;
+import de.hits.prison.pickaxe.enchantment.impl.CubeEnchantment;
 import de.hits.prison.server.util.MessageUtil;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
@@ -83,8 +85,16 @@ public class PlayerDrops {
         return new PlayerDrops(this.volcanicAsh, this.obsidianShards, this.exp);
     }
 
-    public static PlayerDrops generate(long minVolcanicAsh, long maxVolcanicAsh, long minObsidianShards, long maxObsidianShards, long minExp, long maxExp) {
-        return new PlayerDrops(randomNumber(minVolcanicAsh, maxVolcanicAsh), randomNumber(minObsidianShards, maxObsidianShards), randomNumber(minExp, maxExp));
+    public static PlayerDrops generate(BlockValue blockValue) {
+        return new PlayerDrops(randomNumber(blockValue.getVolcanicAsh() / 2, blockValue.getVolcanicAsh()), randomNumber(blockValue.getVolcanicAsh() / 2, blockValue.getVolcanicAsh()), randomNumber(blockValue.getVolcanicAsh() / 2, blockValue.getVolcanicAsh()));
+    }
+
+    public static PlayerDrops generateRestricted(BlockValue blockValue, CubeEnchantment.DropFocus dropFocus) {
+        return switch(dropFocus) {
+            case EXP -> new PlayerDrops(0, 0, randomNumber(blockValue.getExp() / 2, blockValue.getExp()));
+            case ASH -> new PlayerDrops(randomNumber(blockValue.getVolcanicAsh() / 2, blockValue.getVolcanicAsh()), 0, 0);
+            case SHARDS -> new PlayerDrops(0, randomNumber(blockValue.getObsidianShards() / 2, blockValue.getObsidianShards()), 0);
+        };
     }
 
     public void grantPlayer(OfflinePlayer offlinePlayer) {

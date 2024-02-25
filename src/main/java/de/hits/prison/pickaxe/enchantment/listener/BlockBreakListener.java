@@ -1,7 +1,8 @@
 package de.hits.prison.pickaxe.enchantment.listener;
 
-import de.hits.prison.base.model.entity.PlayerCurrency;
+import de.hits.prison.pickaxe.blocks.BlockValue;
 import de.hits.prison.pickaxe.enchantment.helper.PickaxeEnchantmentImplManager;
+import de.hits.prison.pickaxe.fileUtil.BlockValueUtil;
 import de.hits.prison.pickaxe.helper.PickaxeHelper;
 import de.hits.prison.pickaxe.helper.PlayerDrops;
 import de.hits.prison.base.autowire.anno.Autowired;
@@ -20,7 +21,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
+import java.util.Map;
 import java.util.logging.Logger;
 
 @Component
@@ -54,16 +55,26 @@ public class BlockBreakListener implements Listener {
         e.setDropItems(false);
         e.setExpToDrop(0);
 
+        // TODO: Read from config "BlockValue.yml" file to give currency instead of set values
+
         List<PlayerEnchantment> playerEnchantments = prisonPlayer.getPlayerEnchantments();
 
-        // TODO: Read from config file
-        PlayerDrops playerDrops = PlayerDrops.generate(1, 5, 2, 10, 1, 2);
+        BlockValueUtil blockValueUtil = new BlockValueUtil();
+        blockValueUtil.load();
+
+        PlayerDrops playerDrops = new PlayerDrops();
+
+        BlockValue blockValue = blockValueUtil.getBlockValue(e.getBlock().getType());
+        if(blockValue != null) {
+            playerDrops = PlayerDrops.generate(blockValue);
+        }
 
         List<PlayerDrops> extraPlayerDrops = new ArrayList<>();
 
+        PlayerDrops finalPlayerDrops = playerDrops;
         playerEnchantments.forEach(playerEnchantment -> {
             pickaxeEnchantmentImplManager.getEnchantmentsImplementations().stream().filter(pickaxeEnchantmentImpl -> pickaxeEnchantmentImpl.getEnchantmentName().equals(playerEnchantment.getEnchantmentName())).forEach(pickaxeEnchantmentImpl -> {
-                PlayerDrops extraDrop = pickaxeEnchantmentImpl.onBreak(prisonPlayer, playerDrops.clonePlayerDrops(), playerEnchantment, e);
+                PlayerDrops extraDrop = pickaxeEnchantmentImpl.onBreak(prisonPlayer, finalPlayerDrops.clonePlayerDrops(), playerEnchantment, e);
                 if (extraDrop != null) {
                     extraPlayerDrops.add(extraDrop);
                 }
