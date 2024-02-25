@@ -110,7 +110,9 @@ public class CubeEnchantment extends PickaxeEnchantmentImpl {
 
             for (int i = 0; i < availableDropFocus.size(); i++) {
                 if(availableDropFocus.get(i) == this) {
-                    return availableDropFocus.get((i+1)%availableDropFocus.size());
+                    DropFocus dropFocus = availableDropFocus.get((i+1)%availableDropFocus.size());
+                    if(dropFocus != this)
+                        return dropFocus;
                 }
             }
             return null;
