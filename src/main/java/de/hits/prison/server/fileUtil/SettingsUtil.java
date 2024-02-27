@@ -17,7 +17,7 @@ public class SettingsUtil extends FileUtil {
     public SettingsUtil() {
         super("settings.yml");
 
-        this.prefix = "§c[§a§lPRISON§c] §7";
+        this.prefix = "§8[§b§lPRISON§8] §7";
         this.remoteMySQL = false;
         this.host = "localhost";
         this.port = 3306;

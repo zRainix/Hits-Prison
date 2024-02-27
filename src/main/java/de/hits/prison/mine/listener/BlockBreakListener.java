@@ -1,15 +1,20 @@
-package de.hits.prison.pickaxe.enchantment.listener;
+package de.hits.prison.mine.listener;
 
-import de.hits.prison.base.model.entity.PlayerCurrency;
-import de.hits.prison.pickaxe.enchantment.helper.PickaxeEnchantmentImplManager;
-import de.hits.prison.pickaxe.helper.PickaxeHelper;
-import de.hits.prison.pickaxe.helper.PlayerDrops;
 import de.hits.prison.base.autowire.anno.Autowired;
 import de.hits.prison.base.autowire.anno.Component;
 import de.hits.prison.base.model.dao.PlayerEnchantmentDao;
+import de.hits.prison.base.model.dao.PlayerMineDao;
 import de.hits.prison.base.model.dao.PrisonPlayerDao;
+import de.hits.prison.base.model.entity.MineTrustedPlayer;
 import de.hits.prison.base.model.entity.PlayerEnchantment;
+import de.hits.prison.base.model.entity.PlayerMine;
 import de.hits.prison.base.model.entity.PrisonPlayer;
+import de.hits.prison.mine.helper.MineHelper;
+import de.hits.prison.mine.helper.MineWorld;
+import de.hits.prison.pickaxe.enchantment.helper.PickaxeEnchantmentImplManager;
+import de.hits.prison.pickaxe.helper.PickaxeHelper;
+import de.hits.prison.pickaxe.helper.PlayerDrops;
+import de.hits.prison.server.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -20,13 +25,13 @@ import org.bukkit.event.block.BlockBreakEvent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 @Component
 public class BlockBreakListener implements Listener {
 
-    private Logger logger = Bukkit.getLogger();
+    private final Logger logger = Bukkit.getLogger();
 
     @Autowired
     private static PrisonPlayerDao prisonPlayerDao;
@@ -36,6 +41,10 @@ public class BlockBreakListener implements Listener {
     private static PickaxeEnchantmentImplManager pickaxeEnchantmentImplManager;
     @Autowired
     private static PickaxeHelper pickaxeHelper;
+    @Autowired
+    private static MineHelper mineHelper;
+    @Autowired
+    private static PlayerMineDao playerMineDao;
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent e) {
@@ -46,24 +55,52 @@ public class BlockBreakListener implements Listener {
         if (prisonPlayer == null)
             return;
 
-        if (!pickaxeHelper.isCustomPickaxe(player.getInventory().getItemInMainHand(), prisonPlayer))
+        MineWorld mineWorld = mineHelper.getMineWorld(e.getBlock().getWorld());
+
+        if (mineWorld == null)
             return;
 
-        // TODO: Check if player is in mine
+        if (!pickaxeHelper.isCustomPickaxe(player.getInventory().getItemInMainHand(), prisonPlayer)) {
+            e.setCancelled(true);
+            return;
+        }
+
+        PlayerMine playerMine = playerMineDao.findByPrisonPlayer(mineWorld.getPrisonPlayer());
+
+        if (!Objects.equals(mineWorld.getPrisonPlayer().getId(), prisonPlayer.getId())) {
+            boolean allowed = false;
+
+            for (MineTrustedPlayer trustedPlayer : playerMine.getTrustedPlayers()) {
+                if (Objects.equals(trustedPlayer.getRefTrustedPrisonPlayer().getId(), prisonPlayer.getId())) {
+                    allowed = true;
+                    break;
+                }
+            }
+
+            if (!allowed) {
+                MessageUtil.sendMessage(player, "§cYou are not a trusted player.");
+                e.setCancelled(true);
+                return;
+            }
+        }
+
+        if (!mineWorld.isMineBlock(e.getBlock())) {
+            e.setCancelled(true);
+            return;
+        }
 
         e.setDropItems(false);
         e.setExpToDrop(0);
 
         List<PlayerEnchantment> playerEnchantments = prisonPlayer.getPlayerEnchantments();
 
-        // TODO: Read from config file
         PlayerDrops playerDrops = PlayerDrops.generate(1, 5, 2, 10, 1, 2);
 
         List<PlayerDrops> extraPlayerDrops = new ArrayList<>();
 
         playerEnchantments.forEach(playerEnchantment -> {
             pickaxeEnchantmentImplManager.getEnchantmentsImplementations().stream().filter(pickaxeEnchantmentImpl -> pickaxeEnchantmentImpl.getEnchantmentName().equals(playerEnchantment.getEnchantmentName())).forEach(pickaxeEnchantmentImpl -> {
-                PlayerDrops extraDrop = pickaxeEnchantmentImpl.onBreak(prisonPlayer, playerDrops.clonePlayerDrops(), playerEnchantment, e);
+                PlayerDrops extraDrop = pickaxeEnchantmentImpl.onBreak(prisonPlayer, playerDrops.clonePlayerDrops(), playerEnchantment, mineWorld, e);
                 if (extraDrop != null) {
                     extraPlayerDrops.add(extraDrop);
                 }

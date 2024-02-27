@@ -2,12 +2,15 @@ package de.hits.prison.mine.fileUtil;
 
 import de.hits.prison.base.fileUtil.helper.FileUtil;
 import org.bukkit.Location;
+import org.bukkit.Material;
 
 import java.io.File;
 
 public class MineTemplateUtil extends FileUtil {
 
     String name;
+    String builder;
+    Material previewMaterial;
     Location centerBlock;
     Location traderLocation;
     int borderRadius;
@@ -15,6 +18,8 @@ public class MineTemplateUtil extends FileUtil {
     public MineTemplateUtil(File file) {
         super(file);
         this.name = "Template";
+        this.builder = "n/a";
+        this.previewMaterial = Material.STONE;
         this.centerBlock = new Location(null, 0, 70, 0);
         this.traderLocation = new Location(null, 100, 80, 0);
         this.borderRadius = 200;
@@ -23,6 +28,8 @@ public class MineTemplateUtil extends FileUtil {
     @Override
     public void init() {
         cfg.addDefault("Name", name);
+        cfg.addDefault("Builder", builder);
+        cfg.addDefault("PreviewMaterial", previewMaterial.name());
         cfg.addDefault("CenterBlock.X", centerBlock.getBlockX());
         cfg.addDefault("CenterBlock.Y", centerBlock.getBlockY());
         cfg.addDefault("CenterBlock.Z", centerBlock.getBlockZ());
@@ -38,6 +45,8 @@ public class MineTemplateUtil extends FileUtil {
     @Override
     public void save() {
         cfg.set("Name", name);
+        cfg.set("Builder", builder);
+        cfg.set("PreviewMaterial", previewMaterial.name());
         cfg.set("CenterBlock.X", centerBlock.getBlockX());
         cfg.set("CenterBlock.Y", centerBlock.getBlockY());
         cfg.set("CenterBlock.Z", centerBlock.getBlockZ());
@@ -54,6 +63,8 @@ public class MineTemplateUtil extends FileUtil {
     public void load() {
         loadConfig();
         this.name = cfg.getString("Name", this.name);
+        this.builder = cfg.getString("Builder", this.builder);
+        this.previewMaterial = Material.getMaterial(cfg.getString("PreviewMaterial", this.previewMaterial.name()).toUpperCase());
         int centerX = cfg.getInt("CenterBlock.X", this.centerBlock.getBlockX());
         int centerY = cfg.getInt("CenterBlock.Y", this.centerBlock.getBlockY());
         int centerZ = cfg.getInt("CenterBlock.Z", this.centerBlock.getBlockZ());
@@ -73,6 +84,22 @@ public class MineTemplateUtil extends FileUtil {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getBuilder() {
+        return builder;
+    }
+
+    public void setBuilder(String builder) {
+        this.builder = builder;
+    }
+
+    public Material getPreviewMaterial() {
+        return previewMaterial;
+    }
+
+    public void setPreviewMaterial(Material previewMaterial) {
+        this.previewMaterial = previewMaterial;
     }
 
     public Location getCenterBlock() {

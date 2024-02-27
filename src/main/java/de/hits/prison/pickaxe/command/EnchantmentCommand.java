@@ -46,7 +46,13 @@ public class EnchantmentCommand extends AdvancedCommand {
     public void setEnchantment(CommandSender sender,
                                @CommandParameter(name = "player") PrisonPlayer prisonPlayer,
                                @CommandParameter(name = "enchantment") PickaxeUtil.PickaxeEnchantment pickaxeEnchantment,
-                               @CommandParameter(name = "level") @IntParameter(min = 1, limit = NumberLimit.MIN) Integer level) {
+                               @CommandParameter(name = "level") @IntParameter(limit = NumberLimit.MIN) Integer level) {
+
+        if (level == 0) {
+            removeEnchantment(sender, prisonPlayer, pickaxeEnchantment);
+            return;
+        }
+
         PlayerEnchantment playerEnchantment = playerEnchantmentDao.findByPrisonPlayerAndEnchantmentName(prisonPlayer, pickaxeEnchantment.getName());
         if (playerEnchantment == null) {
             playerEnchantment = new PlayerEnchantment();

@@ -115,12 +115,13 @@ public class PickaxeHelper {
     public void checkPlayerInventory(Player player) {
         PrisonPlayer prisonPlayer = prisonPlayerDao.findByPlayer(player);
         PlayerInventory inventory = player.getInventory();
+        ItemStack playerPickaxe = buildPlayerPickaxe(player);
         boolean foundOwn = false;
         for (int slot = 0; slot < inventory.getContents().length; slot++) {
             ItemStack itemStack = inventory.getItem(slot);
             if (isCustomPickaxe(itemStack, null)) {
                 if (isCustomPickaxe(itemStack, prisonPlayer) && !foundOwn) {
-                    inventory.setItem(slot, buildPlayerPickaxe(player));
+                    inventory.setItem(slot, playerPickaxe);
                     foundOwn = true;
                 } else {
                     inventory.setItem(slot, null);
@@ -129,7 +130,9 @@ public class PickaxeHelper {
         }
         if (foundOwn)
             return;
-        inventory.addItem(buildPlayerPickaxe(player));
+        if(playerPickaxe != null) {
+            inventory.addItem(playerPickaxe);
+        }
     }
 
     public PickaxeUtil.PickaxeEnchantment getPickaxeEnchantmentFromPlayerEnchantment(PlayerEnchantment playerEnchantment) {

@@ -47,12 +47,12 @@ public class ItemBuilder {
         return this;
     }
 
-    public ItemBuilder addLore(String prefix, String... lore) {
+    public ItemBuilder addLoreWithPrefix(String prefix, String... lore) {
         if (meta != null) {
             List<String> currentLore = meta.getLore();
             if (currentLore == null)
                 currentLore = new ArrayList<>();
-            for(String l : lore) {
+            for (String l : lore) {
                 currentLore.add(prefix + l);
             }
             meta.setLore(currentLore);
@@ -77,6 +77,17 @@ public class ItemBuilder {
             if (currentLore == null)
                 currentLore = new ArrayList<>();
             currentLore.add(lore);
+            meta.setLore(currentLore);
+        }
+        return this;
+    }
+
+    public ItemBuilder addLoreHeading(String heading) {
+        if (meta != null) {
+            List<String> currentLore = meta.getLore();
+            if (currentLore == null)
+                currentLore = new ArrayList<>();
+            currentLore.add("§8-- §b" + heading + " §8--");
             meta.setLore(currentLore);
         }
         return this;

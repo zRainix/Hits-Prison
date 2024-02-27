@@ -1,11 +1,12 @@
 package de.hits.prison.pickaxe.enchantment.impl;
 
 import de.hits.prison.base.model.entity.PlayerCurrency;
+import de.hits.prison.base.model.entity.PlayerEnchantment;
+import de.hits.prison.base.model.entity.PrisonPlayer;
+import de.hits.prison.mine.helper.MineWorld;
 import de.hits.prison.pickaxe.enchantment.anno.DefaultEnchantment;
 import de.hits.prison.pickaxe.enchantment.helper.PickaxeEnchantmentImpl;
 import de.hits.prison.pickaxe.helper.PlayerDrops;
-import de.hits.prison.base.model.entity.PlayerEnchantment;
-import de.hits.prison.base.model.entity.PrisonPlayer;
 import de.hits.prison.server.util.MessageUtil;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -29,7 +30,7 @@ public class CubeEnchantment extends PickaxeEnchantmentImpl {
     }
 
     @Override
-    public PlayerDrops onBreak(PrisonPlayer prisonPlayer, PlayerDrops playerDrops, PlayerEnchantment cubeEnchantment, BlockBreakEvent event) {
+    public PlayerDrops onBreak(PrisonPlayer prisonPlayer, PlayerDrops playerDrops, PlayerEnchantment cubeEnchantment, MineWorld mineWorld, BlockBreakEvent event) {
         int level = cubeEnchantment.getEnchantmentLevel();
 
         PlayerDrops extraPlayerDrops = new PlayerDrops();
@@ -45,7 +46,8 @@ public class CubeEnchantment extends PickaxeEnchantmentImpl {
                             continue;
                         if (offset.isLiquid())
                             continue;
-
+                        if (!mineWorld.isMineBlock(offset))
+                            continue;
                         offset.setType(Material.AIR);
                         extraPlayerDrops.add(randomPlayerDropsForCube(prisonPlayer));
                     }
@@ -58,7 +60,7 @@ public class CubeEnchantment extends PickaxeEnchantmentImpl {
     public PlayerDrops randomPlayerDropsForCube(PrisonPlayer prisonPlayer) {
         // TODO: Genaue Werte anpassen, ggf. aus Config auslesen.
         String uuid = prisonPlayer.getPlayerUuid();
-        return switch(dropFocusHashMap.getOrDefault(uuid, DropFocus.ASH)) {
+        return switch (dropFocusHashMap.getOrDefault(uuid, DropFocus.ASH)) {
             case EXP -> PlayerDrops.generate(0, 0, 0, 0, 1, 5);
             case ASH -> PlayerDrops.generate(1, 5, 0, 0, 0, 0);
             case SHARDS -> PlayerDrops.generate(0, 0, 1, 5, 0, 0);
@@ -66,19 +68,19 @@ public class CubeEnchantment extends PickaxeEnchantmentImpl {
     }
 
     @Override
-    public void onRightClickAir(PrisonPlayer prisonPlayer, PlayerEnchantment playerEnchantment, PlayerInteractEvent e) {
+    public void onRightClickAir(PrisonPlayer prisonPlayer, PlayerEnchantment playerEnchantment, MineWorld mineWorld, PlayerInteractEvent event) {
         String uuid = prisonPlayer.getPlayerUuid();
         DropFocus dropFocus = dropFocusHashMap.getOrDefault(uuid, DropFocus.ASH);
-        dropFocus = dropFocus.next(e.getPlayer());
+        dropFocus = dropFocus.next(event.getPlayer());
 
-        if(dropFocus == null) {
-            MessageUtil.sendMessage(e.getPlayer(), "§7Can not switch DropFocus");
+        if (dropFocus == null) {
+            MessageUtil.sendMessage(event.getPlayer(), "§7Can not switch DropFocus");
             return;
         }
 
         dropFocusHashMap.remove(uuid);
         dropFocusHashMap.put(uuid, dropFocus);
-        MessageUtil.sendMessage(e.getPlayer(), "§7Switched DropFocus to " + dropFocus.getDisplayName());
+        MessageUtil.sendMessage(event.getPlayer(), "§7Switched DropFocus to " + dropFocus.getDisplayName());
     }
 
     private static enum DropFocus {
@@ -88,6 +90,7 @@ public class CubeEnchantment extends PickaxeEnchantmentImpl {
         EXP("§aExp", "enchantment.DropFocus.Cube.Exp");
         final String displayName;
         final String permission;
+
         DropFocus(String displayName, String permission) {
             this.displayName = displayName;
             this.permission = permission;
@@ -98,7 +101,7 @@ public class CubeEnchantment extends PickaxeEnchantmentImpl {
         }
 
         public BigInteger getValue(PlayerCurrency playerCurrency) {
-            return switch(this) {
+            return switch (this) {
                 case ASH -> playerCurrency.getVolcanicAsh();
                 case SHARDS -> playerCurrency.getObsidianShards();
                 case EXP -> playerCurrency.getExp();
@@ -109,8 +112,8 @@ public class CubeEnchantment extends PickaxeEnchantmentImpl {
             List<DropFocus> availableDropFocus = Arrays.stream(values()).filter(dropFocus -> dropFocus.getPermission() == null || player.hasPermission(dropFocus.getPermission())).collect(Collectors.toList());
 
             for (int i = 0; i < availableDropFocus.size(); i++) {
-                if(availableDropFocus.get(i) == this) {
-                    return availableDropFocus.get((i+1)%availableDropFocus.size());
+                if (availableDropFocus.get(i) == this) {
+                    return availableDropFocus.get((i + 1) % availableDropFocus.size());
                 }
             }
             return null;

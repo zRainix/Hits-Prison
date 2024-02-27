@@ -15,11 +15,19 @@ public class MessageUtil {
     private static SettingsUtil settingsUtil;
 
     public static void sendMessage(CommandSender sender, String message) {
-        sender.sendMessage(settingsUtil.getPrefix() + message);
+        sendMessage(sender, message, true);
+    }
+
+    public static void sendMessage(CommandSender sender, String message, boolean prefix) {
+        sender.sendMessage((prefix ? settingsUtil.getPrefix() : "") + message);
     }
 
     public static void sendFormattedMessage(CommandSender sender, String message) {
-        sender.sendMessage(settingsUtil.getPrefix() + message);
+        sendFormattedMessage(sender, message, true);
+    }
+
+    public static void sendFormattedMessage(CommandSender sender, String message, boolean prefix) {
+        sender.sendMessage((prefix ? settingsUtil.getPrefix() : "") + message);
     }
 
     public static void sendActionbar(Player player, String message) {

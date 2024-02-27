@@ -8,6 +8,7 @@ import de.hits.prison.pickaxe.helper.PickaxeHelper;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityPickupItemEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -25,7 +26,7 @@ public class PickaxeFlagsListener implements Listener {
     @Autowired
     private static PrisonPlayerDao prisonPlayerDao;
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 

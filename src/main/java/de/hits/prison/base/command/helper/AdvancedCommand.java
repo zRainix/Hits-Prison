@@ -73,7 +73,10 @@ public abstract class AdvancedCommand extends SimpleCommand {
 
         String subCommandHelp = generateSubCommandsHelp(subCommands.stream()
                 .filter(method -> method.getParameters()[0].getType() != Player.class || sender instanceof Player)
-                .map(method -> method.getAnnotation(SubCommand.class).subCommand()).collect(Collectors.toList()));
+                .map(method -> method.getAnnotation(SubCommand.class))
+                .filter(subCommand -> hasPermission(sender, subCommand.permission()) && hasOp(sender, subCommand.op()))
+                .map(SubCommand::subCommand)
+                .collect(Collectors.toList()));
 
         if (args.length == 0) {
             sender.sendMessage("§cPlease use: §6" + subCommandHelp);
@@ -84,6 +87,10 @@ public abstract class AdvancedCommand extends SimpleCommand {
 
         for (Method subCommand : subCommands) {
             SubCommand subCommandAnno = subCommand.getAnnotation(SubCommand.class);
+            if (!hasPermission(sender, subCommandAnno.permission()) || !hasOp(sender, subCommandAnno.op())) {
+                sender.sendMessage("§cYou don't have permission to execute this command.");
+                return;
+            }
             String name = subCommandAnno.subCommand();
             if (name.equalsIgnoreCase(subCommandName)) {
                 executeSubCommand(sender, args, name, subCommand);
@@ -143,7 +150,11 @@ public abstract class AdvancedCommand extends SimpleCommand {
         String subCommandName = args[0];
 
         if (args.length == 1) {
-            return subCommands.stream().map(method -> method.getAnnotation(SubCommand.class).subCommand()).filter(name -> name.toLowerCase().startsWith(subCommandName.toLowerCase())).collect(Collectors.toList());
+            return subCommands.stream().filter(method -> method.getParameters()[0].getType() != Player.class || sender instanceof Player)
+                    .map(method -> method.getAnnotation(SubCommand.class))
+                    .filter(subCommand -> hasPermission(sender, subCommand.permission()) && hasOp(sender, subCommand.op()))
+                    .map(SubCommand::subCommand)
+                    .filter(name -> name.toLowerCase().startsWith(subCommandName.toLowerCase())).collect(Collectors.toList());
         }
 
         String name;

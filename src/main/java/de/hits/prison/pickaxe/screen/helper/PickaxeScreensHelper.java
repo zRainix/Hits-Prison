@@ -22,8 +22,8 @@ public class PickaxeScreensHelper {
                 .setAllItemFlags()
                 .setDisplayName(enchantment.getFullName())
                 .addLoreBreak()
-                .addLore("§8-- §bDescription §8--")
-                .addLore("§7", enchantment.getDescription().split("\n"))
+                .addLoreHeading("Description")
+                .addLoreWithPrefix("§7", enchantment.getDescription().split("\n"))
                 .addLoreBreak();
 
         if (nextLevels != null && nextLevels.isEmpty()) {
@@ -34,7 +34,7 @@ public class PickaxeScreensHelper {
 
         if (playerLevel == 0) {
             itemBuilder
-                    .addLore("§8-- §bActivation §8--")
+                    .addLoreHeading("Activation")
                     .addLore("§7Price to activate: §b" + NumberUtil.formatValue(enchantment.getLevel(1).getPrice()))
                     .addLoreBreak();
             return itemBuilder.build();
@@ -43,7 +43,7 @@ public class PickaxeScreensHelper {
         boolean maxLevel = nextLevels == null;
 
         itemBuilder
-                .addLore("§8-- §bStats §8--")
+                .addLoreHeading("Stats")
                 .addLore("§7Current level: §b" + playerLevel + (maxLevel ? " §8(§6Max§8)" : ""));
 
         if (enchantment.getLevel(1).getActivationChance().compareTo(BigDecimal.valueOf(1D)) != 0) {
@@ -59,7 +59,7 @@ public class PickaxeScreensHelper {
             return itemBuilder.build();
 
         itemBuilder
-                .addLore("§8-- §bNext levels §8--");
+                .addLoreHeading("Next levels");
 
         for (int level : nextLevels) {
             PickaxeUtil.EnchantmentLevel enchantmentLevel = enchantment.getLevel(level);

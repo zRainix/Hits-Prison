@@ -10,13 +10,19 @@ import de.hits.prison.base.model.helper.ClassScanner;
 import de.hits.prison.base.model.helper.HibernateUtil;
 import de.hits.prison.base.scheduler.helper.SchedulerManager;
 import de.hits.prison.base.screen.ScreenManager;
+import de.hits.prison.mine.helper.MineHelper;
+import de.hits.prison.mine.helper.MineWorld;
+import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.World;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Set;
 import java.util.logging.Level;
@@ -33,6 +39,8 @@ public final class HitsPrison extends JavaPlugin {
 
     @Autowired
     private static ScreenManager screenManager;
+    @Autowired
+    private static MineHelper mineHelper;
 
     @Override
     public void onEnable() {
@@ -47,6 +55,8 @@ public final class HitsPrison extends JavaPlugin {
         registerHibernate();
         registerCommandParsers();
         registerManagers(pluginManager);
+
+        loadMines();
 
         logger.info("Plugin " + this.getName() + ": STARTED");
     }
@@ -93,6 +103,10 @@ public final class HitsPrison extends JavaPlugin {
         }
     }
 
+    private void loadMines() {
+        mineHelper.getMineWorldMap().values().forEach(MineWorld::updateMine);
+    }
+
     public void registerCommand(String commandName, CommandExecutor commandExecutor) {
         PluginCommand command = getCommand(commandName);
         if (command == null) {
@@ -116,9 +130,29 @@ public final class HitsPrison extends JavaPlugin {
 
         this.fileUtilManager.saveAll();
 
+        World mainWorld = Bukkit.getWorld("world");
+
+        for (World world : Bukkit.getWorlds()) {
+            if (world.getName().startsWith("template-mine-") || world.getName().startsWith("player-mine-")) {
+                world.getPlayers().forEach(player -> player.teleport(mainWorld.getSpawnLocation()));
+                Bukkit.unloadWorld(world, false);
+                try {
+                    FileUtils.deleteDirectory(world.getWorldFolder());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        mineHelper.getMineWorldMap().clear();
+
         HibernateUtil.shutdown();
 
 
         logger.info("Plugin " + this.getName() + ": STOPPED");
+    }
+
+    public File getBaseFolder() {
+        return getDataFolder().getParentFile().getParentFile();
     }
 }
