@@ -25,6 +25,8 @@ import org.bukkit.entity.Player;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -133,26 +135,25 @@ public class MineWorld {
 
         Map<Material, Integer> blockMap = blockLevel.getBlocks();
 
-        Optional<Integer> optionalMax = blockMap.values().stream().reduce((Integer::sum));
+        Optional<BigDecimal> optionalMax = blockMap.values().stream().map(BigDecimal::valueOf).reduce(BigDecimal::add);
 
-        int max = optionalMax.orElse(0);
+        BigDecimal max = optionalMax.orElse(BigDecimal.ONE);
 
-        int current = 0;
+        Iterator<Map.Entry<Material, Integer>> entryIterator = blockLevel.getBlocks().entrySet().iterator();
 
-        Material material = Material.STONE;
+        Map.Entry<Material, Integer> currentEntry = entryIterator.next();
+        int sum = currentEntry.getValue();
 
-        for (Map.Entry<Material, Integer> entry : blockMap.entrySet()) {
-            material = entry.getKey();
-            int amount = entry.getValue();
-            int relativeAmount = (amount * mineBlocks.size()) / max;
-            for (int i = current; i < current + relativeAmount; i++) {
-                setBlockInNativeChunk(mineBlocks.get(i), material);
+        for (int i = 0; i < mineBlocks.size(); i++) {
+            BigDecimal percentage = BigDecimal.valueOf(i).divide(BigDecimal.valueOf(mineBlocks.size()), 3, RoundingMode.HALF_UP);
+            BigDecimal blocksPercentage = BigDecimal.valueOf(sum).divide(max, 3, RoundingMode.HALF_UP);
+
+            if(blocksPercentage.compareTo(percentage) < 0 && entryIterator.hasNext()) {
+                currentEntry = entryIterator.next();
+                sum += currentEntry.getValue();
             }
-            current += relativeAmount;
-        }
 
-        for (int i = current; i < mineBlocks.size(); i++) {
-            setBlockInNativeChunk(mineBlocks.get(i), material);
+            setBlockInNativeChunk(mineBlocks.get(i), currentEntry.getKey());
         }
 
         for (Player player : world.getPlayers()) {

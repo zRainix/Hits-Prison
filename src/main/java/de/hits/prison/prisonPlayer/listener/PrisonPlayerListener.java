@@ -9,6 +9,7 @@ import de.hits.prison.base.model.entity.PlayerCurrency;
 import de.hits.prison.base.model.entity.PrisonPlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
@@ -30,7 +31,7 @@ public class PrisonPlayerListener implements Listener {
 
     private static final long millisToMinutes = 1000L * 60L;
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.LOWEST)
     public void onJoin(PlayerJoinEvent e) {
         Player p = e.getPlayer();
 

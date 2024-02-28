@@ -4,6 +4,7 @@ import de.hits.prison.base.autowire.anno.Autowired;
 import de.hits.prison.base.autowire.anno.Component;
 import de.hits.prison.base.autowire.helper.AutowiredManager;
 import de.hits.prison.base.command.helper.ArgumentParserRegistry;
+import de.hits.prison.base.command.helper.SimpleCommand;
 import de.hits.prison.base.fileUtil.helper.FileUtilManager;
 import de.hits.prison.base.helper.Manager;
 import de.hits.prison.base.model.helper.ClassScanner;
@@ -24,6 +25,9 @@ import org.bukkit.plugin.java.JavaPlugin;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -90,29 +94,38 @@ public final class HitsPrison extends JavaPlugin {
 
     private void registerManagers(PluginManager pluginManager) {
         Set<Class<? extends Manager>> managers = ClassScanner.getClassesBySuperclass(getClass().getPackageName(), Manager.class);
-
+        Set<Manager> baseManagers = new HashSet<>();
         try {
             for (Class<?> manager : managers) {
                 Manager baseManager = (Manager) manager.getConstructor().newInstance();
-                AutowiredManager.register(baseManager);
-                baseManager.register(this, pluginManager);
+                baseManagers.add(baseManager);
             }
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException |
                  InstantiationException e) {
             logger.log(Level.SEVERE, "Error while initializing managers.", e);
         }
+        baseManagers.stream().sorted(Comparator.comparingInt(manager -> ((Manager) manager).getPriority().getSlot()).reversed()).forEach(manager -> {
+            AutowiredManager.register(manager);
+            manager.register(this, pluginManager);
+        });
     }
 
     private void loadMines() {
         mineHelper.getMineWorldMap().values().forEach(MineWorld::updateMine);
     }
 
-    public void registerCommand(String commandName, CommandExecutor commandExecutor) {
+
+    public void registerCommand(SimpleCommand simpleCommand) {
+        registerCommand(simpleCommand.getCommandName(), simpleCommand.getAliases(), simpleCommand);
+    }
+
+    public void registerCommand(String commandName, List<String> aliases, CommandExecutor commandExecutor) {
         PluginCommand command = getCommand(commandName);
         if (command == null) {
             logger.warning("Error while registering command " + commandName + ": Command not defined.");
             return;
         }
+        command.setAliases(aliases);
         command.setExecutor(commandExecutor);
 
         if (!(commandExecutor instanceof TabCompleter)) {
@@ -125,6 +138,8 @@ public final class HitsPrison extends JavaPlugin {
     @Override
     public void onDisable() {
         logger.info("Stopping " + this.getName() + "...");
+
+        HibernateUtil.shutdown();
 
         screenManager.closeAllScreens();
 
@@ -145,9 +160,6 @@ public final class HitsPrison extends JavaPlugin {
         }
 
         mineHelper.getMineWorldMap().clear();
-
-        HibernateUtil.shutdown();
-
 
         logger.info("Plugin " + this.getName() + ": STOPPED");
     }

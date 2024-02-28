@@ -14,6 +14,9 @@ public class SettingsUtil extends FileUtil {
     private String user;
     private String password;
 
+    private String primaryColor;
+    private String secondaryColor;
+
     public SettingsUtil() {
         super("settings.yml");
 
@@ -24,6 +27,8 @@ public class SettingsUtil extends FileUtil {
         this.database = "schema";
         this.user = "user";
         this.password = "password";
+        this.primaryColor = "§d";
+        this.secondaryColor = "§7";
     }
 
     @Override
@@ -35,6 +40,8 @@ public class SettingsUtil extends FileUtil {
         this.cfg.addDefault("database", this.database);
         this.cfg.addDefault("user", this.user);
         this.cfg.addDefault("password", this.password);
+        this.cfg.addDefault("primaryColor", this.primaryColor);
+        this.cfg.addDefault("secondaryColor", this.secondaryColor);
         saveDefaultsConfig();
     }
 
@@ -47,6 +54,8 @@ public class SettingsUtil extends FileUtil {
         this.cfg.set("database", this.database);
         this.cfg.set("user", this.user);
         this.cfg.set("password", this.password);
+        this.cfg.set("primaryColor", this.primaryColor);
+        this.cfg.set("secondaryColor", this.secondaryColor);
         saveConfig();
     }
 
@@ -54,13 +63,15 @@ public class SettingsUtil extends FileUtil {
     public void load() {
         loadConfig();
 
-        this.prefix = this.cfg.getString("prefix");
-        this.remoteMySQL = this.cfg.getBoolean("remoteMySQL");
-        this.host = this.cfg.getString("host");
-        this.port = this.cfg.getInt("port");
-        this.database = this.cfg.getString("database");
-        this.user = this.cfg.getString("user");
-        this.password = this.cfg.getString("password");
+        this.prefix = this.cfg.getString("prefix", this.prefix);
+        this.remoteMySQL = this.cfg.getBoolean("remoteMySQL", this.remoteMySQL);
+        this.host = this.cfg.getString("host", this.host);
+        this.port = this.cfg.getInt("port", this.port);
+        this.database = this.cfg.getString("database", this.database);
+        this.user = this.cfg.getString("user", this.user);
+        this.password = this.cfg.getString("password", this.password);
+        this.primaryColor = this.cfg.getString("primaryColor", this.primaryColor);
+        this.secondaryColor = this.cfg.getString("secondaryColor", this.secondaryColor);
     }
 
     public String getPrefix() {
@@ -117,5 +128,21 @@ public class SettingsUtil extends FileUtil {
 
     public String getDatabase() {
         return database;
+    }
+
+    public String getPrimaryColor() {
+        return primaryColor;
+    }
+
+    public void setPrimaryColor(String primaryColor) {
+        this.primaryColor = primaryColor;
+    }
+
+    public String getSecondaryColor() {
+        return secondaryColor;
+    }
+
+    public void setSecondaryColor(String secondaryColor) {
+        this.secondaryColor = secondaryColor;
     }
 }

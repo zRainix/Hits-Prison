@@ -133,6 +133,10 @@ public class MineHelper {
         return mineWorldMap;
     }
 
+    public boolean isMineWorld(World world) {
+        return getMineWorld(world) != null;
+    }
+
     public MineWorld getMineWorld(World world) {
         for (MineWorld mineWorld : mineWorldMap.values()) {
             if (mineWorld.getWorld() == world)

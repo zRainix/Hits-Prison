@@ -139,31 +139,36 @@ public class MineUtil extends FileUtil {
 
         int relative = level - levelLow;
 
-        BigDecimal partOfLowest = BigDecimal.valueOf(relative).divide(BigDecimal.valueOf(diff), 3, RoundingMode.HALF_UP);
-        BigDecimal partOfHighest = BigDecimal.ONE.subtract(partOfLowest);
+        BigDecimal partOfHighest = BigDecimal.valueOf(relative).divide(BigDecimal.valueOf(diff), 3, RoundingMode.HALF_UP);
+        BigDecimal partOfLowest = BigDecimal.ONE.subtract(partOfHighest);
         Map<Material, Integer> blocks = new HashMap<>();
 
-        int sumLower = lowest.getBlocks().values().stream().reduce(Integer::sum).get();
-        int sumHigher = highest.getBlocks().values().stream().reduce(Integer::sum).get();
+        int sumLower = lowest.getBlocks().values().stream().reduce(Integer::sum).orElse(0);
+        int sumHigher = highest.getBlocks().values().stream().reduce(Integer::sum).orElse(0);
 
         for (Map.Entry<Material, Integer> lowerBlock : lowest.getBlocks().entrySet()) {
             Material material = lowerBlock.getKey();
             int amount = lowerBlock.getValue();
-            amount = (int) ((double) amount / partOfLowest.doubleValue());
-            amount *= sumHigher;
-            blocks.put(material, amount);
+
+            BigDecimal decimal = BigDecimal.valueOf(amount).divide(BigDecimal.valueOf(sumLower), 3, RoundingMode.HALF_UP).multiply(partOfLowest).multiply(BigDecimal.valueOf(10000));
+
+            blocks.put(material, decimal.intValue());
         }
 
         for (Map.Entry<Material, Integer> higherBlock : highest.getBlocks().entrySet()) {
             Material material = higherBlock.getKey();
             int amount = higherBlock.getValue();
-            amount = (int) ((double) amount / partOfHighest.doubleValue());
-            amount *= sumLower;
+
+            BigDecimal decimal = BigDecimal.valueOf(amount).divide(BigDecimal.valueOf(sumHigher), 3, RoundingMode.HALF_UP).multiply(partOfHighest).multiply(BigDecimal.valueOf(10000));
+
+            amount = decimal.intValue();
+
             if (blocks.containsKey(material)) {
                 amount += blocks.remove(material);
             }
             blocks.put(material, amount);
         }
+
         blockLevel = new BlockLevel(level, blocks);
         blockLevelCache.put(level, blockLevel);
         return blockLevel;
@@ -198,15 +203,15 @@ public class MineUtil extends FileUtil {
 
         int relative = level - levelLow;
 
-        BigDecimal partOfLowest = BigDecimal.valueOf(relative).divide(BigDecimal.valueOf(diff), 3, RoundingMode.HALF_UP);
+        BigDecimal partOfDiff = BigDecimal.valueOf(relative).divide(BigDecimal.valueOf(diff), 3, RoundingMode.HALF_UP);
 
         int sizeDiff = highest.getMineSize() - lowest.getMineSize();
-        int mineSize = lowest.getMineSize() + partOfLowest.multiply(BigDecimal.valueOf(sizeDiff)).intValue();
+        int mineSize = lowest.getMineSize() + partOfDiff.multiply(BigDecimal.valueOf(sizeDiff)).intValue();
         mineSize = Math.max(mineSize, lowest.getMineSize());
         mineSize = Math.min(mineSize, highest.getMineSize());
 
         int depthDiff = highest.getMineSize() - lowest.getMineSize();
-        int mineDepth = lowest.getMineDepth() + partOfLowest.multiply(BigDecimal.valueOf(depthDiff)).intValue();
+        int mineDepth = lowest.getMineDepth() + partOfDiff.multiply(BigDecimal.valueOf(depthDiff)).intValue();
         mineDepth = Math.max(mineDepth, lowest.getMineDepth());
         mineDepth = Math.min(mineDepth, highest.getMineDepth());
 

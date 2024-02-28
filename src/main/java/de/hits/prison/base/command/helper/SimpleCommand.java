@@ -3,6 +3,7 @@ package de.hits.prison.base.command.helper;
 import de.hits.prison.base.command.anno.BaseCommand;
 import de.hits.prison.base.command.anno.CommandParameter;
 import de.hits.prison.base.command.anno.SubCommand;
+import de.hits.prison.server.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -13,6 +14,7 @@ import org.bukkit.entity.Player;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.logging.Level;
@@ -36,14 +38,14 @@ public abstract class SimpleCommand implements CommandExecutor, TabCompleter {
 
         Method method = findBaseCommand(this.getClass());
         if (method == null) {
-            sender.sendMessage("§cCommand is not defined.");
+            MessageUtil.sendMessage(sender, "§cCommand is not defined.");
             return true;
         }
 
         BaseCommand annotation = method.getAnnotation(BaseCommand.class);
         if (annotation != null) {
             if (!hasPermission(sender, annotation.permission()) || !hasOp(sender, annotation.op())) {
-                sender.sendMessage("§cYou don't have permission to execute this command.");
+                MessageUtil.sendMessage(sender, "§cYou don't have permission to execute this command.");
                 return true;
             }
         }
@@ -58,7 +60,7 @@ public abstract class SimpleCommand implements CommandExecutor, TabCompleter {
         int argsLength = args.length;
 
         if (argsLength < minLength || argsLength > maxLength) {
-            sender.sendMessage("§cPlease use: §6" + generateCommandHelp(parameters));
+            MessageUtil.sendMessage(sender, "§cPlease use: §6" + generateCommandHelp(parameters));
             return true;
         }
 
@@ -67,7 +69,7 @@ public abstract class SimpleCommand implements CommandExecutor, TabCompleter {
             Object[] parsedArgs = parseArgs(sender, parameters, args);
             method.invoke(this, parsedArgs);
         } catch (IllegalArgumentException e) {
-            sender.sendMessage("§c" + e.getMessage());
+            MessageUtil.sendMessage(sender, "§c" + e.getMessage());
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error while executing command.", e);
         }
@@ -243,6 +245,10 @@ public abstract class SimpleCommand implements CommandExecutor, TabCompleter {
         return sb.toString();
     }
 
+    public String getCommandName() {
+        return commandName;
+    }
+
     protected CommandParameter getParameterAnnotation(Parameter parameter) {
         for (Annotation annotation : parameter.getDeclaredAnnotations()) {
             if (annotation instanceof CommandParameter) {
@@ -250,5 +256,12 @@ public abstract class SimpleCommand implements CommandExecutor, TabCompleter {
             }
         }
         return null;
+    }
+
+    public List<String> getAliases() {
+        Method baseCommand = findBaseCommand(this.getClass());
+        if (baseCommand == null)
+            return new ArrayList<>();
+        return List.of(baseCommand.getAnnotation(BaseCommand.class).aliases());
     }
 }

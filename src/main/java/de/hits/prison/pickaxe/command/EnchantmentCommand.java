@@ -15,6 +15,7 @@ import de.hits.prison.base.screen.ScreenManager;
 import de.hits.prison.pickaxe.fileUtil.PickaxeUtil;
 import de.hits.prison.pickaxe.helper.PickaxeHelper;
 import de.hits.prison.pickaxe.screen.PickaxeScreen;
+import de.hits.prison.server.util.MessageUtil;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -62,9 +63,9 @@ public class EnchantmentCommand extends AdvancedCommand {
         playerEnchantment.setEnchantmentLevel(level);
         playerEnchantmentDao.save(playerEnchantment);
 
-        sender.sendMessage("§aAdded enchantment §6" + pickaxeEnchantment.getName() + " (" + level + "/" + pickaxeEnchantment.getMaxLevel() + ")" + " §ato player §6" + prisonPlayer.getPlayerName() + "§a.");
+        MessageUtil.sendMessage(sender, "§aAdded enchantment §6" + pickaxeEnchantment.getName() + " (" + level + "/" + pickaxeEnchantment.getMaxLevel() + ")" + " §ato player §6" + prisonPlayer.getPlayerName() + "§a.");
         if (level > pickaxeEnchantment.getMaxLevel()) {
-            sender.sendMessage("§cWarning: Level §6" + level + " §cexceeds max level: §6" + pickaxeEnchantment.getMaxLevel() + "§c.");
+            MessageUtil.sendMessage(sender, "§cWarning: Level §6" + level + " §cexceeds max level: §6" + pickaxeEnchantment.getMaxLevel() + "§c.");
         }
 
         OfflinePlayer offlinePlayer = prisonPlayer.getOfflinePlayer();
@@ -81,12 +82,12 @@ public class EnchantmentCommand extends AdvancedCommand {
                                   @CommandParameter(name = "enchantment") PickaxeUtil.PickaxeEnchantment pickaxeEnchantment) {
         PlayerEnchantment playerEnchantment = playerEnchantmentDao.findByPrisonPlayerAndEnchantmentName(prisonPlayer, pickaxeEnchantment.getName());
         if (playerEnchantment == null) {
-            sender.sendMessage("§cPlayer §6" + prisonPlayer.getPlayerName() + " §cdoes not have enchantment §6" + pickaxeEnchantment.getName() + "§c.");
+            MessageUtil.sendMessage(sender, "§cPlayer §6" + prisonPlayer.getPlayerName() + " §cdoes not have enchantment §6" + pickaxeEnchantment.getName() + "§c.");
             return;
         }
         playerEnchantmentDao.delete(playerEnchantment);
 
-        sender.sendMessage("§aRemoved enchantment §6" + pickaxeEnchantment.getName() + " §afrom player §6" + prisonPlayer.getPlayerName() + "§a.");
+        MessageUtil.sendMessage(sender, "§aRemoved enchantment §6" + pickaxeEnchantment.getName() + " §afrom player §6" + prisonPlayer.getPlayerName() + "§a.");
 
         OfflinePlayer offlinePlayer = prisonPlayer.getOfflinePlayer();
 
@@ -101,11 +102,11 @@ public class EnchantmentCommand extends AdvancedCommand {
                                 @CommandParameter(name = "player") PrisonPlayer prisonPlayer) {
         List<PlayerEnchantment> playerEnchantments = playerEnchantmentDao.findAllByPrisonPlayer(prisonPlayer);
         if (playerEnchantments.isEmpty()) {
-            sender.sendMessage("§cPlayer §6" + prisonPlayer.getPlayerName() + " §chas no enchantments.");
+            MessageUtil.sendMessage(sender, "§cPlayer §6" + prisonPlayer.getPlayerName() + " §chas no enchantments.");
             return;
         }
 
-        sender.sendMessage("§7Enchantments of §6" + prisonPlayer.getPlayerName() + " §7:");
+        MessageUtil.sendMessage(sender, "§7Enchantments of §6" + prisonPlayer.getPlayerName() + " §7:");
         for (PlayerEnchantment playerEnchantment : playerEnchantments) {
             PickaxeUtil.PickaxeEnchantment pickaxeEnchantment = pickaxeUtil.getPickaxeEnchantment(playerEnchantment.getEnchantmentName());
             StringBuilder enchantmentBuilder = new StringBuilder();
@@ -116,7 +117,7 @@ public class EnchantmentCommand extends AdvancedCommand {
                 enchantmentBuilder.append("§7/").append(playerEnchantment.getEnchantmentLevel() > pickaxeEnchantment.getMaxLevel() ? "§c" : "§6")
                         .append(pickaxeEnchantment.getMaxLevel()).append("§8]");
             }
-            sender.sendMessage(enchantmentBuilder.toString());
+            MessageUtil.sendMessage(sender, enchantmentBuilder.toString());
         }
     }
 }

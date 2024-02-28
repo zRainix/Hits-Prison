@@ -37,6 +37,14 @@ public class PrisonRepository<T, ID extends Serializable> {
         return entity;
     }
 
+    public void update(T entity, ID id) {
+        Session session = sessionFactory.openSession();
+        Transaction tx = session.beginTransaction();
+        session.load(entity, id);
+        tx.commit();
+        session.close();
+    }
+
     public void delete(T entity) {
         Session session = sessionFactory.openSession();
         Transaction tx = session.beginTransaction();

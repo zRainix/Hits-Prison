@@ -28,8 +28,7 @@ public class MineWorldListener implements Listener {
     @EventHandler
     public void onSpawn(EntitySpawnEvent e) {
         World world = e.getEntity().getWorld();
-
-        if (mineHelper.getMineWorld(world) != null) {
+        if (mineHelper.isMineWorld(world)) {
             e.setCancelled(true);
         }
     }
@@ -37,8 +36,7 @@ public class MineWorldListener implements Listener {
     @EventHandler
     public void onDamage(EntityDamageEvent e) {
         World world = e.getEntity().getWorld();
-        MineWorld mineWorld = mineHelper.getMineWorld(world);
-        if (mineWorld != null) {
+        if (mineHelper.isMineWorld(world)) {
             e.setCancelled(true);
         }
     }
@@ -46,8 +44,7 @@ public class MineWorldListener implements Listener {
     @EventHandler
     public void onDamage(EntityDamageByEntityEvent e) {
         World world = e.getEntity().getWorld();
-        MineWorld mineWorld = mineHelper.getMineWorld(world);
-        if (mineWorld != null) {
+        if (mineHelper.isMineWorld(world)) {
             e.setCancelled(true);
         }
     }
@@ -55,8 +52,7 @@ public class MineWorldListener implements Listener {
     @EventHandler
     public void onDamage(EntityDamageByBlockEvent e) {
         World world = e.getEntity().getWorld();
-        MineWorld mineWorld = mineHelper.getMineWorld(world);
-        if (mineWorld != null) {
+        if (mineHelper.isMineWorld(world)) {
             e.setCancelled(true);
         }
     }

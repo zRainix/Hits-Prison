@@ -20,7 +20,7 @@ public class PickaxeManager implements Manager {
     public void register(HitsPrison hitsPrison, PluginManager pluginManager) {
         // Commands
         EnchantmentCommand enchantmentCommand = new EnchantmentCommand();
-        hitsPrison.registerCommand("enchantment", enchantmentCommand);
+        hitsPrison.registerCommand(enchantmentCommand);
 
         // Listener
         pluginManager.registerEvents(new PickaxeFlagsListener(), hitsPrison);

@@ -25,9 +25,13 @@ public abstract class CustomScheduler implements Runnable {
     }
 
     public void start() {
-        if (!isRunning()) {
+        if (!isRunning())
             schedulerId = Bukkit.getScheduler().scheduleSyncRepeatingTask(main, this, delay, period);
-        }
+    }
+
+    public void startAsync() {
+        if (!isRunning())
+            schedulerId = Bukkit.getScheduler().scheduleAsyncRepeatingTask(main, this, delay, period);
     }
 
     public void stop() {

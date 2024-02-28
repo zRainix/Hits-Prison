@@ -20,13 +20,13 @@ public class PrisonPlayerManager implements Manager {
     public void register(HitsPrison hitsPrison, PluginManager pluginManager) {
         // Commands:
         VolcanicAshCommand volcanicAshCommand = new VolcanicAshCommand();
-        hitsPrison.registerCommand("ash", volcanicAshCommand);
+        hitsPrison.registerCommand(volcanicAshCommand);
 
         ObsidianShardsCommand obsidianShardCommand = new ObsidianShardsCommand();
-        hitsPrison.registerCommand("shards", obsidianShardCommand);
+        hitsPrison.registerCommand(obsidianShardCommand);
 
         ExpCommand expCommand = new ExpCommand();
-        hitsPrison.registerCommand("exp", expCommand);
+        hitsPrison.registerCommand(expCommand);
 
         // Listener:
         PrisonPlayerListener prisonPlayerListener = new PrisonPlayerListener();

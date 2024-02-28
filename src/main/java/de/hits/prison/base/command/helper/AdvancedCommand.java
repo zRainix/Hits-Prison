@@ -2,6 +2,7 @@ package de.hits.prison.base.command.helper;
 
 import de.hits.prison.base.command.anno.BaseCommand;
 import de.hits.prison.base.command.anno.SubCommand;
+import de.hits.prison.server.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -42,7 +43,7 @@ public abstract class AdvancedCommand extends SimpleCommand {
         BaseCommand annotation = method.getAnnotation(BaseCommand.class);
         if (annotation != null) {
             if (!hasPermission(sender, annotation.permission()) || !hasOp(sender, annotation.op())) {
-                sender.sendMessage("§cYou don't have permission to execute this command.");
+                MessageUtil.sendMessage(sender, "§cYou don't have permission to execute this command.");
                 return true;
             }
         }
@@ -50,7 +51,7 @@ public abstract class AdvancedCommand extends SimpleCommand {
         Parameter[] parameters = method.getParameters();
 
         if (parameters.length != 1) {
-            sender.sendMessage("§cBase command must only have parameter for CommandSender or Player.");
+            MessageUtil.sendMessage(sender, "§cBase command must only have parameter for CommandSender or Player.");
             return true;
         }
 
@@ -59,7 +60,7 @@ public abstract class AdvancedCommand extends SimpleCommand {
             Object[] parsedArgs = parseArgs(sender, parameters, args);
             method.invoke(this, parsedArgs);
         } catch (IllegalArgumentException e) {
-            sender.sendMessage("§c" + e.getMessage());
+            MessageUtil.sendMessage(sender, "§c" + e.getMessage());
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error while executing command.", e);
         }
@@ -71,6 +72,11 @@ public abstract class AdvancedCommand extends SimpleCommand {
 
         List<Method> subCommands = findSubCommands(this.getClass());
 
+        if(subCommands.isEmpty()) {
+            MessageUtil.sendMessage(sender, "§cCommand not defined.");
+            return;
+        }
+
         String subCommandHelp = generateSubCommandsHelp(subCommands.stream()
                 .filter(method -> method.getParameters()[0].getType() != Player.class || sender instanceof Player)
                 .map(method -> method.getAnnotation(SubCommand.class))
@@ -79,7 +85,7 @@ public abstract class AdvancedCommand extends SimpleCommand {
                 .collect(Collectors.toList()));
 
         if (args.length == 0) {
-            sender.sendMessage("§cPlease use: §6" + subCommandHelp);
+            MessageUtil.sendMessage(sender, "§cPlease use: §6" + subCommandHelp);
             return;
         }
 
@@ -88,7 +94,7 @@ public abstract class AdvancedCommand extends SimpleCommand {
         for (Method subCommand : subCommands) {
             SubCommand subCommandAnno = subCommand.getAnnotation(SubCommand.class);
             if (!hasPermission(sender, subCommandAnno.permission()) || !hasOp(sender, subCommandAnno.op())) {
-                sender.sendMessage("§cYou don't have permission to execute this command.");
+                MessageUtil.sendMessage(sender, "§cYou don't have permission to execute this command.");
                 return;
             }
             String name = subCommandAnno.subCommand();
@@ -98,7 +104,7 @@ public abstract class AdvancedCommand extends SimpleCommand {
             }
         }
 
-        sender.sendMessage("§cPlease use: §6" + subCommandHelp);
+        MessageUtil.sendMessage(sender, "§cPlease use: §6" + subCommandHelp);
     }
 
 
@@ -117,7 +123,7 @@ public abstract class AdvancedCommand extends SimpleCommand {
         int argsLength = subCommandArgs.length;
 
         if (argsLength < minLength || argsLength > maxLength) {
-            sender.sendMessage("§cPlease use: §6" + generateCommandHelp(parameters, subCommandName));
+            MessageUtil.sendMessage(sender, "§cPlease use: §6" + generateCommandHelp(parameters, subCommandName));
             return;
         }
 
@@ -126,7 +132,7 @@ public abstract class AdvancedCommand extends SimpleCommand {
             Object[] parsedArgs = parseArgs(sender, parameters, subCommandArgs, subCommandName);
             method.invoke(this, parsedArgs);
         } catch (IllegalArgumentException e) {
-            sender.sendMessage("§c" + e.getMessage());
+            MessageUtil.sendMessage(sender, "§c" + e.getMessage());
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error while executing sub command.", e);
         }

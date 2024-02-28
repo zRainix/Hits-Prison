@@ -6,13 +6,16 @@ import de.hits.prison.base.helper.Manager;
 import de.hits.prison.mine.command.MineCommand;
 import de.hits.prison.mine.helper.MineHelper;
 import de.hits.prison.mine.listener.*;
+import org.bukkit.event.EventPriority;
 import org.bukkit.plugin.PluginManager;
 
 public class MineManager implements Manager {
     @Override
     public void register(HitsPrison hitsPrison, PluginManager pluginManager) {
+        AutowiredManager.register(new MineHelper());
+
         // Commands
-        hitsPrison.registerCommand("mine", new MineCommand());
+        hitsPrison.registerCommand(new MineCommand());
 
         // Listener
         pluginManager.registerEvents(new BlockBreakListener(), hitsPrison);
@@ -22,7 +25,5 @@ public class MineManager implements Manager {
 
         pluginManager.registerEvents(new MineWorldListener(), hitsPrison);
         pluginManager.registerEvents(new TemplateWorldListener(), hitsPrison);
-
-        AutowiredManager.register(new MineHelper());
     }
 }

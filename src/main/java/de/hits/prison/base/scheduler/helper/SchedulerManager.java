@@ -58,12 +58,16 @@ public class SchedulerManager {
                     CustomScheduler customScheduler = (CustomScheduler) scheduler.getConstructor().newInstance();
                     registerScheduler(customScheduler);
                     if (schedulerAnno.autoStart()) {
-                        customScheduler.start();
+                        if (schedulerAnno.async())
+                            customScheduler.startAsync();
+                        else
+                            customScheduler.start();
                     }
                     AutowiredManager.register(customScheduler);
                 }
             }
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
+                 InvocationTargetException e) {
             logger.severe("Error while initializing schedulers: " + e.getMessage());
         }
     }

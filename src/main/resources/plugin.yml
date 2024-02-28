@@ -10,3 +10,4 @@ commands:
   fileUtil:
   enchantment:
   mine:
+  scoreboard:

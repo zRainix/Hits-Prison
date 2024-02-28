@@ -53,6 +53,7 @@ public abstract class FileUtil {
 
     protected void loadConfig() {
         try {
+            createFileIfNotExists();
             this.cfg.load(file);
         } catch (IOException | InvalidConfigurationException e) {
             logger.log(Level.SEVERE, "Error while loading config for " + getFileName(), e);
@@ -73,9 +74,10 @@ public abstract class FileUtil {
     }
 
     public void resetConfig() {
-        this.cfg = new YamlConfiguration();
+        this.file.delete();
         init();
         load();
+        save();
     }
 
     public String getFileName() {
