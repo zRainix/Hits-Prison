@@ -187,10 +187,16 @@ public class PlaceholderHelper {
                 return placeholder.get(prisonPlayer);
             }
             if (placeholder.getPlaceholderType() == PlaceholderType.PLAYER_CURRENCY) {
-                return placeholder.get(prisonPlayer.getPlayerCurrency());
+                PlayerCurrency playerCurrency= prisonPlayer.getPlayerCurrency();
+                if(playerCurrency == null)
+                    return "n/a";
+                return placeholder.get(playerCurrency);
             }
             if (placeholder.getPlaceholderType() == PlaceholderType.PLAYER_MINE) {
-                return placeholder.get(prisonPlayer.getPlayerMine());
+                PlayerMine playerMine = prisonPlayer.getPlayerMine();
+                if(playerMine == null)
+                    return "n/a";
+                return placeholder.get(playerMine);
             }
             if (placeholder.getPlaceholderType() == PlaceholderType.CURRENT_MINE) {
                 if (!player.isOnline())
