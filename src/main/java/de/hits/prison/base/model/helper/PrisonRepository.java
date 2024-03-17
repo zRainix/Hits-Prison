@@ -1,6 +1,7 @@
 package de.hits.prison.base.model.helper;
 
-import org.bukkit.Bukkit;
+import de.hits.prison.base.autowire.anno.Autowired;
+import de.hits.prison.base.autowire.anno.Component;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -10,9 +11,11 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.logging.Logger;
 
+@Component
 public class PrisonRepository<T, ID extends Serializable> {
 
-    private final Logger logger = Bukkit.getLogger();
+    @Autowired
+    private static Logger logger;
 
     private final SessionFactory sessionFactory;
     private final Class<T> entityClass;
@@ -35,6 +38,14 @@ public class PrisonRepository<T, ID extends Serializable> {
         tx.commit();
         session.close();
         return entity;
+    }
+
+    public void update(T entity, ID id) {
+        Session session = sessionFactory.openSession();
+        Transaction tx = session.beginTransaction();
+        session.load(entity, id);
+        tx.commit();
+        session.close();
     }
 
     public void delete(T entity) {

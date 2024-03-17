@@ -1,8 +1,11 @@
 package de.hits.prison.base.command.helper;
 
+import de.hits.prison.base.autowire.anno.Autowired;
+import de.hits.prison.base.autowire.anno.Component;
 import de.hits.prison.base.command.anno.AdditionalParser;
 import de.hits.prison.base.model.helper.ClassScanner;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.PluginLogger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
@@ -12,9 +15,11 @@ import java.util.Set;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+@Component
 public class ArgumentParserRegistry {
 
-    private static final Logger logger = Bukkit.getLogger();
+    @Autowired
+    private static Logger logger;
 
     private static final Map<Class<?>, ArgumentParser<?>> parsers = new HashMap<>();
 

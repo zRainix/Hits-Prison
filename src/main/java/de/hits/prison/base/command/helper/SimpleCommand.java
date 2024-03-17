@@ -1,28 +1,42 @@
 package de.hits.prison.base.command.helper;
 
+import de.hits.prison.base.autowire.anno.Autowired;
+import de.hits.prison.base.autowire.anno.Component;
 import de.hits.prison.base.command.anno.BaseCommand;
 import de.hits.prison.base.command.anno.CommandParameter;
 import de.hits.prison.base.command.anno.SubCommand;
+import de.hits.prison.server.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginLogger;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+@Component
 public abstract class SimpleCommand implements CommandExecutor, TabCompleter {
 
-    private final Logger logger = Bukkit.getLogger();
+    @Autowired
+    private static Logger logger;
     protected final String commandName;
+
+    protected final static String MULTI_VALUE_DELIMITER = ",";
+    protected final static String MULTI_VALUE_ALL_STRING = "@a";
+    protected final static String MULTI_VALUE_RANDOM_STRING = "@r";
 
     public SimpleCommand(String commandName) {
         this.commandName = commandName;
@@ -36,14 +50,14 @@ public abstract class SimpleCommand implements CommandExecutor, TabCompleter {
 
         Method method = findBaseCommand(this.getClass());
         if (method == null) {
-            sender.sendMessage("§cCommand is not defined.");
+            MessageUtil.sendMessage(sender, "§cCommand is not defined.");
             return true;
         }
 
         BaseCommand annotation = method.getAnnotation(BaseCommand.class);
         if (annotation != null) {
             if (!hasPermission(sender, annotation.permission()) || !hasOp(sender, annotation.op())) {
-                sender.sendMessage("§cYou don't have permission to execute this command.");
+                MessageUtil.sendMessage(sender, "§cYou don't have permission to execute this command.");
                 return true;
             }
         }
@@ -58,7 +72,7 @@ public abstract class SimpleCommand implements CommandExecutor, TabCompleter {
         int argsLength = args.length;
 
         if (argsLength < minLength || argsLength > maxLength) {
-            sender.sendMessage("§cPlease use: §6" + generateCommandHelp(parameters));
+            MessageUtil.sendMessage(sender, "§cPlease use: §6" + generateCommandHelp(parameters));
             return true;
         }
 
@@ -67,7 +81,7 @@ public abstract class SimpleCommand implements CommandExecutor, TabCompleter {
             Object[] parsedArgs = parseArgs(sender, parameters, args);
             method.invoke(this, parsedArgs);
         } catch (IllegalArgumentException e) {
-            sender.sendMessage("§c" + e.getMessage());
+            MessageUtil.sendMessage(sender, "§c" + e.getMessage());
         } catch (Exception e) {
             logger.log(Level.SEVERE, "Error while executing command.", e);
         }
@@ -114,6 +128,12 @@ public abstract class SimpleCommand implements CommandExecutor, TabCompleter {
             }
         }
 
+        return tabCompleteMethod(sender, method, args);
+    }
+
+    protected List<String> tabCompleteMethod(CommandSender sender, Method method, String[] args) {
+        List<String> completion = List.of();
+
         int argLen = args.length;
 
         method.setAccessible(true);
@@ -124,13 +144,44 @@ public abstract class SimpleCommand implements CommandExecutor, TabCompleter {
         }
 
         Parameter parameter = parameters[argLen];
-        ArgumentParser<?> argumentParser = ArgumentParserRegistry.getParser(parameter.getType());
+        Class<?> parameterClass = parameter.getType();
 
-        if (argumentParser == null) {
-            return completion;
+        String arg = args[argLen - 1];
+
+        if (parameterClass == List.class) {
+            Type listType = ((ParameterizedType) parameter.getParameterizedType()).getActualTypeArguments()[0];
+            ArgumentParser<?> listParser = ArgumentParserRegistry.getParser((Class<?>) listType);
+            if (listParser == null)
+                throw new IllegalArgumentException("§cNo parser found for type: §6" + parameterClass.getSimpleName());
+
+            String[] splitArgs = arg.split(MULTI_VALUE_DELIMITER);
+
+            int lastIndex = splitArgs.length - 1;
+
+            int commaCount = (int) arg.chars().filter(ch -> ch == ',').count();
+
+            boolean startingWithComma = commaCount != lastIndex;
+            List<String> tabComplete = listParser.tabComplete(sender, startingWithComma ? "" : splitArgs[lastIndex], parameter);
+            if (commaCount == 0)
+                tabComplete.addAll(List.of(MULTI_VALUE_ALL_STRING, MULTI_VALUE_RANDOM_STRING));
+
+            return tabComplete.stream().filter(tab -> !List.of(splitArgs).contains(tab)).map(tab -> {
+                if (startingWithComma) {
+                    return String.join(MULTI_VALUE_DELIMITER, splitArgs) + MULTI_VALUE_DELIMITER + tab;
+                } else {
+                    splitArgs[lastIndex] = tab;
+                    return String.join(MULTI_VALUE_DELIMITER, splitArgs);
+                }
+            }).toList();
+        } else {
+            ArgumentParser<?> argumentParser = ArgumentParserRegistry.getParser(parameter.getType());
+
+            if (argumentParser == null) {
+                return completion;
+            }
+
+            return argumentParser.tabComplete(sender, arg, parameter);
         }
-
-        return argumentParser.tabComplete(sender, args[argLen - 1], parameter);
     }
 
     protected boolean hasPermission(CommandSender sender, String permission) {
@@ -191,12 +242,45 @@ public abstract class SimpleCommand implements CommandExecutor, TabCompleter {
                 }
             }
 
-            ArgumentParser<?> parser = ArgumentParserRegistry.getParser(parameterClass);
-            if (parser == null) {
-                throw new IllegalArgumentException("§cNo parser found for type: §6" + parameterClass.getSimpleName());
-            }
+            String arg = args[argsIndex];
 
-            parsedArgs[i] = parser.parse(sender, args[argsIndex], parameter);
+            ArgumentParser<?> parser = ArgumentParserRegistry.getParser(parameterClass);
+
+            if (parameterClass == List.class) {
+                Type listType = ((ParameterizedType) parameter.getParameterizedType()).getActualTypeArguments()[0];
+                ArgumentParser<?> listParser = ArgumentParserRegistry.getParser((Class<?>) listType);
+                if (listParser == null)
+                    throw new IllegalArgumentException("§cNo parser found for type: §6" + parameterClass.getSimpleName());
+
+                List<Object> list = new ArrayList<>();
+
+                String[] splitArgs = arg.split(MULTI_VALUE_DELIMITER);
+
+                List<String> argsToParse;
+
+                if (arg.equals(MULTI_VALUE_ALL_STRING)) {
+                    argsToParse = listParser.tabComplete(sender, "", parameter);
+                } else if (arg.equals(MULTI_VALUE_RANDOM_STRING)) {
+                    List<String> shuffle = listParser.tabComplete(sender, "", parameter);
+                    Collections.shuffle(shuffle);
+                    if (shuffle.isEmpty())
+                        throw new IllegalArgumentException("§cCould not get random element. No elements found.");
+                    argsToParse = List.of(shuffle.get(0));
+                } else {
+                    argsToParse = List.of(splitArgs);
+                }
+
+                for (String splitArg : argsToParse) {
+                    list.add(listParser.parse(sender, splitArg, parameter));
+                }
+
+                parsedArgs[i] = list;
+            } else {
+                if (parser == null) {
+                    throw new IllegalArgumentException("§cNo parser found for type: §6" + parameterClass.getSimpleName());
+                }
+                parsedArgs[i] = parser.parse(sender, arg, parameter);
+            }
         }
         return parsedArgs;
     }
@@ -243,6 +327,10 @@ public abstract class SimpleCommand implements CommandExecutor, TabCompleter {
         return sb.toString();
     }
 
+    public String getCommandName() {
+        return commandName;
+    }
+
     protected CommandParameter getParameterAnnotation(Parameter parameter) {
         for (Annotation annotation : parameter.getDeclaredAnnotations()) {
             if (annotation instanceof CommandParameter) {
@@ -250,5 +338,12 @@ public abstract class SimpleCommand implements CommandExecutor, TabCompleter {
             }
         }
         return null;
+    }
+
+    public List<String> getAliases() {
+        Method baseCommand = findBaseCommand(this.getClass());
+        if (baseCommand == null)
+            return new ArrayList<>();
+        return List.of(baseCommand.getAnnotation(BaseCommand.class).aliases());
     }
 }

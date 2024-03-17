@@ -1,5 +1,6 @@
 package de.hits.prison.pickaxe.enchantment.helper;
 
+import de.hits.prison.mine.helper.MineWorld;
 import de.hits.prison.pickaxe.helper.PlayerDrops;
 import de.hits.prison.pickaxe.helper.VanillaEnchantment;
 import de.hits.prison.base.model.entity.PlayerEnchantment;
@@ -21,7 +22,7 @@ public class PickaxeEnchantmentImpl {
         return enchantmentName;
     }
 
-    public PlayerDrops onBreak(PrisonPlayer prisonPlayer, PlayerDrops playerDrops, PlayerEnchantment playerEnchantment, BlockBreakEvent event) {
+    public PlayerDrops onBreak(PrisonPlayer prisonPlayer, PlayerDrops playerDrops, PlayerEnchantment playerEnchantment, MineWorld mineWorld, BlockBreakEvent event) {
         return null;
     }
 
@@ -33,13 +34,13 @@ public class PickaxeEnchantmentImpl {
         return null;
     }
 
-    public void onRightClickAir(PrisonPlayer prisonPlayer, PlayerEnchantment playerEnchantment, PlayerInteractEvent event) {
+    public void onRightClickAir(PrisonPlayer prisonPlayer, PlayerEnchantment playerEnchantment, MineWorld mineWorld, PlayerInteractEvent event) {
     }
 
-    public void onRightClickEntity(PrisonPlayer prisonPlayer, PlayerEnchantment playerEnchantment, PlayerInteractAtEntityEvent event) {
+    public void onRightClickEntity(PrisonPlayer prisonPlayer, PlayerEnchantment playerEnchantment, MineWorld mineWorld, PlayerInteractAtEntityEvent event) {
     }
 
-    public void onRightClickBlock(PrisonPlayer prisonPlayer, PlayerEnchantment playerEnchantment, PlayerInteractEvent event) {
+    public void onRightClickBlock(PrisonPlayer prisonPlayer, PlayerEnchantment playerEnchantment, MineWorld mineWorld, PlayerInteractEvent event) {
     }
 
 }

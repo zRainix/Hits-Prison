@@ -9,6 +9,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface BaseCommand {
     String permission() default "";
-
+    String[] aliases() default {};
     boolean op() default false;
 }

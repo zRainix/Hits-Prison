@@ -1,9 +1,11 @@
 package de.hits.prison.base.scheduler.helper;
 
+import de.hits.prison.base.autowire.anno.Autowired;
+import de.hits.prison.base.autowire.anno.Component;
 import de.hits.prison.base.autowire.helper.AutowiredManager;
 import de.hits.prison.base.model.helper.ClassScanner;
 import de.hits.prison.base.scheduler.anno.Scheduler;
-import org.bukkit.Bukkit;
+import org.bukkit.plugin.PluginLogger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -11,9 +13,11 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+@Component
 public class SchedulerManager {
 
-    private final Logger logger = Bukkit.getLogger();
+    @Autowired
+    private static Logger logger;
 
     private final List<CustomScheduler> registeredSchedulers;
 
@@ -58,12 +62,16 @@ public class SchedulerManager {
                     CustomScheduler customScheduler = (CustomScheduler) scheduler.getConstructor().newInstance();
                     registerScheduler(customScheduler);
                     if (schedulerAnno.autoStart()) {
-                        customScheduler.start();
+                        if (schedulerAnno.async())
+                            customScheduler.startAsync();
+                        else
+                            customScheduler.start();
                     }
                     AutowiredManager.register(customScheduler);
                 }
             }
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
+                 InvocationTargetException e) {
             logger.severe("Error while initializing schedulers: " + e.getMessage());
         }
     }

@@ -1,9 +1,12 @@
 package de.hits.prison.base.fileUtil.helper;
 
+import de.hits.prison.base.autowire.anno.Autowired;
+import de.hits.prison.base.autowire.anno.Component;
 import de.hits.prison.base.autowire.helper.AutowiredManager;
 import de.hits.prison.base.fileUtil.anno.SettingsFile;
 import de.hits.prison.base.model.helper.ClassScanner;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.PluginLogger;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
@@ -11,11 +14,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
 
+@Component
 public class FileUtilManager {
 
-    private Logger logger = Bukkit.getLogger();
+    @Autowired
+    private static Logger logger;
 
-    private List<FileUtil> registeredFileUtils;
+    private final List<FileUtil> registeredFileUtils;
 
     public FileUtilManager() {
         this.registeredFileUtils = new ArrayList<>();
@@ -58,7 +63,7 @@ public class FileUtilManager {
             for (Class<?> settingsUtil : settingsUtils) {
                 SettingsFile settingsFile = settingsUtil.getAnnotation(SettingsFile.class);
 
-                if (settingsUtil.getSuperclass() == FileUtil.class) {
+                if (FileUtil.class.isAssignableFrom(settingsUtil.getSuperclass())) {
                     FileUtil fileUtil = (FileUtil) settingsUtil.getConstructor().newInstance();
                     registerFileUtil(fileUtil);
 

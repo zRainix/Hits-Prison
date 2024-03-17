@@ -8,6 +8,7 @@ import de.hits.prison.prisonPlayer.cache.impl.TopPlayerExpCache;
 import de.hits.prison.prisonPlayer.cache.impl.TopPlayerObsidianShardsCache;
 import de.hits.prison.prisonPlayer.cache.impl.TopPlayerVolcanicAshCache;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.PluginLogger;
 
 import java.util.logging.Logger;
 
@@ -15,7 +16,8 @@ import java.util.logging.Logger;
 @Scheduler
 public class TopPlayerCacheScheduler extends CustomScheduler {
 
-    private final Logger logger = Bukkit.getLogger();
+    @Autowired
+    private static Logger logger;
 
     @Autowired
     private static TopPlayerExpCache topPlayerExpCache;

@@ -5,10 +5,10 @@ import de.hits.prison.base.autowire.anno.Component;
 import de.hits.prison.base.autowire.helper.AutowiredManager;
 import de.hits.prison.base.helper.Manager;
 import de.hits.prison.pickaxe.command.EnchantmentCommand;
-import de.hits.prison.pickaxe.enchantment.listener.BlockBreakListener;
-import de.hits.prison.pickaxe.enchantment.listener.RightClickAirListener;
-import de.hits.prison.pickaxe.enchantment.listener.RightClickBlockListener;
-import de.hits.prison.pickaxe.enchantment.listener.RightClickEntityListener;
+import de.hits.prison.mine.listener.BlockBreakListener;
+import de.hits.prison.mine.listener.RightClickAirListener;
+import de.hits.prison.mine.listener.RightClickBlockListener;
+import de.hits.prison.mine.listener.RightClickEntityListener;
 import de.hits.prison.pickaxe.helper.PickaxeHelper;
 import de.hits.prison.pickaxe.listener.PickaxeFlagsListener;
 import org.bukkit.plugin.PluginManager;
@@ -20,14 +20,10 @@ public class PickaxeManager implements Manager {
     public void register(HitsPrison hitsPrison, PluginManager pluginManager) {
         // Commands
         EnchantmentCommand enchantmentCommand = new EnchantmentCommand();
-        hitsPrison.registerCommand("enchantment", enchantmentCommand);
+        hitsPrison.registerCommand(enchantmentCommand);
 
         // Listener
-        pluginManager.registerEvents(new BlockBreakListener(), hitsPrison);
         pluginManager.registerEvents(new PickaxeFlagsListener(), hitsPrison);
-        pluginManager.registerEvents(new RightClickAirListener(), hitsPrison);
-        pluginManager.registerEvents(new RightClickBlockListener(), hitsPrison);
-        pluginManager.registerEvents(new RightClickEntityListener(), hitsPrison);
 
         AutowiredManager.register(new PickaxeHelper());
     }

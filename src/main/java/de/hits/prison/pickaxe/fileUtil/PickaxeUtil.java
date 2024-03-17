@@ -1,10 +1,13 @@
 package de.hits.prison.pickaxe.fileUtil;
 
+import de.hits.prison.base.autowire.anno.Autowired;
+import de.hits.prison.base.autowire.anno.Component;
 import de.hits.prison.base.fileUtil.anno.SettingsFile;
 import de.hits.prison.base.fileUtil.helper.FileUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.plugin.PluginLogger;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -13,10 +16,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.logging.Logger;
 
+@Component
 @SettingsFile
 public class PickaxeUtil extends FileUtil {
 
-    private final Logger logger = Bukkit.getLogger();
+    @Autowired
+    private static Logger logger;
 
     List<PickaxeEnchantment> pickaxeEnchantments;
     List<PickaxeEnchantmentType> pickaxeEnchantmentTypes;

@@ -9,3 +9,5 @@ commands:
   exp:
   fileUtil:
   enchantment:
+  mine:
+  scoreboard:

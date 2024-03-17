@@ -6,6 +6,7 @@ import de.hits.prison.base.scheduler.anno.Scheduler;
 import de.hits.prison.base.scheduler.helper.CustomScheduler;
 import de.hits.prison.base.fileUtil.helper.FileUtilManager;
 import org.bukkit.Bukkit;
+import org.bukkit.plugin.PluginLogger;
 
 import java.util.logging.Logger;
 
@@ -13,7 +14,8 @@ import java.util.logging.Logger;
 @Scheduler
 public class SaveFileUtilScheduler extends CustomScheduler {
 
-    private final Logger logger = Bukkit.getLogger();
+    @Autowired
+    private static Logger logger;
 
     @Autowired
     private static FileUtilManager fileUtilManager;

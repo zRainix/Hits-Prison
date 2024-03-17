@@ -1,12 +1,11 @@
 package de.hits.prison.base.model.helper;
 
 import de.hits.prison.HitsPrison;
-import de.hits.prison.server.fileUtil.SettingsUtil;
 import de.hits.prison.base.autowire.anno.Autowired;
 import de.hits.prison.base.autowire.anno.Component;
 import de.hits.prison.base.autowire.helper.AutowiredManager;
 import de.hits.prison.base.model.anno.Repository;
-import org.bukkit.Bukkit;
+import de.hits.prison.server.fileUtil.SettingsUtil;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
@@ -26,7 +25,8 @@ import java.util.logging.Logger;
 @Component
 public class HibernateUtil {
 
-    static Logger logger = Bukkit.getLogger();
+    @Autowired
+    private static Logger logger;
 
     private static SessionFactory sessionFactory;
 
@@ -47,7 +47,7 @@ public class HibernateUtil {
                     logger.info("Remote MySQL enabled. Connecting to remote host.");
 
                     settings.put(Environment.DRIVER, "com.mysql.jdbc.Driver");
-                    settings.put(Environment.URL, "jdbc:mysql://" + settingsUtil.getHost() + ":" + settingsUtil.getPort() + "/" + settingsUtil.getDatabase() + "");
+                    settings.put(Environment.URL, "jdbc:mysql://" + settingsUtil.getHost() + ":" + settingsUtil.getPort() + "/" + settingsUtil.getDatabase());
                     settings.put(Environment.USER, settingsUtil.getUser());
                     settings.put(Environment.PASS, settingsUtil.getPassword());
                 } else {
@@ -128,7 +128,8 @@ public class HibernateUtil {
                     AutowiredManager.register(prisonRepository);
                 }
             }
-        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
+        } catch (NoSuchMethodException | InstantiationException | IllegalAccessException |
+                 InvocationTargetException e) {
             logger.severe("Error while initializing repositories: " + e.getMessage());
         }
     }
