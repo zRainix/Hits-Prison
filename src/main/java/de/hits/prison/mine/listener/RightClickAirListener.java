@@ -24,6 +24,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.plugin.PluginLogger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +34,8 @@ import java.util.logging.Logger;
 @Component
 public class RightClickAirListener implements Listener {
 
-    private Logger logger = Bukkit.getLogger();
+    @Autowired
+    private static Logger logger;
 
     @Autowired
     private static PrisonPlayerDao prisonPlayerDao;

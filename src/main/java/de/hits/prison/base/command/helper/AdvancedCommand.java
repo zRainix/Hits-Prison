@@ -1,9 +1,10 @@
 package de.hits.prison.base.command.helper;
 
+import de.hits.prison.base.autowire.anno.Autowired;
+import de.hits.prison.base.autowire.anno.Component;
 import de.hits.prison.base.command.anno.BaseCommand;
 import de.hits.prison.base.command.anno.SubCommand;
 import de.hits.prison.server.util.MessageUtil;
-import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -15,9 +16,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+@Component
 public abstract class AdvancedCommand extends SimpleCommand {
 
-    private final Logger logger = Bukkit.getLogger();
+    @Autowired
+    private static Logger logger;
+
 
     public AdvancedCommand(String commandName) {
         super(commandName);
@@ -72,7 +76,7 @@ public abstract class AdvancedCommand extends SimpleCommand {
 
         List<Method> subCommands = findSubCommands(this.getClass());
 
-        if(subCommands.isEmpty()) {
+        if (subCommands.isEmpty()) {
             MessageUtil.sendMessage(sender, "§cCommand not defined.");
             return;
         }
@@ -81,7 +85,7 @@ public abstract class AdvancedCommand extends SimpleCommand {
                 .filter(method -> method.getParameters()[0].getType() != Player.class || sender instanceof Player)
                 .map(method -> method.getAnnotation(SubCommand.class))
                 .filter(subCommand -> hasPermission(sender, subCommand.permission()) && hasOp(sender, subCommand.op()))
-                .map(SubCommand::subCommand)
+                .map(SubCommand::value)
                 .collect(Collectors.toList()));
 
         if (args.length == 0) {
@@ -91,20 +95,20 @@ public abstract class AdvancedCommand extends SimpleCommand {
 
         String subCommandName = args[0];
 
-        for (Method subCommand : subCommands) {
-            SubCommand subCommandAnno = subCommand.getAnnotation(SubCommand.class);
-            if (!hasPermission(sender, subCommandAnno.permission()) || !hasOp(sender, subCommandAnno.op())) {
-                MessageUtil.sendMessage(sender, "§cYou don't have permission to execute this command.");
-                return;
-            }
-            String name = subCommandAnno.subCommand();
-            if (name.equalsIgnoreCase(subCommandName)) {
-                executeSubCommand(sender, args, name, subCommand);
-                return;
-            }
+        Method subCommand = getSubCommand(subCommandName);
+
+        if (subCommand == null) {
+            MessageUtil.sendMessage(sender, "§cPlease use: §6" + subCommandHelp);
+            return;
         }
 
-        MessageUtil.sendMessage(sender, "§cPlease use: §6" + subCommandHelp);
+        SubCommand subCommandAnno = subCommand.getAnnotation(SubCommand.class);
+        if (!hasPermission(sender, subCommandAnno.permission()) || !hasOp(sender, subCommandAnno.op())) {
+            MessageUtil.sendMessage(sender, "§cYou don't have permission to execute this command.");
+            return;
+        }
+
+        executeSubCommand(sender, args, subCommandAnno.value(), subCommand);
     }
 
 
@@ -147,35 +151,23 @@ public abstract class AdvancedCommand extends SimpleCommand {
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         List<String> completion = List.of();
 
-        List<Method> subCommands = findSubCommands(this.getClass());
-
         if (args.length == 0) {
             return completion;
         }
 
         String subCommandName = args[0];
 
+        List<Method> subCommands = findSubCommands(this.getClass());
+
         if (args.length == 1) {
             return subCommands.stream().filter(method -> method.getParameters()[0].getType() != Player.class || sender instanceof Player)
                     .map(method -> method.getAnnotation(SubCommand.class))
                     .filter(subCommand -> hasPermission(sender, subCommand.permission()) && hasOp(sender, subCommand.op()))
-                    .map(SubCommand::subCommand)
+                    .map(SubCommand::value)
                     .filter(name -> name.toLowerCase().startsWith(subCommandName.toLowerCase())).collect(Collectors.toList());
         }
 
-        String name;
-        Method method = null;
-
-        for (Method subCommand : subCommands) {
-            SubCommand subCommandAnno = subCommand.getAnnotation(SubCommand.class);
-
-            name = subCommandAnno.subCommand();
-
-            if (name.equalsIgnoreCase(subCommandName)) {
-                method = subCommand;
-                break;
-            }
-        }
+        Method method = getSubCommand(subCommandName);
 
         if (method == null) {
             return completion;
@@ -184,22 +176,19 @@ public abstract class AdvancedCommand extends SimpleCommand {
         String[] subCommandArgs = new String[args.length - 1];
         System.arraycopy(args, 1, subCommandArgs, 0, subCommandArgs.length);
 
-        int argLen = subCommandArgs.length;
+        return tabCompleteMethod(sender, method, subCommandArgs);
+    }
 
-        method.setAccessible(true);
-        Parameter[] parameters = method.getParameters();
+    private Method getSubCommand(String subCommandName) {
+        List<Method> subCommands = findSubCommands(this.getClass());
 
-        if (!(argLen < parameters.length)) {
-            return completion;
+        for (Method subCommand : subCommands) {
+            SubCommand subCommandAnno = subCommand.getAnnotation(SubCommand.class);
+            if (subCommandAnno.value().equalsIgnoreCase(subCommandName)) {
+                return subCommand;
+            }
         }
 
-        Parameter parameter = parameters[argLen];
-        ArgumentParser<?> argumentParser = ArgumentParserRegistry.getParser(parameter.getType());
-
-        if (argumentParser == null) {
-            return completion;
-        }
-
-        return argumentParser.tabComplete(sender, subCommandArgs[argLen - 1], parameter);
+        return null;
     }
 }

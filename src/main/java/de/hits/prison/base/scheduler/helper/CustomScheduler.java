@@ -12,11 +12,27 @@ public abstract class CustomScheduler implements Runnable {
     private static HitsPrison main;
 
     private int schedulerId = -1;
-    private final long delay;
-    private final long period;
+    private long delay;
+    private long period;
 
     public CustomScheduler(long delay, long period) {
         this.delay = delay;
+        this.period = period;
+    }
+
+    public long getDelay() {
+        return delay;
+    }
+
+    public void setDelay(long delay) {
+        this.delay = delay;
+    }
+
+    public long getPeriod() {
+        return period;
+    }
+
+    public void setPeriod(long period) {
         this.period = period;
     }
 

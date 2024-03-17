@@ -3,7 +3,6 @@ package de.hits.prison.base.fileUtil.helper;
 import de.hits.prison.HitsPrison;
 import de.hits.prison.base.autowire.anno.Autowired;
 import de.hits.prison.base.autowire.anno.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 
@@ -15,7 +14,8 @@ import java.util.logging.Logger;
 @Component
 public abstract class FileUtil {
 
-    private final Logger logger = Bukkit.getLogger();
+    @Autowired
+    private static Logger logger;
 
     @Autowired
     private static HitsPrison main;
@@ -75,6 +75,7 @@ public abstract class FileUtil {
 
     public void resetConfig() {
         this.file.delete();
+        this.cfg = new YamlConfiguration();
         init();
         load();
         save();

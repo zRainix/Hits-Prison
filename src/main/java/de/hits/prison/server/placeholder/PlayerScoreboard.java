@@ -2,6 +2,7 @@ package de.hits.prison.server.placeholder;
 
 import de.hits.prison.base.autowire.anno.Autowired;
 import de.hits.prison.base.autowire.anno.Component;
+import de.hits.prison.base.fileUtil.helper.AnimateLineFileUtil;
 import de.hits.prison.base.model.entity.PrisonPlayer;
 import de.hits.prison.scoreboard.fileUtil.ScoreboardUtil;
 import org.apache.commons.lang.text.StrSubstitutor;
@@ -17,19 +18,30 @@ import java.util.Objects;
 public class PlayerScoreboard {
 
     @Autowired
+    private static ScoreboardUtil scoreboardUtil;
+    @Autowired
     private static PlaceholderHelper placeholderHelper;
 
     PrisonPlayer prisonPlayer;
     ScoreboardUtil.PrisonScoreboard prisonScoreboard;
     Scoreboard scoreboard;
 
-    Map<Team, String> replacements;
+    Map<Team, AnimateLineFileUtil.AnimatedLines> replacements;
 
     public PlayerScoreboard(PrisonPlayer prisonPlayer, ScoreboardUtil.PrisonScoreboard prisonScoreboard) {
         this.prisonPlayer = prisonPlayer;
         this.prisonScoreboard = prisonScoreboard;
         this.scoreboard = null;
         this.replacements = new HashMap<>();
+        init();
+    }
+
+    public void reload() {
+        if (prisonScoreboard == null)
+            return;
+
+        prisonScoreboard = scoreboardUtil.getPrisonScoreboard(prisonScoreboard.getName());
+
         init();
     }
 
@@ -40,21 +52,21 @@ public class PlayerScoreboard {
         for (Objective objective : scoreboard.getObjectives()) {
             objective.unregister();
         }
-        StrSubstitutor strSubstitutor = placeholderHelper.getPlaceholderSubstitutor(prisonPlayer.getOfflinePlayer());
+        StrSubstitutor strSubstitutor = placeholderHelper.getPlayerPlaceholderSubstitutor(prisonPlayer.getOfflinePlayer());
 
         Objective objective = scoreboard.registerNewObjective(prisonScoreboard.getName(), Criteria.DUMMY, strSubstitutor.replace(prisonScoreboard.getDisplayName()));
         objective.setDisplaySlot(DisplaySlot.SIDEBAR);
 
-        List<String> rows = prisonScoreboard.getRows();
+        List<AnimateLineFileUtil.AnimatedLines> rows = prisonScoreboard.getRows();
 
         replacements.clear();
 
         for (int i = 0; i < rows.size(); i++) {
-            String row = rows.get(i);
+            AnimateLineFileUtil.AnimatedLines animatedLines = rows.get(i);
+            AnimateLineFileUtil.AnimatedLine animatedLine = animatedLines.getCurrentLine();
+            String row = animatedLine.getText();
             String emptyString = "§a".repeat(i);
-            if (row.isEmpty()) {
-                row = emptyString;
-            }
+            row += emptyString;
             String replacedRow = strSubstitutor.replace(row);
             int score = rows.size() - i;
             if (row.equals(replacedRow)) {
@@ -64,15 +76,23 @@ public class PlayerScoreboard {
                 team.addEntry(emptyString);
                 team.setPrefix(replacedRow);
                 objective.getScore(emptyString).setScore(score);
-                replacements.put(team, row);
+                replacements.put(team, animatedLines);
             }
         }
     }
 
+    public PrisonPlayer getPrisonPlayer() {
+        return prisonPlayer;
+    }
+
+    public ScoreboardUtil.PrisonScoreboard getPrisonScoreboard() {
+        return prisonScoreboard;
+    }
+
     public void update() {
-        for (Map.Entry<Team, String> entry : replacements.entrySet()) {
-            String string = entry.getValue();
-            StrSubstitutor strSubstitutor = placeholderHelper.getPlaceholderSubstitutor(prisonPlayer.getOfflinePlayer(), string);
+        for (Map.Entry<Team, AnimateLineFileUtil.AnimatedLines> entry : replacements.entrySet()) {
+            String string = entry.getValue().getCurrentLine().getText();
+            StrSubstitutor strSubstitutor = placeholderHelper.getPlayerPlaceholderSubstitutor(prisonPlayer.getOfflinePlayer(), string);
             entry.getKey().setPrefix(strSubstitutor.replace(string));
         }
     }

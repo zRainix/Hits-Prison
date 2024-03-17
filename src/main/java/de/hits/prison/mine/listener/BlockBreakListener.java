@@ -22,6 +22,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.plugin.PluginLogger;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,8 @@ import java.util.logging.Logger;
 @Component
 public class BlockBreakListener implements Listener {
 
-    private final Logger logger = Bukkit.getLogger();
+    @Autowired
+    private static Logger logger;
 
     @Autowired
     private static PrisonPlayerDao prisonPlayerDao;

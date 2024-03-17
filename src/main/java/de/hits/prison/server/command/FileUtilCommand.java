@@ -15,19 +15,19 @@ public class FileUtilCommand extends AdvancedCommand {
         super("fileUtil");
     }
 
-    @SubCommand(subCommand = "load")
+    @SubCommand("load")
     private void loadFile(CommandSender sender, @CommandParameter(name = "fileName") FileUtil fileUtil) {
         fileUtil.load();
         MessageUtil.sendMessage(sender, "§7File §6" + fileUtil.getFileName() + " §7loaded successfully.");
     }
 
-    @SubCommand(subCommand = "save")
+    @SubCommand("save")
     private void saveFile(CommandSender sender, @CommandParameter(name = "fileName") FileUtil fileUtil) {
         fileUtil.save();
         MessageUtil.sendMessage(sender, "§7File §6" + fileUtil.getFileName() + " §7saved successfully.");
     }
 
-    @SubCommand(subCommand = "reset")
+    @SubCommand("reset")
     private void resetFile(CommandSender sender, @CommandParameter(name = "fileName") FileUtil fileUtil) {
         fileUtil.resetConfig();
         MessageUtil.sendMessage(sender, "§7File §6" + fileUtil.getFileName() + " §7reset successfully.");

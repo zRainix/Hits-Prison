@@ -12,6 +12,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginLogger;
 
 import java.io.File;
 import java.io.IOException;
@@ -25,7 +26,8 @@ import java.util.logging.Logger;
 @Component
 public class MineHelper {
 
-    private final Logger logger = Bukkit.getLogger();
+    @Autowired
+    private static Logger logger;
 
     @Autowired
     private static HitsPrison main;

@@ -6,7 +6,6 @@ import de.hits.prison.base.autowire.anno.Component;
 import de.hits.prison.base.autowire.helper.AutowiredManager;
 import de.hits.prison.base.model.anno.Repository;
 import de.hits.prison.server.fileUtil.SettingsUtil;
-import org.bukkit.Bukkit;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.Metadata;
 import org.hibernate.boot.MetadataSources;
@@ -26,7 +25,8 @@ import java.util.logging.Logger;
 @Component
 public class HibernateUtil {
 
-    static Logger logger = Bukkit.getLogger();
+    @Autowired
+    private static Logger logger;
 
     private static SessionFactory sessionFactory;
 

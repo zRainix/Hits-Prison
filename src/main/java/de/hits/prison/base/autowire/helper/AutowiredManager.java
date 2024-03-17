@@ -11,9 +11,8 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import java.util.logging.Logger;
 
-public class AutowiredManager {
 
-    private static final Logger logger = Bukkit.getLogger();
+public class AutowiredManager {
 
     private static Map<String, List<Field>> autowiredFields = null;
 
@@ -39,22 +38,24 @@ public class AutowiredManager {
         }
     }
 
-    public static void register(Object entity) {
+    public static <T>  void register(T entity) {
+        register(entity, entity.getClass());
+    }
+
+    public static <T> void register(T entity, Class<? extends T> type) {
         if (autowiredFields == null) {
             init();
         }
 
-        List<Field> fields = autowiredFields.getOrDefault(entity.getClass().getName(), new ArrayList<>());
+        List<Field> fields = autowiredFields.getOrDefault(type.getName(), new ArrayList<>());
         for (Field field : fields) {
             field.setAccessible(true);
             try {
                 field.set(null, entity);
             } catch (IllegalAccessException e) {
-                logger.info("Could not autowire " + entity.getClass().getSimpleName() + " for " + field + ".");
+                throw new RuntimeException("Could not autowire " + entity.getClass().getSimpleName() + " for " + field + ".");
             }
         }
-
-        logger.info("Autowired " + entity.getClass().getSimpleName() + " for " + fields.size() + " fields.");
     }
 
 }

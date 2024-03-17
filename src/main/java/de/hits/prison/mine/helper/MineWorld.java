@@ -22,6 +22,7 @@ import org.bukkit.craftbukkit.v1_20_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_20_R3.entity.CraftPlayer;
 import org.bukkit.craftbukkit.v1_20_R3.util.CraftMagicNumbers;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginLogger;
 
 import java.io.File;
 import java.io.IOException;
@@ -34,10 +35,9 @@ import java.util.logging.Logger;
 @Component
 public class MineWorld {
 
-    private final Logger logger = Bukkit.getLogger();
-
     @Autowired
-    private static HitsPrison main;
+    private static Logger logger;
+
     @Autowired
     private static MineUtil mineUtil;
     @Autowired

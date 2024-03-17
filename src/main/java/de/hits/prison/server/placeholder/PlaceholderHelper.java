@@ -11,7 +11,9 @@ import de.hits.prison.mine.helper.MineWorld;
 import de.hits.prison.server.fileUtil.SettingsUtil;
 import de.hits.prison.server.scheduler.TpsScheduler;
 import org.apache.commons.lang.text.StrSubstitutor;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.Player;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -19,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Component
 public class PlaceholderHelper {
@@ -34,11 +38,12 @@ public class PlaceholderHelper {
 
     public PlaceholderHelper() {
         placeholders.addAll(List.of(
-                new Placeholder<>(PlaceholderType.SERVER, "tps", value -> new DecimalFormat("#.00").format(TpsScheduler.getTps())),
+                new Placeholder<>(PlaceholderType.SERVER, "tps", value -> new DecimalFormat("00.00").format(TpsScheduler.getTps())),
                 new Placeholder<>(PlaceholderType.SERVER, "primaryColor", SettingsUtil::getPrimaryColor),
                 new Placeholder<>(PlaceholderType.SERVER, "pc", SettingsUtil::getPrimaryColor),
                 new Placeholder<>(PlaceholderType.SERVER, "secondaryColor", SettingsUtil::getSecondaryColor),
                 new Placeholder<>(PlaceholderType.SERVER, "sc", SettingsUtil::getSecondaryColor),
+                new Placeholder<>(PlaceholderType.SERVER, "prefix", SettingsUtil::getPrefix),
                 new Placeholder<>(PlaceholderType.PRISON_PLAYER, "name", PrisonPlayer::getPlayerName),
                 new Placeholder<>(PlaceholderType.PRISON_PLAYER, "uuid", PrisonPlayer::getPlayerUuid),
                 new Placeholder<>(PlaceholderType.PRISON_PLAYER, "playtimeInMinutes", PrisonPlayer::getPlaytimeInMinutes),
@@ -63,7 +68,62 @@ public class PlaceholderHelper {
         ));
     }
 
-    public StrSubstitutor getPlaceholderSubstitutor(OfflinePlayer player, String string) {
+    public StrSubstitutor getServerPlaceholderSubstitutor(String string) {
+        PlaceholderHelper.PlaceholderParser parser = new PlaceholderHelper.ServerPlaceHolderParser();
+
+        Map<String, String> placeholderReplacements = new HashMap<>();
+        placeholders.stream().filter(placeholder -> placeholder.getPlaceholderType() == PlaceholderType.SERVER).forEach(placeholder -> {
+            String name = placeholder.getPlaceholderType().getName() + "." + placeholder.getName();
+            if (string == null || string.contains(name))
+                placeholderReplacements.put(name, parser.getValue(placeholder));
+        });
+
+        return new StrSubstitutor(placeholderReplacements);
+    }
+
+    public String replace(String string) {
+        return replace(string, (Player) null);
+    }
+
+    public String replace(String string, Player player) {
+        StrSubstitutor substitute = player != null ? getPlayerPlaceholderSubstitutor(player, string) : getServerPlaceholderSubstitutor();
+        string = substitute.replace(string);
+        string = translateHexColorCodes(string);
+        return string;
+    }
+
+    public String replace(String string, PrisonPlayer prisonPlayer) {
+        StrSubstitutor substitute = prisonPlayer != null ? getPlayerPlaceholderSubstitutor(prisonPlayer, string) : getServerPlaceholderSubstitutor();
+        string = substitute.replace(string);
+        string = translateHexColorCodes(string);
+        return string;
+    }
+
+    public String translateHexColorCodes(String message) {
+        return translateHexColorCodes("#", "", message);
+    }
+
+    public String translateHexColorCodes(String startTag, String endTag, String message) {
+        final Pattern hexPattern = Pattern.compile(startTag + "([A-Fa-f0-9]{6})" + endTag);
+        final char COLOR_CHAR = ChatColor.COLOR_CHAR;
+        Matcher matcher = hexPattern.matcher(message);
+        StringBuffer buffer = new StringBuffer(message.length() + 4 * 8);
+        while (matcher.find()) {
+            String group = matcher.group(1);
+            matcher.appendReplacement(buffer, COLOR_CHAR + "x"
+                    + COLOR_CHAR + group.charAt(0) + COLOR_CHAR + group.charAt(1)
+                    + COLOR_CHAR + group.charAt(2) + COLOR_CHAR + group.charAt(3)
+                    + COLOR_CHAR + group.charAt(4) + COLOR_CHAR + group.charAt(5)
+            );
+        }
+        return matcher.appendTail(buffer).toString();
+    }
+
+    public StrSubstitutor getServerPlaceholderSubstitutor() {
+        return getServerPlaceholderSubstitutor(null);
+    }
+
+    public StrSubstitutor getPlayerPlaceholderSubstitutor(OfflinePlayer player, String string) {
         PlaceholderHelper.PlaceholderParser parser = new PlaceholderHelper.PlayerPlaceholderParser(player);
 
         Map<String, String> placeholderReplacements = new HashMap<>();
@@ -76,8 +136,21 @@ public class PlaceholderHelper {
         return new StrSubstitutor(placeholderReplacements);
     }
 
-    public StrSubstitutor getPlaceholderSubstitutor(OfflinePlayer offlinePlayer) {
-        return getPlaceholderSubstitutor(offlinePlayer, null);
+    public StrSubstitutor getPlayerPlaceholderSubstitutor(PrisonPlayer player, String string) {
+        PlaceholderHelper.PlaceholderParser parser = new PlaceholderHelper.PlayerPlaceholderParser(player);
+
+        Map<String, String> placeholderReplacements = new HashMap<>();
+        placeholders.forEach(placeholder -> {
+            String name = placeholder.getPlaceholderType().getName() + "." + placeholder.getName();
+            if (string == null || string.contains(name))
+                placeholderReplacements.put(name, parser.getValue(placeholder));
+        });
+
+        return new StrSubstitutor(placeholderReplacements);
+    }
+
+    public StrSubstitutor getPlayerPlaceholderSubstitutor(OfflinePlayer offlinePlayer) {
+        return getPlayerPlaceholderSubstitutor(offlinePlayer, null);
     }
 
     public static abstract class PlaceholderParser {
@@ -94,8 +167,11 @@ public class PlaceholderHelper {
         public PlayerPlaceholderParser(OfflinePlayer player) {
             this.player = player;
             this.prisonPlayer = prisonPlayerDao.findByPlayer(player);
-            if (this.prisonPlayer == null)
-                return;
+        }
+
+        public PlayerPlaceholderParser(PrisonPlayer prisonPlayer) {
+            this.player = prisonPlayer.getOfflinePlayer();
+            this.prisonPlayer = prisonPlayer;
         }
 
         public String getValue(Placeholder placeholder) {

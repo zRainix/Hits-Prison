@@ -22,6 +22,9 @@ import java.util.List;
 @Component
 public class ExpCommand extends AdvancedCommand {
 
+    private static final String EXP_GET_PERMISSION = "prison.exp.get";
+    private static final String EXP_MODIFY_PERMISSION = "prison.exp.modify";
+
     @Autowired
     private static PlayerCurrencyDao playerCurrencyDao;
     @Autowired
@@ -39,7 +42,7 @@ public class ExpCommand extends AdvancedCommand {
         MessageUtil.sendMessage(player, "§7Exp balance: §6" + targetExp.formatExp() + "§7.");
     }
 
-    @SubCommand(subCommand = "get")
+    @SubCommand(value = "get", permission = EXP_GET_PERMISSION)
     public void getTargetExp(CommandSender sender,
                              @CommandParameter(name = "target") PrisonPlayer target) {
         PlayerCurrency targetExp = target.getPlayerCurrency();
@@ -50,7 +53,7 @@ public class ExpCommand extends AdvancedCommand {
         MessageUtil.sendMessage(sender, "§7Exp balance of §6" + target.getPlayerName() + "§7: §6" + targetExp.formatExp() + "§7.");
     }
 
-    @SubCommand(subCommand = "set")
+    @SubCommand(value = "set", permission = EXP_MODIFY_PERMISSION)
     public void setTargetExp(CommandSender sender,
                              @CommandParameter(name = "target") PrisonPlayer target,
                              @CommandParameter(name = "amount") BigInteger amount) {
@@ -69,7 +72,7 @@ public class ExpCommand extends AdvancedCommand {
         MessageUtil.sendMessage(sender, "§7Exp balance of §6" + target.getPlayerName() + " §7set to §6" + targetExp.formatExp() + "§7.");
     }
 
-    @SubCommand(subCommand = "remove")
+    @SubCommand(value = "remove", permission = EXP_MODIFY_PERMISSION)
     public void removeTargetExp(CommandSender sender,
                                 @CommandParameter(name = "target") PrisonPlayer target,
                                 @CommandParameter(name = "amount") BigInteger amount) {
@@ -88,7 +91,7 @@ public class ExpCommand extends AdvancedCommand {
         MessageUtil.sendMessage(sender, "§7Exp balance of §6" + target.getPlayerName() + " §7was removed §6" + amount + "§7. New balance: §6" + targetExp.formatExp() + "§7.");
     }
 
-    @SubCommand(subCommand = "add")
+    @SubCommand(value = "add", permission = EXP_MODIFY_PERMISSION)
     public void addTargetExp(CommandSender sender,
                              @CommandParameter(name = "target") PrisonPlayer target,
                              @CommandParameter(name = "amount") BigInteger amount) {
@@ -107,7 +110,7 @@ public class ExpCommand extends AdvancedCommand {
         MessageUtil.sendMessage(sender, "§7Exp balance of §6" + target.getPlayerName() + " §7was added §6" + amount + "§7. New balance: §6" + targetExp.formatExp() + "§7.");
     }
 
-    @SubCommand(subCommand = "top")
+    @SubCommand("top")
     public void getTopTen(CommandSender sender) {
         List<PlayerCurrency> topExp = topPlayerExpCache.getTopPlayerCache();
 

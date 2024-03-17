@@ -1,16 +1,25 @@
 package de.hits.prison.scoreboard.fileUtil;
 
+import de.hits.prison.base.autowire.anno.Autowired;
+import de.hits.prison.base.autowire.anno.Component;
 import de.hits.prison.base.fileUtil.anno.SettingsFile;
-import de.hits.prison.base.fileUtil.helper.FileUtil;
+import de.hits.prison.base.fileUtil.helper.AnimateLineFileUtil;
+import de.hits.prison.scoreboard.ScoreboardManager;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@Component
 @SettingsFile
-public class ScoreboardUtil extends FileUtil {
+public class ScoreboardUtil extends AnimateLineFileUtil {
 
-    private final PrisonScoreboard defaultPrisonScoreboard = new PrisonScoreboard("Main", "§b§lPRISON", List.of("", "§7Welcome §b${prisonPlayer.name}", "", "§6^^", ""));
+    @Autowired
+    private static ScoreboardManager scoreboardManager;
+
+    private final PrisonScoreboard defaultPrisonScoreboard = new PrisonScoreboard("Main", "§b§lPRISON", 20L, "", "§7Welcome §b${prisonPlayer.name}", "", "§6^^", "");
 
     List<PrisonScoreboard> prisonScoreboards;
 
@@ -27,7 +36,8 @@ public class ScoreboardUtil extends FileUtil {
 
         String path = "Scoreboard." + defaultPrisonScoreboard.getName();
         cfg.addDefault(path + ".DisplayName", defaultPrisonScoreboard.getDisplayName());
-        cfg.addDefault(path + ".Rows", defaultPrisonScoreboard.getRows());
+        cfg.addDefault(path + ".UpdatePeriod", defaultPrisonScoreboard.getUpdatePeriod());
+        setAnimatedLinesList(path + ".Rows", defaultPrisonScoreboard.getRows(), true);
         saveDefaultsConfig();
     }
 
@@ -37,7 +47,8 @@ public class ScoreboardUtil extends FileUtil {
         for (PrisonScoreboard scoreboard : prisonScoreboards) {
             String path = "Scoreboard." + scoreboard.getName();
             cfg.set(path + ".DisplayName", scoreboard.getDisplayName());
-            cfg.set(path + ".Rows", scoreboard.getRows());
+            cfg.set(path + ".UpdatePeriod", scoreboard.getUpdatePeriod());
+            setAnimatedLinesList(path + ".Rows", scoreboard.getRows());
         }
         saveConfig();
     }
@@ -51,9 +62,25 @@ public class ScoreboardUtil extends FileUtil {
         prisonScoreboards.clear();
         for (String name : scoreboardSection.getKeys(false)) {
             String displayName = scoreboardSection.getString(name + ".DisplayName", "Title");
-            List<String> rows = scoreboardSection.getStringList(name + ".Rows");
-            prisonScoreboards.add(new PrisonScoreboard(name, displayName, rows));
+            List<AnimatedLines> rows = getAnimatedLinesList("Scoreboard." + name + ".Rows");
+            long updatePeriod = scoreboardSection.getLong(name + ".UpdatePeriod", 20L);
+            prisonScoreboards.add(new PrisonScoreboard(name, displayName, updatePeriod, rows));
         }
+
+        reloadScoreboards();
+    }
+
+    private void reloadScoreboards() {
+        if (scoreboardManager == null)
+            return;
+
+        scoreboardManager.getScoreboardSchedulerMap().forEach((string, scoreboardScheduler) -> {
+            scoreboardScheduler.update(getPrisonScoreboard(string));
+        });
+    }
+
+    public List<PrisonScoreboard> getPrisonScoreboards() {
+        return prisonScoreboards;
     }
 
     public PrisonScoreboard getPrisonScoreboard(String name) {
@@ -79,11 +106,20 @@ public class ScoreboardUtil extends FileUtil {
 
         String name;
         String displayName;
-        List<String> rows;
+        long updatePeriod;
+        List<AnimatedLines> rows;
 
-        public PrisonScoreboard(String name, String displayName, List<String> rows) {
+        public PrisonScoreboard(String name, String displayName, long updatePeriod, String... rows) {
             this.name = name;
             this.displayName = displayName;
+            this.updatePeriod = updatePeriod;
+            this.rows = Arrays.stream(rows).map(line -> new AnimatedLines(0, List.of(new AnimatedLine(line)))).collect(Collectors.toList());
+        }
+
+        public PrisonScoreboard(String name, String displayName, long updatePeriod, List<AnimatedLines> rows) {
+            this.name = name;
+            this.displayName = displayName;
+            this.updatePeriod = updatePeriod;
             this.rows = rows;
         }
 
@@ -103,11 +139,19 @@ public class ScoreboardUtil extends FileUtil {
             this.displayName = displayName;
         }
 
-        public List<String> getRows() {
+        public long getUpdatePeriod() {
+            return updatePeriod;
+        }
+
+        public void setUpdatePeriod(long updatePeriod) {
+            this.updatePeriod = updatePeriod;
+        }
+
+        public List<AnimatedLines> getRows() {
             return rows;
         }
 
-        public void setRows(List<String> rows) {
+        public void setRows(List<AnimatedLines> rows) {
             this.rows = rows;
         }
     }

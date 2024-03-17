@@ -9,6 +9,8 @@ import de.hits.prison.server.placeholder.PlayerScoreboard;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class ScoreboardHelper {
@@ -41,6 +43,10 @@ public class ScoreboardHelper {
 
     public HashMap<String, PlayerScoreboard> getPlayerScoreboards() {
         return playerScoreboards;
+    }
+
+    public Map<String, PlayerScoreboard> getPlayerScoreboards(String scoreboardName) {
+        return playerScoreboards.entrySet().stream().filter(e -> e.getValue().getPrisonScoreboard().getName().equals(scoreboardName)).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     public void updatePlayerScoreboard(Player player, ScoreboardUtil.PrisonScoreboard prisonScoreboard) {

@@ -19,6 +19,7 @@ import org.bukkit.World;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.PluginCommand;
 import org.bukkit.command.TabCompleter;
+import org.bukkit.plugin.PluginLogger;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -35,8 +36,6 @@ import java.util.logging.Logger;
 @Component
 public final class HitsPrison extends JavaPlugin {
 
-    private final Logger logger = Bukkit.getLogger();
-
     // Manager
     private final FileUtilManager fileUtilManager = new FileUtilManager();
     private final SchedulerManager schedulerManager = new SchedulerManager();
@@ -48,9 +47,10 @@ public final class HitsPrison extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        logger.info("Starting " + this.getName() + "...");
+        getLogger().info("Starting " + this.getName() + "...");
 
         AutowiredManager.register(this);
+        AutowiredManager.register(getLogger(), Logger.class);
 
         PluginManager pluginManager = Bukkit.getPluginManager();
 
@@ -62,7 +62,7 @@ public final class HitsPrison extends JavaPlugin {
 
         loadMines();
 
-        logger.info("Plugin " + this.getName() + ": STARTED");
+        getLogger().info("Plugin " + this.getName() + ": STARTED");
     }
 
     private void registerUtils(FileUtilManager fileUtilManager) {
@@ -88,7 +88,7 @@ public final class HitsPrison extends JavaPlugin {
             ArgumentParserRegistry.registerAll();
         } catch (NoSuchMethodException | InvocationTargetException | InstantiationException |
                  IllegalAccessException e) {
-            logger.severe("Error while initializing command type parsers: " + e.getMessage());
+            getLogger().severe("Error while initializing command type parsers: " + e.getMessage());
         }
     }
 
@@ -102,7 +102,7 @@ public final class HitsPrison extends JavaPlugin {
             }
         } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException |
                  InstantiationException e) {
-            logger.log(Level.SEVERE, "Error while initializing managers.", e);
+            getLogger().log(Level.SEVERE, "Error while initializing managers.", e);
         }
         baseManagers.stream().sorted(Comparator.comparingInt(manager -> ((Manager) manager).getPriority().getSlot()).reversed()).forEach(manager -> {
             AutowiredManager.register(manager);
@@ -122,7 +122,7 @@ public final class HitsPrison extends JavaPlugin {
     public void registerCommand(String commandName, List<String> aliases, CommandExecutor commandExecutor) {
         PluginCommand command = getCommand(commandName);
         if (command == null) {
-            logger.warning("Error while registering command " + commandName + ": Command not defined.");
+            getLogger().warning("Error while registering command " + commandName + ": Command not defined.");
             return;
         }
         command.setAliases(aliases);
@@ -137,7 +137,7 @@ public final class HitsPrison extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        logger.info("Stopping " + this.getName() + "...");
+        getLogger().info("Stopping " + this.getName() + "...");
 
         HibernateUtil.shutdown();
 
@@ -161,7 +161,7 @@ public final class HitsPrison extends JavaPlugin {
 
         mineHelper.getMineWorldMap().clear();
 
-        logger.info("Plugin " + this.getName() + ": STOPPED");
+        getLogger().info("Plugin " + this.getName() + ": STOPPED");
     }
 
     public File getBaseFolder() {

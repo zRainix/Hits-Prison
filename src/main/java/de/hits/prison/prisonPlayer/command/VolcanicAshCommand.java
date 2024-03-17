@@ -22,6 +22,9 @@ import java.util.List;
 @Component
 public class VolcanicAshCommand extends AdvancedCommand {
 
+    private static final String ASH_GET_PERMISSION = "prison.ash.get";
+    private static final String ASH_MODIFY_PERMISSION = "prison.ash.modify";
+
     @Autowired
     private static PlayerCurrencyDao playerCurrencyDao;
     @Autowired
@@ -40,7 +43,7 @@ public class VolcanicAshCommand extends AdvancedCommand {
         MessageUtil.sendMessage(player, "§7Ash balance: §6" + targetAsh.formatVolcanicAsh() + "§7.");
     }
 
-    @SubCommand(subCommand = "get")
+    @SubCommand(value = "get", permission = ASH_GET_PERMISSION)
     public void getTargetAsh(CommandSender sender,
                              @CommandParameter(name = "target") PrisonPlayer target) {
 
@@ -54,7 +57,7 @@ public class VolcanicAshCommand extends AdvancedCommand {
         MessageUtil.sendMessage(sender, "§7Ash balance of §6" + target.getPlayerName() + "§7: §6" + targetAsh.formatVolcanicAsh() + "§7.");
     }
 
-    @SubCommand(subCommand = "set")
+    @SubCommand(value = "set", permission = ASH_MODIFY_PERMISSION)
     public void setTargetAsh(CommandSender sender,
                              @CommandParameter(name = "target") PrisonPlayer target,
                              @CommandParameter(name = "amount") BigInteger amount) {
@@ -73,7 +76,7 @@ public class VolcanicAshCommand extends AdvancedCommand {
         MessageUtil.sendMessage(sender, "§7Ash balance of §6" + target.getPlayerName() + " §7set to §6" + targetAsh.formatVolcanicAsh() + "§7.");
     }
 
-    @SubCommand(subCommand = "remove")
+    @SubCommand(value = "remove", permission = ASH_MODIFY_PERMISSION)
     public void removeTargetAsh(CommandSender sender,
                                 @CommandParameter(name = "target") PrisonPlayer target,
                                 @CommandParameter(name = "amount") BigInteger amount) {
@@ -92,7 +95,7 @@ public class VolcanicAshCommand extends AdvancedCommand {
         MessageUtil.sendMessage(sender, "§7Ash balance of §6" + target.getPlayerName() + " §7was removed §6" + amount + "§7. New balance: §6" + targetAsh.formatVolcanicAsh() + "§7.");
     }
 
-    @SubCommand(subCommand = "add")
+    @SubCommand(value = "add", permission = ASH_MODIFY_PERMISSION)
     public void addTargetAsh(CommandSender sender,
                              @CommandParameter(name = "target") PrisonPlayer target,
                              @CommandParameter(name = "amount") BigInteger amount) {
@@ -111,7 +114,7 @@ public class VolcanicAshCommand extends AdvancedCommand {
         MessageUtil.sendMessage(sender, "§7Ash balance of §6" + target.getPlayerName() + " §7was added §6" + amount + "§7. New balance: §6" + targetAsh.formatVolcanicAsh() + "§7.");
     }
 
-    @SubCommand(subCommand = "top")
+    @SubCommand("top")
     public void getTopTen(CommandSender sender) {
         List<PlayerCurrency> topVolcanicAsh = topPlayerVolcanicAshCache.getTopPlayerCache();
 

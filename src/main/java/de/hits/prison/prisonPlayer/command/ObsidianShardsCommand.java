@@ -22,6 +22,9 @@ import java.util.List;
 @Component
 public class ObsidianShardsCommand extends AdvancedCommand {
 
+    private static final String SHARDS_GET_PERMISSION = "prison.shards.get";
+    private static final String SHARDS_MODIFY_PERMISSION = "prison.shards.modify";
+
     @Autowired
     private static PlayerCurrencyDao playerCurrencyDao;
     @Autowired
@@ -39,7 +42,7 @@ public class ObsidianShardsCommand extends AdvancedCommand {
         MessageUtil.sendMessage(player, "§7Shards balance: §6" + targetShards.formatObsidianShards() + "§7.");
     }
 
-    @SubCommand(subCommand = "get")
+    @SubCommand(value = "get", permission = SHARDS_GET_PERMISSION)
     public void getTargetShards(CommandSender sender,
                                 @CommandParameter(name = "target") PrisonPlayer target) {
         PlayerCurrency targetShards = target.getPlayerCurrency();
@@ -50,7 +53,7 @@ public class ObsidianShardsCommand extends AdvancedCommand {
         MessageUtil.sendMessage(sender, "§7Shards balance of §6" + target.getPlayerName() + "§7: §6" + targetShards.formatObsidianShards() + "§7.");
     }
 
-    @SubCommand(subCommand = "set")
+    @SubCommand(value = "set", permission = SHARDS_MODIFY_PERMISSION)
     public void setTargetShards(CommandSender sender,
                                 @CommandParameter(name = "target") PrisonPlayer target,
                                 @CommandParameter(name = "amount") BigInteger amount) {
@@ -69,7 +72,7 @@ public class ObsidianShardsCommand extends AdvancedCommand {
         MessageUtil.sendMessage(sender, "§7Shards balance of §6" + target.getPlayerName() + " §7set to §6" + targetShards.formatObsidianShards() + "§7.");
     }
 
-    @SubCommand(subCommand = "remove")
+    @SubCommand(value = "remove", permission = SHARDS_MODIFY_PERMISSION)
     public void removeTargetShards(CommandSender sender,
                                    @CommandParameter(name = "target") PrisonPlayer target,
                                    @CommandParameter(name = "amount") BigInteger amount) {
@@ -88,7 +91,7 @@ public class ObsidianShardsCommand extends AdvancedCommand {
         MessageUtil.sendMessage(sender, "§7Shards balance of §6" + target.getPlayerName() + " §7was removed §6" + amount + "§7. New balance: §6" + targetShards.formatObsidianShards() + "§7.");
     }
 
-    @SubCommand(subCommand = "add")
+    @SubCommand(value = "add", permission = SHARDS_MODIFY_PERMISSION)
     public void addTargetShards(CommandSender sender,
                                 @CommandParameter(name = "target") PrisonPlayer target,
                                 @CommandParameter(name = "amount") BigInteger amount) {
@@ -107,7 +110,7 @@ public class ObsidianShardsCommand extends AdvancedCommand {
         MessageUtil.sendMessage(sender, "§7Shards balance of §6" + target.getPlayerName() + " §7was added §6" + amount + "§7. New balance: §6" + targetShards.formatObsidianShards() + "§7.");
     }
 
-    @SubCommand(subCommand = "top")
+    @SubCommand("top")
     public void getTopTen(CommandSender sender) {
         List<PlayerCurrency> topObsidianShards = topPlayerObsidianShardsCache.getTopPlayerCache();
 

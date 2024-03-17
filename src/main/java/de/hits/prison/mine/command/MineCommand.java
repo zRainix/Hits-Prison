@@ -21,6 +21,7 @@ import de.hits.prison.server.util.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.PluginLogger;
 
 import java.util.List;
 import java.util.Objects;
@@ -30,7 +31,8 @@ import java.util.logging.Logger;
 @Component
 public class MineCommand extends AdvancedCommand {
 
-    private final Logger logger = Bukkit.getLogger();
+    @Autowired
+    private static Logger logger;
 
     @Autowired
     private static PrisonPlayerDao prisonPlayerDao;
@@ -86,7 +88,7 @@ public class MineCommand extends AdvancedCommand {
         }
     }
 
-    @SubCommand(subCommand = "reset")
+    @SubCommand("reset")
     public void resetMine(Player player) {
         PrisonPlayer prisonPlayer = prisonPlayerDao.findByPlayer(player);
 
@@ -112,7 +114,7 @@ public class MineCommand extends AdvancedCommand {
         MessageUtil.sendMessage(player, "§7Mine was reset.");
     }
 
-    @SubCommand(subCommand = "public")
+    @SubCommand("public")
     public void publicMine(Player player) {
         PrisonPlayer prisonPlayer = prisonPlayerDao.findByPlayer(player);
 
@@ -138,7 +140,7 @@ public class MineCommand extends AdvancedCommand {
         MessageUtil.sendMessage(player, "§7Your mine is now §apublic§7.");
     }
 
-    @SubCommand(subCommand = "private")
+    @SubCommand("private")
     public void privateMine(Player player) {
         PrisonPlayer prisonPlayer = prisonPlayerDao.findByPlayer(player);
 
@@ -164,7 +166,7 @@ public class MineCommand extends AdvancedCommand {
         MessageUtil.sendMessage(player, "§7Your mine is now §cprivate§7.");
     }
 
-    @SubCommand(subCommand = "trust")
+    @SubCommand("trust")
     public void trustPlayer(Player player, @CommandParameter(name = "player") PrisonPlayer trusted) {
         PrisonPlayer prisonPlayer = prisonPlayerDao.findByPlayer(player);
 
@@ -198,7 +200,7 @@ public class MineCommand extends AdvancedCommand {
         MessageUtil.sendMessage(player, "§7This player is now §atrusted§7.");
     }
 
-    @SubCommand(subCommand = "untrust")
+    @SubCommand("untrust")
     public void untrustPlayer(Player player, @CommandParameter(name = "player") PrisonPlayer untrusted) {
         PrisonPlayer prisonPlayer = prisonPlayerDao.findByPlayer(player);
 
@@ -228,7 +230,7 @@ public class MineCommand extends AdvancedCommand {
         MessageUtil.sendMessage(player, "§7This player is now §cnot trusted§7.");
     }
 
-    @SubCommand(subCommand = "trusted")
+    @SubCommand("trusted")
     public void trustedPlayers(Player player) {
         PrisonPlayer prisonPlayer = prisonPlayerDao.findByPlayer(player);
 
@@ -255,7 +257,7 @@ public class MineCommand extends AdvancedCommand {
         }
     }
 
-    @SubCommand(subCommand = "visit")
+    @SubCommand("visit")
     public void visitMine(Player player, @CommandParameter(name = "player") PrisonPlayer visit) {
         PrisonPlayer prisonPlayer = prisonPlayerDao.findByPlayer(player);
 
@@ -300,7 +302,8 @@ public class MineCommand extends AdvancedCommand {
             logger.log(Level.SEVERE, "Error while loading mine world for player " + player.getName(), e);
         }
     }
-    @SubCommand(subCommand = "setBlockLevel", permission = MODIFY_BLOCK_LEVEL_PERMISSION)
+
+    @SubCommand(value = "setBlockLevel", permission = MODIFY_BLOCK_LEVEL_PERMISSION)
     public void setBlockLevel(CommandSender sender, @CommandParameter(name = "player") PrisonPlayer prisonPlayer, @CommandParameter(name = "blockLevel") int blockLevel) {
         PlayerMine playerMine = prisonPlayer.getPlayerMine();
 
@@ -326,7 +329,7 @@ public class MineCommand extends AdvancedCommand {
         MessageUtil.sendMessage(sender, "§7Player mine was updated.");
     }
 
-    @SubCommand(subCommand = "getBlockLevel", permission = RESET_CACHE_PERMISSION)
+    @SubCommand(value = "getBlockLevel", permission = RESET_CACHE_PERMISSION)
     public void getBlockLevel(CommandSender sender, @CommandParameter(name = "player") PrisonPlayer prisonPlayer) {
         PlayerMine playerMine = prisonPlayer.getPlayerMine();
 
@@ -338,7 +341,7 @@ public class MineCommand extends AdvancedCommand {
         MessageUtil.sendMessage(sender, "§7Block level of player §b" + prisonPlayer.getPlayerName() + " §7is §b" + playerMine.getBlockLevel() + "§7.");
     }
 
-    @SubCommand(subCommand = "setAreaLevel", permission = MODIFY_AREA_LEVEL_PERMISSION)
+    @SubCommand(value = "setAreaLevel", permission = MODIFY_AREA_LEVEL_PERMISSION)
     public void setAreaLevel(CommandSender sender, @CommandParameter(name = "player") PrisonPlayer prisonPlayer, @CommandParameter(name = "areaLevel") int areaLevel) {
         PlayerMine playerMine = prisonPlayer.getPlayerMine();
 
@@ -364,7 +367,7 @@ public class MineCommand extends AdvancedCommand {
         MessageUtil.sendMessage(sender, "§7Player mine was updated.");
     }
 
-    @SubCommand(subCommand = "getAreaLevel", permission = MODIFY_AREA_LEVEL_PERMISSION)
+    @SubCommand(value = "getAreaLevel", permission = MODIFY_AREA_LEVEL_PERMISSION)
     public void getAreaLevel(CommandSender sender, @CommandParameter(name = "player") PrisonPlayer prisonPlayer) {
         PlayerMine playerMine = prisonPlayer.getPlayerMine();
 
@@ -376,7 +379,7 @@ public class MineCommand extends AdvancedCommand {
         MessageUtil.sendMessage(sender, "§7Area level of player §b" + prisonPlayer.getPlayerName() + " §7is §b" + playerMine.getAreaLevel() + "§7.");
     }
 
-    @SubCommand(subCommand = "resetCache", permission = RESET_CACHE_PERMISSION)
+    @SubCommand(value = "resetCache", permission = RESET_CACHE_PERMISSION)
     public void resetCache(CommandSender sender) {
         mineUtil.getBlockLevelCache().clear();
         mineUtil.getAreaLevelCache().clear();

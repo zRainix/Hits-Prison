@@ -19,6 +19,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
+import org.bukkit.plugin.PluginLogger;
 
 import java.util.List;
 import java.util.Objects;
@@ -27,7 +28,8 @@ import java.util.logging.Logger;
 @Component
 public class RightClickEntityListener implements Listener {
 
-    private Logger logger = Bukkit.getLogger();
+    @Autowired
+    private static Logger logger;
 
     @Autowired
     private static PrisonPlayerDao prisonPlayerDao;

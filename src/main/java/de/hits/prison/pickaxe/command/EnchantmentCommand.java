@@ -43,7 +43,7 @@ public class EnchantmentCommand extends AdvancedCommand {
         screenManager.openScreen(player, new PickaxeScreen(player));
     }
 
-    @SubCommand(subCommand = "set")
+    @SubCommand("set")
     public void setEnchantment(CommandSender sender,
                                @CommandParameter(name = "player") PrisonPlayer prisonPlayer,
                                @CommandParameter(name = "enchantment") PickaxeUtil.PickaxeEnchantment pickaxeEnchantment,
@@ -76,7 +76,7 @@ public class EnchantmentCommand extends AdvancedCommand {
         pickaxeHelper.checkPlayerInventory(offlinePlayer.getPlayer());
     }
 
-    @SubCommand(subCommand = "remove")
+    @SubCommand("remove")
     public void removeEnchantment(CommandSender sender,
                                   @CommandParameter(name = "player") PrisonPlayer prisonPlayer,
                                   @CommandParameter(name = "enchantment") PickaxeUtil.PickaxeEnchantment pickaxeEnchantment) {
@@ -97,7 +97,7 @@ public class EnchantmentCommand extends AdvancedCommand {
         pickaxeHelper.checkPlayerInventory(offlinePlayer.getPlayer());
     }
 
-    @SubCommand(subCommand = "list")
+    @SubCommand("list")
     public void listEnchantment(CommandSender sender,
                                 @CommandParameter(name = "player") PrisonPlayer prisonPlayer) {
         List<PlayerEnchantment> playerEnchantments = playerEnchantmentDao.findAllByPrisonPlayer(prisonPlayer);

@@ -21,7 +21,7 @@ public class PlayerArgumentParser extends ArgumentParser<Player> {
         if (player == null) {
             throw new IllegalArgumentException("§cPlayer not found: §6" + arg);
         }
-        if (isFriend(parameter) && checkFriends(sender, player)) {
+        if (requireFriend(parameter) && checkFriends(sender, player)) {
             throw new IllegalArgumentException("§cYou are not friends with this player.");
         }
         return player;
@@ -32,7 +32,7 @@ public class PlayerArgumentParser extends ArgumentParser<Player> {
         return value.getName();
     }
 
-    public boolean isFriend(Parameter parameter) {
+    public boolean requireFriend(Parameter parameter) {
         if (parameter.isAnnotationPresent(PlayerArgument.class)) {
             PlayerArgument playerArgument = parameter.getAnnotation(PlayerArgument.class);
             return playerArgument.isFriend();
@@ -49,7 +49,7 @@ public class PlayerArgumentParser extends ArgumentParser<Player> {
     public List<String> tabComplete(CommandSender sender, String arg, Parameter parameter) {
         List<String> completions = new ArrayList<>();
         for (Player player : Bukkit.getOnlinePlayers()) {
-            if (player.getName().toLowerCase().startsWith(arg.toLowerCase()) && (!isFriend(parameter) || checkFriends(sender, player))) {
+            if (player.getName().toLowerCase().startsWith(arg.toLowerCase()) && (!requireFriend(parameter) || checkFriends(sender, player))) {
                 completions.add(player.getName());
             }
         }
