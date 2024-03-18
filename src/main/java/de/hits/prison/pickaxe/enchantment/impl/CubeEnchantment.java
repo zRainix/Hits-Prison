@@ -1,11 +1,15 @@
 package de.hits.prison.pickaxe.enchantment.impl;
 
+import de.hits.prison.base.autowire.anno.Autowired;
+import de.hits.prison.base.autowire.anno.Component;
 import de.hits.prison.base.model.entity.PlayerCurrency;
 import de.hits.prison.base.model.entity.PlayerEnchantment;
 import de.hits.prison.base.model.entity.PrisonPlayer;
 import de.hits.prison.mine.helper.MineWorld;
+import de.hits.prison.pickaxe.blocks.BlockValue;
 import de.hits.prison.pickaxe.enchantment.anno.DefaultEnchantment;
 import de.hits.prison.pickaxe.enchantment.helper.PickaxeEnchantmentImpl;
+import de.hits.prison.pickaxe.fileUtil.BlockValueUtil;
 import de.hits.prison.pickaxe.helper.PlayerDrops;
 import de.hits.prison.server.util.MessageUtil;
 import org.bukkit.Material;
@@ -20,10 +24,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Component
 @DefaultEnchantment(maxLevel = 3, description = "Mines a cube of blocks around mined block. \nEvery extra minded block drops exp.", activationPrice = "100", priceMultiplier = "10", type = "Mining")
 public class CubeEnchantment extends PickaxeEnchantmentImpl {
 
     private static final HashMap<String, DropFocus> dropFocusHashMap = new HashMap<>();
+
+    @Autowired
+    private static BlockValueUtil blockValueUtil;
 
     public CubeEnchantment() {
         super("Cube");
@@ -48,8 +56,11 @@ public class CubeEnchantment extends PickaxeEnchantmentImpl {
                             continue;
                         if (!mineWorld.isMineBlock(offset))
                             continue;
+
+                        Material material = offset.getType();
+
                         offset.setType(Material.AIR);
-                        extraPlayerDrops.add(randomPlayerDropsForCube(prisonPlayer));
+                        extraPlayerDrops.add(randomPlayerDropsForCube(prisonPlayer, blockValueUtil.getBlockValue(material)));
                     }
                 }
             }
@@ -57,13 +68,12 @@ public class CubeEnchantment extends PickaxeEnchantmentImpl {
         return extraPlayerDrops;
     }
 
-    public PlayerDrops randomPlayerDropsForCube(PrisonPlayer prisonPlayer) {
-        // TODO: Genaue Werte anpassen, ggf. aus Config auslesen.
+    public PlayerDrops randomPlayerDropsForCube(PrisonPlayer prisonPlayer, BlockValue blockValue) {
         String uuid = prisonPlayer.getPlayerUuid();
         return switch (dropFocusHashMap.getOrDefault(uuid, DropFocus.ASH)) {
-            case EXP -> PlayerDrops.generate(0, 0, 0, 0, 1, 5);
-            case ASH -> PlayerDrops.generate(1, 5, 0, 0, 0, 0);
-            case SHARDS -> PlayerDrops.generate(0, 0, 1, 5, 0, 0);
+            case EXP -> PlayerDrops.generate(blockValue).multiply(0, 0, 1);
+            case ASH -> PlayerDrops.generate(blockValue).multiply(1, 0, 0);
+            case SHARDS -> PlayerDrops.generate(blockValue).multiply(0, 1, 0);
         };
     }
 
@@ -83,7 +93,7 @@ public class CubeEnchantment extends PickaxeEnchantmentImpl {
         MessageUtil.sendMessage(event.getPlayer(), "§7Switched DropFocus to " + dropFocus.getDisplayName());
     }
 
-    private static enum DropFocus {
+    public static enum DropFocus {
 
         ASH("§cVolcanic Ash", null),
         SHARDS("§bObsidian Shards", "enchantment.DropFocus.Cube.Shards"),

@@ -14,7 +14,7 @@ public class HasteEnchantment extends PickaxeEnchantmentImpl {
     }
 
     @Override
-    public PotionEffect getVanillaPotionEffect(PrisonPlayer prisonPlayer, PlayerEnchantment playerEnchantment) {
-        return new PotionEffect(PotionEffectType.FAST_DIGGING, 20 * 3, playerEnchantment.getEnchantmentLevel() - 1);
+    public PotionEffect getVanillaPotionEffect(PrisonPlayer prisonPlayer, PlayerEnchantment hasteEnchantment) {
+        return new PotionEffect(PotionEffectType.FAST_DIGGING, 20 * 3, hasteEnchantment.getEnchantmentLevel() - 1);
     }
 }

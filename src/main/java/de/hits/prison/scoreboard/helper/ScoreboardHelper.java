@@ -4,8 +4,11 @@ import de.hits.prison.base.autowire.anno.Autowired;
 import de.hits.prison.base.autowire.anno.Component;
 import de.hits.prison.base.model.dao.PrisonPlayerDao;
 import de.hits.prison.base.model.entity.PrisonPlayer;
+import de.hits.prison.mine.helper.MineHelper;
+import de.hits.prison.mine.helper.MineWorld;
 import de.hits.prison.scoreboard.fileUtil.ScoreboardUtil;
 import de.hits.prison.server.placeholder.PlayerScoreboard;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;
@@ -19,6 +22,10 @@ public class ScoreboardHelper {
     private static PrisonPlayerDao prisonPlayerDao;
     @Autowired
     private static ScoreboardUtil scoreboardUtil;
+    @Autowired
+    private static MineHelper mineHelper;
+    @Autowired
+    private static ScoreboardHelper scoreboardHelper;
 
     private final HashMap<String, PlayerScoreboard> playerScoreboards;
 
@@ -46,7 +53,7 @@ public class ScoreboardHelper {
     }
 
     public Map<String, PlayerScoreboard> getPlayerScoreboards(String scoreboardName) {
-        return playerScoreboards.entrySet().stream().filter(e -> e.getValue().getPrisonScoreboard().getName().equals(scoreboardName)).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        return playerScoreboards.entrySet().stream().filter(e -> e.getValue().getPrisonScoreboard() != null && e.getValue().getPrisonScoreboard().getName().equals(scoreboardName)).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     public void updatePlayerScoreboard(Player player, ScoreboardUtil.PrisonScoreboard prisonScoreboard) {
@@ -60,6 +67,16 @@ public class ScoreboardHelper {
         PlayerScoreboard playerScoreboard = new PlayerScoreboard(prisonPlayer, prisonScoreboard);
         playerScoreboards.put(uuid, playerScoreboard);
         player.setScoreboard(playerScoreboard.getScoreboard());
+    }
+
+    public void updatePlayerScoreboard(Player player) {
+        World world = player.getWorld();
+        MineWorld mineWorld;
+        if ((mineWorld = mineHelper.getMineWorld(world)) != null) {
+            scoreboardHelper.updatePlayerScoreboard(player, scoreboardUtil.getPrisonScoreboard(mineWorld.getPrisonPlayer().getPlayerUuid().equals(player.getUniqueId().toString()) ? "Mine" : "VisitMine"));
+        } else {
+            scoreboardHelper.updatePlayerScoreboard(player, scoreboardUtil.getMainPrisonScoreboard());
+        }
     }
 
 }

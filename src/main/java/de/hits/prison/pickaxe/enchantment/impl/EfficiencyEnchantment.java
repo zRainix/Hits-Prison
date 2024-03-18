@@ -6,6 +6,7 @@ import de.hits.prison.pickaxe.helper.VanillaEnchantment;
 import de.hits.prison.base.model.entity.PlayerEnchantment;
 import de.hits.prison.base.model.entity.PrisonPlayer;
 import org.bukkit.enchantments.Enchantment;
+import org.bukkit.event.EventHandler;
 
 @DefaultEnchantment(maxLevel = 20, description = "Adds vanilla efficiency enchantment for faster mining.", activationPrice = "100", priceMultiplier = "1.5", type = "Vanilla Enchantment")
 public class EfficiencyEnchantment extends PickaxeEnchantmentImpl {
@@ -18,4 +19,5 @@ public class EfficiencyEnchantment extends PickaxeEnchantmentImpl {
     public VanillaEnchantment getVanillaEnchantment(PrisonPlayer prisonPlayer, PlayerEnchantment efficiencyEnchantment) {
         return new VanillaEnchantment(Enchantment.DIG_SPEED, efficiencyEnchantment.getEnchantmentLevel());
     }
+
 }

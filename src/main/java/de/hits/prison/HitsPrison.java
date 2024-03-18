@@ -57,6 +57,11 @@ public final class HitsPrison extends JavaPlugin {
         registerUtils(this.fileUtilManager);
         registerSchedulers(this.schedulerManager);
         registerHibernate();
+        if(HibernateUtil.getSessionFactory() == null || HibernateUtil.getSessionFactory().isClosed()) {
+            getLogger().severe("Could not connect to database. Disabling plugin...");
+            pluginManager.disablePlugin(this);
+            return;
+        }
         registerCommandParsers();
         registerManagers(pluginManager);
 
@@ -141,9 +146,11 @@ public final class HitsPrison extends JavaPlugin {
 
         HibernateUtil.shutdown();
 
-        screenManager.closeAllScreens();
+        if(screenManager != null)
+            screenManager.closeAllScreens();
 
-        this.fileUtilManager.saveAll();
+        if(this.fileUtilManager != null)
+            this.fileUtilManager.saveAll();
 
         World mainWorld = Bukkit.getWorld("world");
 
@@ -159,7 +166,8 @@ public final class HitsPrison extends JavaPlugin {
             }
         }
 
-        mineHelper.getMineWorldMap().clear();
+        if(mineHelper != null)
+            mineHelper.getMineWorldMap().clear();
 
         getLogger().info("Plugin " + this.getName() + ": STOPPED");
     }

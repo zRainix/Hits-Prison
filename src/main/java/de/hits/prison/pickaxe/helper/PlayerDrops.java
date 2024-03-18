@@ -71,10 +71,18 @@ public class PlayerDrops {
         playerDrops.forEach(this::add);
     }
 
-    public void multiply(double multiplier) {
+    public PlayerDrops multiply(double multiplier) {
         this.volcanicAsh = (long) ((double) this.volcanicAsh * multiplier);
         this.obsidianShards = (long) ((double) this.obsidianShards * multiplier);
         this.exp = (long) ((double) this.exp * multiplier);
+        return this;
+    }
+
+    public PlayerDrops multiply(double multiplierAsh, double multiplierShards, double multiplierExp) {
+        this.volcanicAsh = (long) ((double) this.volcanicAsh * multiplierAsh);
+        this.obsidianShards = (long) ((double) this.obsidianShards * multiplierShards);
+        this.exp = (long) ((double) this.exp * multiplierExp);
+        return this;
     }
 
     private static long randomNumber(long min, long max) {

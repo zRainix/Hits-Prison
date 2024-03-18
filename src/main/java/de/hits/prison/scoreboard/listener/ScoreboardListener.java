@@ -30,19 +30,12 @@ public class ScoreboardListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
 
-        scoreboardHelper.updatePlayerScoreboard(player, scoreboardUtil.getMainPrisonScoreboard());
+        scoreboardHelper.updatePlayerScoreboard(player);
     }
 
     @EventHandler
     public void onWorldChange(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
-        World world = event.getPlayer().getWorld();
-        MineWorld mineWorld;
-        if ((mineWorld = mineHelper.getMineWorld(world)) != null) {
-            scoreboardHelper.updatePlayerScoreboard(player, scoreboardUtil.getPrisonScoreboard(mineWorld.getPrisonPlayer().getPlayerUuid().equals(player.getUniqueId().toString()) ? "Mine" : "VisitMine"));
-        } else {
-            scoreboardHelper.updatePlayerScoreboard(player, scoreboardUtil.getMainPrisonScoreboard());
-        }
+        scoreboardHelper.updatePlayerScoreboard(player);
     }
-
 }

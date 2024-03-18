@@ -12,6 +12,7 @@ import de.hits.prison.base.model.entity.PrisonPlayer;
 import de.hits.prison.mine.helper.MineHelper;
 import de.hits.prison.mine.helper.MineWorld;
 import de.hits.prison.pickaxe.enchantment.helper.PickaxeEnchantmentImplManager;
+import de.hits.prison.pickaxe.fileUtil.BlockValueUtil;
 import de.hits.prison.pickaxe.helper.PickaxeHelper;
 import de.hits.prison.pickaxe.helper.PlayerDrops;
 import de.hits.prison.server.util.MessageUtil;
@@ -47,6 +48,8 @@ public class BlockBreakListener implements Listener {
     private static MineHelper mineHelper;
     @Autowired
     private static PlayerMineDao playerMineDao;
+    @Autowired
+    private static BlockValueUtil blockValueUtil;
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent e) {
@@ -96,7 +99,7 @@ public class BlockBreakListener implements Listener {
 
         List<PlayerEnchantment> playerEnchantments = prisonPlayer.getPlayerEnchantments();
 
-        PlayerDrops playerDrops = PlayerDrops.generate(1, 5, 2, 10, 1, 2);
+        PlayerDrops playerDrops = PlayerDrops.generate(blockValueUtil.getBlockValue(e.getBlock().getType()));
 
         List<PlayerDrops> extraPlayerDrops = new ArrayList<>();
 
