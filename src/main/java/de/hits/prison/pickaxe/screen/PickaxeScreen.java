@@ -11,6 +11,7 @@ import de.hits.prison.base.screen.helper.ScreenColumn;
 import de.hits.prison.pickaxe.fileUtil.PickaxeUtil;
 import de.hits.prison.pickaxe.screen.helper.PickaxeScreensHelper;
 import de.hits.prison.server.util.ItemBuilder;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;
@@ -52,6 +53,10 @@ public class PickaxeScreen extends Screen {
 
     @Override
     public void init() {
+        for (Map.Entry<String, ScreenColumn> entry : typeColumns.entrySet()) {
+            PickaxeUtil.PickaxeEnchantmentType type = pickaxeUtil.getEnchantmentType(entry.getKey());
+            setItem(entry.getValue().getStartColumn(), new ItemBuilder(type.getPreviewMaterial()).setDisplayName("§9" + entry.getKey()).build(), null);
+        }
         for (PickaxeUtil.PickaxeEnchantment enchantment : pickaxeUtil.getPickaxeEnchantments().stream().sorted(Comparator.comparingInt(o -> o.getRarity().getOrder())).toList()) {
             PlayerEnchantment playerEnchantment = playerEnchantmentDao.findByPlayerAndEnchantmentName(player, enchantment.getName());
             ScreenColumn screenColumn = typeColumns.get(enchantment.getType().getName());

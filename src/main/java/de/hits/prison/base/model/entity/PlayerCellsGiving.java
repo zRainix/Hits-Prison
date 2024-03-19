@@ -14,7 +14,7 @@ public class PlayerCellsGiving {
     Long amount;
 
     @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false, unique = true)
+    @JoinColumn(nullable = false)
     PrisonPlayer refPrisonPlayer;
 
     public Long getId() {

@@ -7,19 +7,24 @@ import org.bukkit.configuration.ConfigurationSection;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @SettingsFile
 public class CellsGivingUtil extends FileUtil {
 
     private final Logger logger = Bukkit.getLogger();
     private List<CellsGivingLevel> cellsGivingLevelsList;
+    private List<CellsGivingDrop> cellsGivingDrops;
 
     public CellsGivingUtil() {
         super("CellsGiving.yml");
         this.cellsGivingLevelsList = new ArrayList<>();
+        this.cellsGivingDrops = new ArrayList<>();
     }
 
     @Override
@@ -32,14 +37,19 @@ public class CellsGivingUtil extends FileUtil {
         cfg.set("Level", null);
 
         for (CellsGivingLevel cellsGivingLevel : cellsGivingLevelsList) {
-
-            for(CellsGivingDrop drop : cellsGivingLevel.getDrops()) {
-                String path = "Level." + cellsGivingLevel.getLevel() + "." + drop.getItemType();
-                cfg.set(path + ".ItemType", drop.getItemType());
-                cfg.set(path + ".Chance", drop.getChance().toString());
-                cfg.set(path + ".Amount", drop.getAmount());
+            for(CellsGivingDropChance drop : cellsGivingLevel.getDrops()) {
+                cfg.set("Level." + cellsGivingLevel.getLevel() + "." + drop.getDrop().getName(), drop.getChance().toString());
             }
         }
+
+        for(CellsGivingDrop cellsGivingDrop : cellsGivingDrops) {
+            cfg.set("Drop." + cellsGivingDrop.getItemType() + ".Name", cellsGivingDrop.getName());
+            cfg.set("Drop." + cellsGivingDrop.getItemType() + ".ColorPrefix", cellsGivingDrop.getColorPrefix());
+            for(Map.Entry<Integer, Integer> entry : cellsGivingDrop.getAmountWeights().entrySet()) {
+                cfg.set("Drop." + cellsGivingDrop.getItemType() + ".Amounts." + entry.getKey(), entry.getValue());
+            }
+        }
+
 
         saveConfig();
         logger.log(Level.INFO, "CellsGiving values saved.");
@@ -49,6 +59,37 @@ public class CellsGivingUtil extends FileUtil {
     public void load() {
         loadConfig();
 
+        loadDrops();
+        loadLevels();
+    }
+
+    public void loadDrops() {
+        ConfigurationSection dropSection = cfg.getConfigurationSection("Drop");
+        if(dropSection == null) {
+            return;
+        }
+        cellsGivingDrops.clear();
+
+        for(String name : dropSection.getKeys(false)) {
+            String itemName = dropSection.getString(name + ".ItemName", "key");
+            ConfigurationSection amountsSection = dropSection.getConfigurationSection(name + ".Amounts");
+            if(amountsSection == null) {
+                logger.warning("Could not load Drop " + itemName);
+                continue;
+            }
+            Map<Integer, Integer> amountsWeights = amountsSection.getKeys(false).stream().map(amountString -> {
+                int amount = Integer.parseInt((amountString));
+                int weight = amountsSection.getInt(amountString, 0);
+                return Map.entry(amount, weight);
+            }).collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+            String colorPrefix = dropSection.getString(name + ".ColorPrefix", "§7");
+
+
+            cellsGivingDrops.add(new CellsGivingDrop(name, itemName, amountsWeights, colorPrefix));
+        }
+    }
+
+    public void loadLevels() {
         ConfigurationSection levelSection = cfg.getConfigurationSection("Level");
         if(levelSection == null) return;
         this.cellsGivingLevelsList.clear();
@@ -58,16 +99,28 @@ public class CellsGivingUtil extends FileUtil {
             ConfigurationSection dropSection = levelSection.getConfigurationSection(levelString);
             if(dropSection == null) continue;
 
-            List<CellsGivingDrop> drops = new ArrayList<>();
-            for(String itemType : dropSection.getKeys(false)) {
-                    String displayName = dropSection.getString(itemType + ".ItemName", "key");
-                    BigDecimal chance = new BigDecimal(dropSection.getString(itemType + ".Chance", "0"));
-                    int amount = dropSection.getInt(itemType + ".Amount", 0);
+            List<CellsGivingDropChance> dropChances = new ArrayList<>();
+            for(String dropName : dropSection.getKeys(false)) {
+                System.out.println(dropSection.getString(dropName));
+                BigDecimal chance = new BigDecimal(dropSection.getString(dropName, "0.0"));
+                CellsGivingDrop cellsGivingDrop = getCellsGivingDrop(dropName);
+                if(cellsGivingDrop == null) {
+                    continue;
+                }
 
-                    drops.add(new CellsGivingDrop(itemType, chance, amount));
+                dropChances.add(new CellsGivingDropChance(cellsGivingDrop, chance));
             }
-            this.cellsGivingLevelsList.add(new CellsGivingLevel(level, drops));
+            this.cellsGivingLevelsList.add(new CellsGivingLevel(level, dropChances));
         }
+    }
+
+    public CellsGivingDrop getCellsGivingDrop(String name) {
+        for (CellsGivingDrop cellsGivingDrop : cellsGivingDrops) {
+            if(cellsGivingDrop.getName().equals(name)) {
+                return cellsGivingDrop;
+            }
+        }
+        return null;
     }
 
     public List<CellsGivingLevel> getCellsGivingLevelsList() {
@@ -86,9 +139,9 @@ public class CellsGivingUtil extends FileUtil {
     public static class CellsGivingLevel {
 
         int level;
-        List<CellsGivingDrop> drops;
+        List<CellsGivingDropChance> drops;
 
-        public CellsGivingLevel(int level, List<CellsGivingDrop> drops) {
+        public CellsGivingLevel(int level, List<CellsGivingDropChance> drops) {
             this.level = level;
             this.drops = drops;
         }
@@ -101,33 +154,51 @@ public class CellsGivingUtil extends FileUtil {
             this.level = level;
         }
 
-        public List<CellsGivingDrop> getDrops() {
+        public List<CellsGivingDropChance> getDrops() {
             return drops;
         }
 
-        public void setDrops(List<CellsGivingDrop> drops) {
+        public void setDrops(List<CellsGivingDropChance> drops) {
             this.drops = drops;
         }
     }
 
     public static class CellsGivingDrop {
 
+        String name;
         String itemType;
-        BigDecimal chance;
-        int amount;
+        String colorPrefix;
+        Map<Integer, Integer> amountWeights;
 
-        public CellsGivingDrop(String itemType, BigDecimal chance, int amount) {
+        public CellsGivingDrop(String name, String itemType, Map<Integer, Integer> amountWeights, String colorPrefix) {
+            this.name = name;
             this.itemType = itemType;
-            this.chance = chance;
-            this.amount = amount;
+            this.amountWeights = amountWeights;
+            this.colorPrefix = colorPrefix;
         }
 
-        public int getAmount() {
-            return amount;
+        public String getName() {
+            return name;
         }
 
-        public void setAmount(int amount) {
-            this.amount = amount;
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public Map<Integer, Integer> getAmountWeights() {
+            return amountWeights;
+        }
+
+        public void setAmountWeights(Map<Integer, Integer> amountWeights) {
+            this.amountWeights = amountWeights;
+        }
+
+        public String getColorPrefix() {
+            return colorPrefix;
+        }
+
+        public void setColorPrefix(String colorPrefix) {
+            this.colorPrefix = colorPrefix;
         }
 
         public String getItemType() {
@@ -136,6 +207,25 @@ public class CellsGivingUtil extends FileUtil {
 
         public void setItemType(String itemType) {
             this.itemType = itemType;
+        }
+    }
+
+    public static class CellsGivingDropChance {
+
+        CellsGivingDrop drop;
+        BigDecimal chance;
+
+        public CellsGivingDropChance(CellsGivingDrop drop, BigDecimal chance) {
+            this.drop = drop;
+            this.chance = chance;
+        }
+
+        public CellsGivingDrop getDrop() {
+            return drop;
+        }
+
+        public void setDrop(CellsGivingDrop drop) {
+            this.drop = drop;
         }
 
         public BigDecimal getChance() {

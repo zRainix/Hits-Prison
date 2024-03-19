@@ -15,6 +15,7 @@ import java.util.HashMap;
 public class ScreenManager implements Manager {
 
     private ItemStack placeHolderItemStack;
+    private ItemStack borderItemStack;
     private HashMap<Player, Screen> playerScreen;
 
     @Override
@@ -28,10 +29,15 @@ public class ScreenManager implements Manager {
 
     private void buildPlaceholder() {
         placeHolderItemStack = new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).setDisplayName("§7").setAllItemFlags().build();
+        borderItemStack = new ItemBuilder(Material.BLACK_STAINED_GLASS_PANE).setDisplayName("§7").setAllItemFlags().build();
     }
 
     public ItemStack getPlaceHolderItemStack() {
         return placeHolderItemStack;
+    }
+
+    public ItemStack getBorderItemStack() {
+        return borderItemStack;
     }
 
     public Screen getCurrentScreen(Player player) {

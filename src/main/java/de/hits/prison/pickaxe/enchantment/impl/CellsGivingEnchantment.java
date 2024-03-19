@@ -20,6 +20,8 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.Random;
 
 @Component
@@ -35,7 +37,7 @@ public class CellsGivingEnchantment extends PickaxeEnchantmentImpl {
 
     private final Random random;
 
-    protected CellsGivingEnchantment() {
+    public CellsGivingEnchantment() {
         super("CellsGiving");
         this.random = new Random();
     }
@@ -57,16 +59,15 @@ public class CellsGivingEnchantment extends PickaxeEnchantmentImpl {
             return null;
         }
 
-        //returnCellsGivingDrop(cellsGivingEnchantment, cellsGivingLevel);
-        addCellsGivingItem(drop, prisonPlayer);
+        int amount = addCellsGivingItem(drop, prisonPlayer);
 
         PlayerCellsGiving playerCellsGiving = new PlayerCellsGivingDao().findByPrisonPlayerAndType(prisonPlayer, drop.getItemType());
-        MessageUtil.sendMessage(event.getPlayer(), "§7you found §b" + playerCellsGiving.getCellsGivingItem() + " (§c" + playerCellsGiving.getAmount() + "§b)");
+        MessageUtil.sendMessage(event.getPlayer(), "§7You found §6" + (amount == 1 ? "" : amount + "x§7 ") + drop.getColorPrefix() + drop.getItemType() + " §7(§c" + playerCellsGiving.getAmount() + "§7)");
 
         return null;
     }
 
-    public void addCellsGivingItem(CellsGivingUtil.CellsGivingDrop drop, PrisonPlayer prisonPlayer) {
+    public int addCellsGivingItem(CellsGivingUtil.CellsGivingDrop drop, PrisonPlayer prisonPlayer) {
         PlayerCellsGiving playerCellsGiving = playerCellsGivingDao.findByPrisonPlayerAndType(prisonPlayer, drop.getItemType());
         if(playerCellsGiving == null) {
             playerCellsGiving = new PlayerCellsGiving();
@@ -74,10 +75,20 @@ public class CellsGivingEnchantment extends PickaxeEnchantmentImpl {
             playerCellsGiving.setAmount(0L);
             playerCellsGiving.setRefPrisonPlayer(prisonPlayer);
             playerCellsGivingDao.save(playerCellsGiving);
+
         }
 
-        playerCellsGiving.setAmount(playerCellsGiving.getAmount() + drop.getAmount());
-        new PlayerCellsGivingDao().save(playerCellsGiving);
+        ArrayList<Integer> amounts = new ArrayList<>();
+        for (Map.Entry<Integer, Integer> entry : drop.getAmountWeights().entrySet()) {
+            for(int i = 0; i<entry.getValue(); i++) {
+                amounts.add(entry.getKey());
+            }
+        }
+        int amount = amounts.get(random.nextInt(amounts.size()));
+
+        playerCellsGiving.setAmount(playerCellsGiving.getAmount() + amount);
+        playerCellsGivingDao.save(playerCellsGiving);
+        return amount;
     }
 
     public CellsGivingUtil.CellsGivingDrop returnCellsGivingDrop(PlayerEnchantment cellsGivingEnchantment, CellsGivingUtil.CellsGivingLevel level) {
@@ -85,17 +96,13 @@ public class CellsGivingEnchantment extends PickaxeEnchantmentImpl {
         if(level == null) {
             return null;
         }
-        for(CellsGivingUtil.CellsGivingDrop drop : level.getDrops()) {
-            System.out.println(drop.getItemType());
-            BigDecimal chance = drop.getChance();
+        for(CellsGivingUtil.CellsGivingDropChance dropChance : level.getDrops()) {
+            BigDecimal chance = dropChance.getChance();
             BigDecimal randomNumber = BigDecimal.valueOf(random.nextFloat());
-            System.out.println(chance);
-            System.out.println(randomNumber);
-            System.out.println(chance.compareTo(randomNumber));
             if(randomNumber.compareTo(chance) >= 0) {
                 continue;
             }
-            return drop;
+            return dropChance.getDrop();
         }
 
         return null;

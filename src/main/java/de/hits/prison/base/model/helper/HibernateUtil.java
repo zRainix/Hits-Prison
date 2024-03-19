@@ -47,7 +47,7 @@ public class HibernateUtil {
                     logger.info("Remote MySQL enabled. Connecting to remote host.");
 
                     settings.put(Environment.DRIVER, "com.mysql.jdbc.Driver");
-                    settings.put(Environment.URL, "jdbc:mysql://" + settingsUtil.getHost() + ":" + settingsUtil.getPort() + "/" + settingsUtil.getDatabase());
+                    settings.put(Environment.URL, "jdbc:mysql://" + settingsUtil.getHost() + ":" + settingsUtil.getPort() + "/" + settingsUtil.getDatabase() + "?createDatabaseIfNotExist=true");
                     settings.put(Environment.USER, settingsUtil.getUser());
                     settings.put(Environment.PASS, settingsUtil.getPassword());
                 } else {

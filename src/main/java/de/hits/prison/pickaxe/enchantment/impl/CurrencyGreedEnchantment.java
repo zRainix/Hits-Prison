@@ -1,4 +1,9 @@
 package de.hits.prison.pickaxe.enchantment.impl;
 
-public class CurrencyGreedEnchantment {
+import de.hits.prison.pickaxe.enchantment.helper.PickaxeEnchantmentImpl;
+
+public class CurrencyGreedEnchantment extends PickaxeEnchantmentImpl {
+    public CurrencyGreedEnchantment() {
+        super("Currency Greed");
+    }
 }

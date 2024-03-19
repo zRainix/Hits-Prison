@@ -84,4 +84,12 @@ public class ScreenColumn {
     public void clear() {
         this.entries.clear();
     }
+
+    public int getStartColumn() {
+        return startColumn;
+    }
+
+    public int getStartRow() {
+        return startRow;
+    }
 }

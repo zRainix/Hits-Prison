@@ -41,6 +41,7 @@ public class KeyFinderUtil extends FileUtil {
                 String path = "Level." + keyFinderLevel.getLevel() + "." + drop.getItemName();
                 cfg.set(path + ".DisplayName", drop.getDisplayName());
                 cfg.set(path + ".Chance", drop.getChance().toString());
+                cfg.set(path + ".Rarity", drop.getRarity());
             }
         }
 
@@ -65,7 +66,8 @@ public class KeyFinderUtil extends FileUtil {
             for(String itemName : dropSection.getKeys(false)) {
                 String displayName = dropSection.getString(itemName + ".DisplayName", "key");
                 BigDecimal chance = new BigDecimal(dropSection.getString(itemName + ".Chance", "0"));
-                drops.add(new KeyFinderLevelDrop(displayName, itemName, chance));
+                KeyFinderRaritys rarity = KeyFinderRaritys.valueOf(dropSection.getString(itemName + "Rarity", "rarity"));
+                drops.add(new KeyFinderLevelDrop(displayName, itemName, chance, rarity));
             }
             this.keyFinderLevelList.add(new KeyFinderLevel(level, drops));
         }
@@ -114,14 +116,17 @@ public class KeyFinderUtil extends FileUtil {
 
     public static class KeyFinderLevelDrop {
 
-        String displayName;
-        String itemName;
-        BigDecimal chance;
+        private String displayName;
+        private String itemName;
+        private BigDecimal chance;
+        private KeyFinderRaritys rarity;
 
-        public KeyFinderLevelDrop(String displayName, String itemName, BigDecimal chance) {
+
+        public KeyFinderLevelDrop(String displayName, String itemName, BigDecimal chance, KeyFinderRaritys rarity) {
             this.displayName = displayName;
             this.itemName = itemName;
             this.chance = chance;
+            this.rarity = rarity;
         }
 
         public String getDisplayName() {
@@ -133,7 +138,11 @@ public class KeyFinderUtil extends FileUtil {
         }
 
         public String getItemName() {
-            return itemName;
+            return this.itemName;
+        }
+
+        public KeyFinderRaritys getRarity() {
+            return KeyFinderRaritys.valueOf(String.valueOf(this.rarity));
         }
 
         public void setItemName(String itemName) {
@@ -141,12 +150,24 @@ public class KeyFinderUtil extends FileUtil {
         }
 
         public BigDecimal getChance() {
-            return chance;
+            return this.chance;
         }
 
         public void setChance(BigDecimal chance) {
             this.chance = chance;
         }
+    }
+
+    public enum KeyFinderRaritys {
+
+        RARE,
+        LEGENDARY,
+        MYTHIC,
+        TOKEN,
+        RANK,
+        MONTHLY,
+        FLORAL;
+
     }
 
 }

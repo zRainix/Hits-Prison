@@ -111,7 +111,11 @@ public abstract class Screen {
         for (int i = 0; i < inventory.getSize(); i++) {
             ItemStack itemStack = inventory.getItem(i);
             if (itemStack == null || itemStack.getType().isAir()) {
-                inventory.setItem(i, screenManager.getPlaceHolderItemStack());
+                ItemStack placeHolder = screenManager.getPlaceHolderItemStack();
+                if (border && (i % 9 == 0 || i % 9 == 8 || i / 9 == 0 || i / 9 == (inventory.getSize() - 1) / 9)) {
+                    placeHolder = screenManager.getBorderItemStack();
+                }
+                inventory.setItem(i, placeHolder);
             }
         }
     }
