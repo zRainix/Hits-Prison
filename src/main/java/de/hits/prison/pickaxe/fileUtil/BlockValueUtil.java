@@ -6,6 +6,7 @@ import de.hits.prison.pickaxe.blocks.BlockValue;
 import de.hits.prison.pickaxe.blocks.BlockRarities;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.configuration.ConfigurationSection;
 
 import java.util.ArrayList;
@@ -62,6 +63,7 @@ public class BlockValueUtil extends FileUtil {
         if (blocksSection == null) {
             return;
         }
+        blockValues.clear();
 
         for (String blockTypeName : blocksSection.getKeys(false)) {
             Material material = Material.getMaterial(blockTypeName);

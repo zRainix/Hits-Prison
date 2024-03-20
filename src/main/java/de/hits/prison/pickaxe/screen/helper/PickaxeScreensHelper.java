@@ -44,7 +44,7 @@ public class PickaxeScreensHelper {
 
         itemBuilder
                 .addLoreHeading("Stats")
-                .addLore("§7Current level: §b" + playerLevel + (maxLevel ? " §8(§6Max§8)" : ""));
+                .addLore("§7Current level: " + (maxLevel ? "§6" : "§b") + playerLevel + "§8/§6" + enchantment.getMaxLevel());
 
         if (enchantment.getLevel(1).getActivationChance().compareTo(BigDecimal.valueOf(1D)) != 0) {
             PickaxeUtil.EnchantmentLevel enchantmentLevel = enchantment.getLevel(playerLevel);
@@ -136,7 +136,7 @@ public class PickaxeScreensHelper {
             return false;
         }
 
-        BigInteger playerBalance = prisonPlayer.getPlayerCurrency().getVolcanicAsh();
+        BigInteger playerBalance = prisonPlayer.getPlayerCurrency().getObsidianShards();
         BigInteger price = calculatePrice(enchantment, playerLevel, level);
 
         if(playerBalance.compareTo(price) < 0) {

@@ -94,7 +94,10 @@ public class PlayerDrops {
     }
 
     public static PlayerDrops generate(BlockValue blockValue) {
-        return new PlayerDrops(randomNumber(blockValue.getVolcanicAsh() / 2, blockValue.getVolcanicAsh()), randomNumber(blockValue.getVolcanicAsh() / 2, blockValue.getVolcanicAsh()), randomNumber(blockValue.getVolcanicAsh() / 2, blockValue.getVolcanicAsh()));
+        if(blockValue == null) {
+            return new PlayerDrops();
+        }
+        return new PlayerDrops(randomNumber(blockValue.getVolcanicAsh() / 2, blockValue.getVolcanicAsh()), randomNumber(blockValue.getObsidianShards() / 2, blockValue.getObsidianShards()), randomNumber(blockValue.getExp() / 2, blockValue.getExp()));
     }
 
     public static PlayerDrops generateRestricted(BlockValue blockValue, CubeEnchantment.DropFocus dropFocus) {

@@ -12,8 +12,8 @@ import java.util.Arrays;
 import java.util.List;
 
 public class ItemBuilder {
-    private final ItemStack item;
-    private final ItemMeta meta;
+    protected final ItemStack item;
+    protected final ItemMeta meta;
 
     private int repeats = 1;
 
