@@ -81,6 +81,7 @@ public class EnchantmentCommand extends AdvancedCommand {
                                   @CommandParameter(name = "player") PrisonPlayer prisonPlayer,
                                   @CommandParameter(name = "enchantment") PickaxeUtil.PickaxeEnchantment pickaxeEnchantment) {
         PlayerEnchantment playerEnchantment = playerEnchantmentDao.findByPrisonPlayerAndEnchantmentName(prisonPlayer, pickaxeEnchantment.getName());
+
         if (playerEnchantment == null) {
             MessageUtil.sendMessage(sender, "§cPlayer §6" + prisonPlayer.getPlayerName() + " §cdoes not have enchantment §6" + pickaxeEnchantment.getName() + "§c.");
             return;

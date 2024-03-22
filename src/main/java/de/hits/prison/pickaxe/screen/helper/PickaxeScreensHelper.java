@@ -16,7 +16,7 @@ import java.util.List;
 public class PickaxeScreensHelper {
 
     public static ItemStack buildEnchantmentItem(PickaxeUtil.PickaxeEnchantment enchantment, PlayerEnchantment playerEnchantment) {
-        List<Integer> nextLevels = getNextLevels(enchantment, playerEnchantment);
+        NextLevels nextLevels = getNextLevels(enchantment, playerEnchantment);
 
         ItemBuilder itemBuilder = new ItemBuilder(enchantment.getPreviewMaterial())
                 .setAllItemFlags()
@@ -26,7 +26,7 @@ public class PickaxeScreensHelper {
                 .addLoreWithPrefix("§7", enchantment.getDescription().split("\n"))
                 .addLoreBreak();
 
-        if (nextLevels != null && nextLevels.isEmpty()) {
+        if (nextLevels == null || nextLevels.isNotDefined()) {
             return itemBuilder.build();
         }
 
@@ -40,7 +40,7 @@ public class PickaxeScreensHelper {
             return itemBuilder.build();
         }
 
-        boolean maxLevel = nextLevels == null;
+        boolean maxLevel = nextLevels.isMaxLevel();
 
         itemBuilder
                 .addLoreHeading("Stats")
@@ -61,13 +61,13 @@ public class PickaxeScreensHelper {
         itemBuilder
                 .addLoreHeading("Next levels");
 
-        for (int level : nextLevels) {
+        for (int level : nextLevels.getNextLevels()) {
             PickaxeUtil.EnchantmentLevel enchantmentLevel = enchantment.getLevel(level);
             BigInteger price = calculatePrice(enchantment, playerLevel, level);
             String levelTitle = "§7Level §b" + level;
             if (level == 1) {
                 levelTitle += " §8(§aActivate Enchantment§8)";
-            } else if (level == enchantment.getMaxLevel()) {
+            } else if (level >= enchantment.getMaxLevel()) {
                 levelTitle += " §8(§6Max§8)";
             }
             levelTitle += "§7:";
@@ -83,30 +83,26 @@ public class PickaxeScreensHelper {
         return itemBuilder.build();
     }
 
-    /**
-     * Returns next levels to buy for given enchantment
-     *
-     * @param enchantment       pickaxe enchantment to get levels from
-     * @param playerEnchantment matching player enchantment
-     * @return list of next levels for player to buy
-     * if enchantment has no levels: empty list
-     * if player enchantment is null: only first level (buy)
-     * if player enchantment level is enchantment max level: returns null
-     * else returns player level + 1, player level + 10 (if possible) and max purchasable level
-     */
-    public static List<Integer> getNextLevels(PickaxeUtil.PickaxeEnchantment enchantment, PlayerEnchantment playerEnchantment) {
+    public static NextLevels getNextLevels(PickaxeUtil.PickaxeEnchantment enchantment, PlayerEnchantment playerEnchantment) {
         int maxLevel = enchantment.getMaxLevel();
 
         if (playerEnchantment != null && playerEnchantment.getEnchantmentLevel() >= maxLevel)
             return null;
 
-        if (enchantment.getEnchantmentLevels().isEmpty())
-            return List.of();
+        if (enchantment.getEnchantmentLevels().isEmpty()) {
+            return new NextLevels(List.of(), false, false, true);
+        }
 
-        if (playerEnchantment == null)
-            return List.of(1);
+        if (playerEnchantment == null) {
+            return new NextLevels(List.of(1), true, false, false);
+        }
 
         int playerLevel = playerEnchantment.getEnchantmentLevel();
+
+        if (playerLevel >= enchantment.getMaxLevel()) {
+            return new NextLevels(List.of(), false, true, false);
+        }
+
         PrisonPlayer prisonPlayer = playerEnchantment.getRefPrisonPlayer();
 
         List<Integer> levels = new ArrayList<>();
@@ -119,27 +115,72 @@ public class PickaxeScreensHelper {
             levels.add(plusTen);
 
         int maxPurchasableLevel = -1;
-        for(int level = playerLevel+2; level <= maxLevel; level++) {
-            if(!possibleToBuyLevel(prisonPlayer, enchantment, playerLevel, level)) {
+        for (int level = playerLevel + 2; level <= maxLevel; level++) {
+            if (!possibleToBuyLevel(prisonPlayer, enchantment, playerLevel, level)) {
                 break;
             }
             maxPurchasableLevel = level;
         }
-        if(maxPurchasableLevel != -1 && !levels.contains(maxPurchasableLevel))
+        if (maxPurchasableLevel != -1 && !levels.contains(maxPurchasableLevel))
             levels.add(maxPurchasableLevel);
 
-        return levels;
+        return new NextLevels(levels, false, false, false);
+    }
+
+    public static class NextLevels {
+
+        List<Integer> nextLevels;
+        boolean activation, maxLevel, notDefined;
+
+        public NextLevels(List<Integer> nextLevels, boolean activation, boolean maxLevel, boolean notDefined) {
+            this.nextLevels = nextLevels;
+            this.activation = activation;
+            this.maxLevel = maxLevel;
+            this.notDefined = notDefined;
+        }
+
+        public List<Integer> getNextLevels() {
+            return nextLevels;
+        }
+
+        public void setNextLevels(List<Integer> nextLevels) {
+            this.nextLevels = nextLevels;
+        }
+
+        public boolean isActivation() {
+            return activation;
+        }
+
+        public void setActivation(boolean activation) {
+            this.activation = activation;
+        }
+
+        public boolean isMaxLevel() {
+            return maxLevel;
+        }
+
+        public void setMaxLevel(boolean maxLevel) {
+            this.maxLevel = maxLevel;
+        }
+
+        public boolean isNotDefined() {
+            return notDefined;
+        }
+
+        public void setNotDefined(boolean notDefined) {
+            this.notDefined = notDefined;
+        }
     }
 
     public static boolean possibleToBuyLevel(PrisonPlayer prisonPlayer, PickaxeUtil.PickaxeEnchantment enchantment, int playerLevel, int level) {
-        if(enchantment.getLevel(level) == null) {
+        if (enchantment.getLevel(level) == null) {
             return false;
         }
 
         BigInteger playerBalance = prisonPlayer.getPlayerCurrency().getObsidianShards();
         BigInteger price = calculatePrice(enchantment, playerLevel, level);
 
-        if(playerBalance.compareTo(price) < 0) {
+        if (playerBalance.compareTo(price) < 0) {
             return false;
         }
         return true;
@@ -165,7 +206,7 @@ public class PickaxeScreensHelper {
         String displayName = "§8Buy Level: §b" + level;
         if (level == 1) {
             displayName += " §8(§aActivate Enchantment§8)";
-        } else if (level == enchantment.getMaxLevel()) {
+        } else if (level >= enchantment.getMaxLevel()) {
             displayName += " §8(§6Max§8)";
         }
 

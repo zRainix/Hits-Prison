@@ -43,17 +43,21 @@ public class EnchantmentUpdateScreen extends Screen {
 
     @Override
     protected void init() {
-        List<Integer> nextLevels = PickaxeScreensHelper.getNextLevels(enchantment, playerEnchantment);
+        PickaxeScreensHelper.NextLevels nextLevels = PickaxeScreensHelper.getNextLevels(enchantment, playerEnchantment);
         ItemStack preview = PickaxeScreensHelper.buildEnchantmentItem(enchantment, playerEnchantment);
-        if (nextLevels == null || nextLevels.isEmpty()) {
+
+        if (nextLevels == null || nextLevels.getNextLevels().isEmpty()) {
             setItem(4 + 9, preview, null);
             return;
         }
+
         setItem(4, preview, null);
-        int[] slots = getCenteredSlot(nextLevels.size());
-        for (int i = 0; i < nextLevels.size(); i++) {
+        List<Integer> nextLevelsList = nextLevels.getNextLevels();
+        int[] slots = getCenteredSlot(nextLevelsList.size());
+
+        for (int i = 0; i < nextLevelsList.size(); i++) {
             int slot = slots[i] + 9;
-            int level = nextLevels.get(i);
+            int level = nextLevelsList.get(i);
             int playerLevel = playerEnchantment != null ? playerEnchantment.getEnchantmentLevel() : 0;
             setItem(slot, PickaxeScreensHelper.buildLevelItem(enchantment, playerEnchantment, level), new ClickAction() {
                 @Override
@@ -73,13 +77,7 @@ public class EnchantmentUpdateScreen extends Screen {
                             playerCurrency.setObsidianShards(playerCurrency.getObsidianShards().subtract(price));
                             playerCurrencyDao.save(playerCurrency);
 
-                            PlayerEnchantment updatedEnchantment = playerEnchantment;
-                            if(updatedEnchantment == null) {
-                                updatedEnchantment = new PlayerEnchantment();
-                                updatedEnchantment.setRefPrisonPlayer(playerCurrency.getRefPrisonPlayer());
-                                updatedEnchantment.setEnchantmentName(enchantment.getName());
-                            }
-                            updatedEnchantment.setEnchantmentLevel(level);
+                            PlayerEnchantment updatedEnchantment = getPlayerEnchantment(playerCurrency);
                             playerEnchantmentDao.save(updatedEnchantment);
                             pickaxeHelper.checkPlayerInventory(player);
 
@@ -89,6 +87,17 @@ public class EnchantmentUpdateScreen extends Screen {
                                 MessageUtil.sendMessage(player, "§7Advanced Enchantment " + enchantment.getRarity().getColorPrefix() + enchantment.getName() + " §7to level §b" + level);
                             }
                             screenManager.openScreen(player, null);
+                        }
+
+                        private PlayerEnchantment getPlayerEnchantment(PlayerCurrency playerCurrency) {
+                            PlayerEnchantment updatedEnchantment = playerEnchantment;
+                            if(updatedEnchantment == null) {
+                                updatedEnchantment = new PlayerEnchantment();
+                                updatedEnchantment.setRefPrisonPlayer(playerCurrency.getRefPrisonPlayer());
+                                updatedEnchantment.setEnchantmentName(enchantment.getName());
+                            }
+                            updatedEnchantment.setEnchantmentLevel(level);
+                            return updatedEnchantment;
                         }
                     }, screen));
                 }

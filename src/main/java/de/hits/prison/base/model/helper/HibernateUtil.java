@@ -67,7 +67,7 @@ public class HibernateUtil {
                 settings.put(Environment.DIALECT, MySQL8Dialect.class.getName());
                 settings.put(Environment.HBM2DDL_AUTO, "update");
                 settings.put(Environment.PHYSICAL_NAMING_STRATEGY, CustomPhysicalNamingStrategy.class.getName());
-                settings.put(Environment.POOL_SIZE, "5");
+                settings.put(Environment.POOL_SIZE, "10");
                 settings.put(Environment.CURRENT_SESSION_CONTEXT_CLASS, "thread");
                 settings.put(Environment.SHOW_SQL, "false");
 
