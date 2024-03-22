@@ -17,20 +17,14 @@ import de.hits.prison.pickaxe.fileUtil.PickaxeUtil;
 import de.hits.prison.pickaxe.helper.PickaxeHelper;
 import de.hits.prison.pickaxe.helper.PlayerDrops;
 import de.hits.prison.server.util.MessageUtil;
-import org.bukkit.Bukkit;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.plugin.PluginLogger;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Random;
 import java.util.logging.Logger;
 
 @Component
@@ -55,8 +49,6 @@ public class BlockBreakListener implements Listener {
     private static BlockValueUtil blockValueUtil;
     @Autowired
     private static PickaxeUtil pickaxeUtil;
-
-    private final Random random = new Random();
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent e) {
@@ -112,24 +104,6 @@ public class BlockBreakListener implements Listener {
 
         playerEnchantments.forEach(playerEnchantment -> {
             pickaxeEnchantmentImplManager.getEnchantmentsImplementations().stream().filter(pickaxeEnchantmentImpl -> pickaxeEnchantmentImpl.getEnchantmentName().equals(playerEnchantment.getEnchantmentName())).forEach(pickaxeEnchantmentImpl -> {
-
-                PickaxeUtil.PickaxeEnchantment enchantment = pickaxeUtil.getPickaxeEnchantment(playerEnchantment.getEnchantmentName());
-                if(enchantment == null)
-                    return;
-
-                PickaxeUtil.EnchantmentLevel level = enchantment.getLevel(playerEnchantment.getEnchantmentLevel());
-                if(level == null)
-                    return;
-
-                BigDecimal activationChance =  level.getActivationChance();
-
-                if(activationChance.compareTo(BigDecimal.ONE) != 0) {
-                    BigDecimal activation = BigDecimal.valueOf(random.nextDouble());
-                    if(activationChance.compareTo(activation) < 0) {
-                        return;
-                    }
-                }
-
                 PlayerDrops extraDrop = pickaxeEnchantmentImpl.onBreak(prisonPlayer, playerDrops.clonePlayerDrops(), playerEnchantment, mineWorld, e);
                 if (extraDrop != null) {
                     extraPlayerDrops.add(extraDrop);
@@ -141,41 +115,4 @@ public class BlockBreakListener implements Listener {
 
         playerDrops.grantPlayer(player);
     }
-
-    public void executeJackhammerEnchantment(Player player, PlayerEnchantment blockEnchantment, BlockBreakEvent e) {
-        int mineWidth = 10, mineHeight = 12;
-
-        int maxSize = Math.max(mineWidth, mineHeight);
-
-        int mineX1 = 10;
-        int mineX2 = 20;
-        int mineZ1 = 10;
-        int mineZ2 = 20;
-
-        int blockX = e.getBlock().getX();
-        int blockZ = e.getBlock().getZ();
-
-        for (int offsetX = -maxSize; offsetX <= maxSize; offsetX++) {
-            for (int offsetZ = -maxSize; offsetZ <= maxSize; offsetZ++) {
-                int x = blockX + offsetX;
-                int z = blockZ + offsetZ;
-
-                if (!(x >= mineX1 && x <= mineX2) || !(z >= mineZ1 && z <= mineZ2)) {
-                    continue;
-                }
-
-                if (!(offsetX == 0 && offsetZ == 0)) {
-                    Block offset = e.getBlock().getRelative(offsetX, 0, offsetZ);
-                    if (offset.getType().isAir())
-                        continue;
-                    if (offset.getType() == Material.BEDROCK)
-                        continue;
-                    offset.setType(Material.AIR);
-                }
-
-            }
-        }
-    }
-
-
 }

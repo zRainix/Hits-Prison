@@ -26,7 +26,7 @@ public class JackhammerEnchantment extends PickaxeEnchantmentImpl {
 
     @Override
     public PlayerDrops onBreak(PrisonPlayer prisonPlayer, PlayerDrops playerDrops, PlayerEnchantment jackhammerEnchantment, MineWorld mineWorld, BlockBreakEvent event) {
-        int level = jackhammerEnchantment.getEnchantmentLevel();
+        if (!checkActivationChance(jackhammerEnchantment)) return null;
 
         Block block = event.getBlock();
 
@@ -43,16 +43,16 @@ public class JackhammerEnchantment extends PickaxeEnchantmentImpl {
 
         PlayerDrops extraDrops = new PlayerDrops();
 
-        for(int x = startX; x <= endX; x++) {
-            for(int z = startZ; z <= endZ; z++) {
-                if(x == blockX && z == blockZ)
+        for (int x = startX; x <= endX; x++) {
+            for (int z = startZ; z <= endZ; z++) {
+                if (x == blockX && z == blockZ)
                     continue;
 
                 Block jackhammerBlock = block.getWorld().getBlockAt(x, blockY, z);
 
-                if(!mineWorld.isMineBlock(jackhammerBlock))
+                if (!mineWorld.isMineBlock(jackhammerBlock))
                     continue;
-                if(jackhammerBlock.getType() == Material.AIR)
+                if (jackhammerBlock.getType() == Material.AIR)
                     continue;
 
                 jackhammerBlock.setType(Material.AIR);
