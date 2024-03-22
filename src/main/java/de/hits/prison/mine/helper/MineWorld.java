@@ -189,15 +189,7 @@ public class MineWorld {
         chunks.clear();
     }
 
-    public boolean isMineBlock(Block block) {
-        return isMineBlock(block.getLocation());
-    }
-
-    public boolean isMineBlock(Location location) {
-        int blockX = location.getBlockX();
-        int blockY = location.getBlockY();
-        int blockZ = location.getBlockZ();
-
+    public int[] getMineBounds() {
         Block centerBlock = currentMineCenterBlock;
         int size = currentMineSize;
         int depth = currentMineDepth;
@@ -208,6 +200,27 @@ public class MineWorld {
         int endX = startX + size - 1;
         int endY = startY + depth - 1;
         int endZ = startZ + size - 1;
+
+        return new int[]{startX, startY, startZ, endX, endY, endZ};
+    }
+
+    public boolean isMineBlock(Block block) {
+        return isMineBlock(block.getLocation());
+    }
+
+    public boolean isMineBlock(Location location) {
+        int blockX = location.getBlockX();
+        int blockY = location.getBlockY();
+        int blockZ = location.getBlockZ();
+
+        int[] bounds = getMineBounds();
+
+        int startX = bounds[0];
+        int startY = bounds[1];
+        int startZ = bounds[2];
+        int endX = bounds[3];
+        int endY = bounds[4];
+        int endZ = bounds[5];
 
         return (blockX >= startX && blockX <= endX) && (blockY >= startY && blockY <= endY) && (blockZ >= startZ && blockZ <= endZ);
     }
@@ -249,4 +262,5 @@ public class MineWorld {
     public void setPrisonPlayer(PrisonPlayer prisonPlayer) {
         this.prisonPlayer = prisonPlayer;
     }
+
 }

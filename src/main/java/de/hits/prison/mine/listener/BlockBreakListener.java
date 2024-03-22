@@ -13,6 +13,7 @@ import de.hits.prison.mine.helper.MineHelper;
 import de.hits.prison.mine.helper.MineWorld;
 import de.hits.prison.pickaxe.enchantment.helper.PickaxeEnchantmentImplManager;
 import de.hits.prison.pickaxe.fileUtil.BlockValueUtil;
+import de.hits.prison.pickaxe.fileUtil.PickaxeUtil;
 import de.hits.prison.pickaxe.helper.PickaxeHelper;
 import de.hits.prison.pickaxe.helper.PlayerDrops;
 import de.hits.prison.server.util.MessageUtil;
@@ -25,9 +26,11 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.plugin.PluginLogger;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.logging.Logger;
 
 @Component
@@ -50,6 +53,10 @@ public class BlockBreakListener implements Listener {
     private static PlayerMineDao playerMineDao;
     @Autowired
     private static BlockValueUtil blockValueUtil;
+    @Autowired
+    private static PickaxeUtil pickaxeUtil;
+
+    private final Random random = new Random();
 
     @EventHandler
     public void onBlockBreak(BlockBreakEvent e) {
@@ -105,6 +112,24 @@ public class BlockBreakListener implements Listener {
 
         playerEnchantments.forEach(playerEnchantment -> {
             pickaxeEnchantmentImplManager.getEnchantmentsImplementations().stream().filter(pickaxeEnchantmentImpl -> pickaxeEnchantmentImpl.getEnchantmentName().equals(playerEnchantment.getEnchantmentName())).forEach(pickaxeEnchantmentImpl -> {
+
+                PickaxeUtil.PickaxeEnchantment enchantment = pickaxeUtil.getPickaxeEnchantment(playerEnchantment.getEnchantmentName());
+                if(enchantment == null)
+                    return;
+
+                PickaxeUtil.EnchantmentLevel level = enchantment.getLevel(playerEnchantment.getEnchantmentLevel());
+                if(level == null)
+                    return;
+
+                BigDecimal activationChance =  level.getActivationChance();
+
+                if(activationChance.compareTo(BigDecimal.ONE) != 0) {
+                    BigDecimal activation = BigDecimal.valueOf(random.nextDouble());
+                    if(activationChance.compareTo(activation) < 0) {
+                        return;
+                    }
+                }
+
                 PlayerDrops extraDrop = pickaxeEnchantmentImpl.onBreak(prisonPlayer, playerDrops.clonePlayerDrops(), playerEnchantment, mineWorld, e);
                 if (extraDrop != null) {
                     extraPlayerDrops.add(extraDrop);

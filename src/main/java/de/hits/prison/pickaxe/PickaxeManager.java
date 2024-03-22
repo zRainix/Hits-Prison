@@ -7,6 +7,7 @@ import de.hits.prison.base.helper.Manager;
 import de.hits.prison.pickaxe.command.CellValueCommand;
 import de.hits.prison.pickaxe.command.EnchantmentCommand;
 import de.hits.prison.pickaxe.helper.PickaxeHelper;
+import de.hits.prison.pickaxe.listener.ClickPickaxeScreenListener;
 import de.hits.prison.pickaxe.listener.PickaxeFlagsListener;
 import org.bukkit.plugin.PluginManager;
 
@@ -24,6 +25,7 @@ public class PickaxeManager implements Manager {
 
         // Listener
         pluginManager.registerEvents(new PickaxeFlagsListener(), hitsPrison);
+        pluginManager.registerEvents(new ClickPickaxeScreenListener(), hitsPrison);
 
         AutowiredManager.register(new PickaxeHelper());
     }

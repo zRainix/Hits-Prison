@@ -49,12 +49,8 @@ public class KeyFinderEnchantment extends PickaxeEnchantmentImpl {
         }
 
         for(KeyFinderUtil.KeyFinderLevelDrop drop : keyFinderLevel.getDrops()) {
-            System.out.println(drop.getDisplayName());
             BigDecimal chance = drop.getChance();
             BigDecimal randomNumber = BigDecimal.valueOf(random.nextFloat());
-            System.out.println(chance);
-            System.out.println(randomNumber);
-            System.out.println(chance.compareTo(randomNumber));
             if(randomNumber.compareTo(chance) >= 0) {
                 continue;
             }
