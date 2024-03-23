@@ -5,13 +5,13 @@ import de.hits.prison.base.autowire.anno.Component;
 import de.hits.prison.base.autowire.helper.AutowiredManager;
 import de.hits.prison.base.fileUtil.anno.SettingsFile;
 import de.hits.prison.base.model.helper.ClassScanner;
-import org.bukkit.Bukkit;
-import org.bukkit.plugin.PluginLogger;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Component
@@ -64,7 +64,14 @@ public class FileUtilManager {
                 SettingsFile settingsFile = settingsUtil.getAnnotation(SettingsFile.class);
 
                 if (FileUtil.class.isAssignableFrom(settingsUtil.getSuperclass())) {
-                    FileUtil fileUtil = (FileUtil) settingsUtil.getConstructor().newInstance();
+
+                    System.out.println(settingsUtil);
+                    System.out.println(settingsFile);
+
+                    Constructor<?> constructor = settingsUtil.getConstructor();
+                    constructor.setAccessible(true);
+
+                    FileUtil fileUtil = (FileUtil) constructor.newInstance();
                     registerFileUtil(fileUtil);
 
                     if (settingsFile.autoInit()) {
@@ -78,7 +85,7 @@ public class FileUtilManager {
                 }
             }
         } catch (NoSuchMethodException | InstantiationException | IllegalAccessException | InvocationTargetException e) {
-            logger.severe("Error while initializing file utils: " + e.getMessage());
+            logger.log(Level.SEVERE,"Error while initializing file utils: " + e.getMessage(), e);
         }
     }
 
